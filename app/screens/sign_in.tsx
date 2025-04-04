@@ -8,6 +8,7 @@ import CustomTextInput from '../components/inputs/custom_text_input1';
 import Button1 from '../components/buttons/button1';
 import CustomCheckbox1 from '../components/inputs/custom_checkbox1';
 import ClickableText from '../components/inputs/custom_text';
+import { router } from 'expo-router';
 
 const SignIn = () => {
     const [email, setEmail] = useState('');
@@ -58,7 +59,7 @@ const SignIn = () => {
                 <Button1 title="Sign In" isPrimary={true} borderRadius={15} onPress={() => { }} />
                 <View style={styles.container3}>
                     <Text style={styles.accountReg}>Don't have an account?</Text>
-                    <TouchableOpacity style={styles.clicker}>
+                    <TouchableOpacity style={styles.clicker} onPress={() => {router.push('./screens/sign_up')}}>
                         <Text style={styles.signup}>Sign up</Text>
                     </TouchableOpacity>
                 </View>
