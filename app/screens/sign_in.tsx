@@ -1,0 +1,119 @@
+import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
+import dimensions from '../../app/utils/sizing';
+import React, { useState } from 'react';
+import MainCont from '../components/general/background';
+import Title1 from '../components/texts/title1';
+import Subtitle1 from '../components/texts/subtitle1';
+import CustomTextInput from '../components/inputs/custom_text_input1';
+import Button1 from '../components/buttons/button1';
+import CustomCheckbox1 from '../components/inputs/custom_checkbox1';
+import ClickableText from '../components/inputs/custom_text';
+
+const SignIn = () => {
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [isChecked, setIsChecked] = useState(false);
+
+    const handleCheckboxChange = (newValue: boolean) => {
+        setIsChecked(newValue);
+    };
+
+    return (
+        <MainCont>
+            <Image
+                source={require('../assets/images/general/furry-fresh-logo.png')}
+                style={styles.loaderImage}
+            />
+            <Subtitle1 text="PET GROOMING • QUALITY SUPPLIES" />
+            <View style={styles.container1}>
+                <Title1 text='Sign In' fontSize={dimensions.screenWidth * 0.05} />
+                <Subtitle1 text="Enter your Email and Password" fontFamily="Poppins-Regular" fontSize={dimensions.screenWidth * 0.03}/>
+            </View>
+            <View style={styles.container1}>
+                <CustomTextInput
+                    label="Email"
+                    value={email}
+                    onChangeText={setEmail}
+                    placeholder="Enter your email"
+                    iconName="email"
+                    keyboardType="email-address"
+                />
+                <CustomTextInput
+                    value={password}
+                    label="Password"
+                    onChangeText={setPassword}
+                    placeholder="Enter your password"
+                    secureTextEntry={true}
+                    iconName="lock"
+                    marginBottom={0}
+                />
+                <View style={styles.container2}>
+                    <CustomCheckbox1
+                        label="Remember Me"
+                        value={isChecked}
+                        onValueChange={handleCheckboxChange}
+                    />
+                    <ClickableText fontSize={dimensions.screenWidth * 0.036} color='#ED7964' onPress={() => { console.log('Redirecting') }}>Forgot Password?</ClickableText>
+                </View>
+                <Button1 title="Sign In" isPrimary={true} borderRadius={15} onPress={() => { }} />
+                <View style={styles.container3}>
+                    <Text style={styles.accountReg}>Don't have an account?</Text>
+                    <TouchableOpacity style={styles.clicker}>
+                        <Text style={styles.signup}>Sign up</Text>
+                    </TouchableOpacity>
+                </View>
+            </View>
+        </MainCont>
+    );
+};
+
+export default SignIn;
+
+const styles = StyleSheet.create({
+    loaderImage: {
+        alignSelf: 'center',
+        marginTop: dimensions.screenHeight * 0.07,
+        width: dimensions.screenWidth * 0.27,
+        height: dimensions.screenWidth * 0.27
+    },
+    container1: {
+        alignItems: 'flex-start',
+        marginTop: dimensions.screenHeight * 0.04,
+        paddingHorizontal: dimensions.screenWidth * 0.035
+    },
+    container2: {
+        display: 'flex',
+        width: '100%',
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: dimensions.screenHeight * 0.03,
+    },
+    container3: {
+        alignItems: 'center',
+        justifyContent: 'center',
+        width: '100%',
+        flexDirection: 'row',
+        margin: 0,
+        padding: 0,
+        marginTop: dimensions.screenHeight * 0.04
+      },
+      accountReg: {
+        fontFamily: 'Poppins-Regular',
+        alignSelf: 'center',
+        textAlign: 'center',
+        margin: 0,
+        padding: 0,
+        lineHeight: 20,
+        opacity: 0.6
+      },
+      clicker: {
+        marginLeft: 5,
+      },
+      signup: {
+        fontFamily: 'Poppins-SemiBold',
+        textAlign: 'center',
+        lineHeight: 20, 
+        color: '#ED7964',
+      },
+});
