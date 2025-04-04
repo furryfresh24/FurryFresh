@@ -1,13 +1,13 @@
 import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
-import dimensions from '../../app/utils/sizing';
+import dimensions from '../../utils/sizing';
 import React, { useState } from 'react';
-import MainCont from '../components/general/background';
-import Title1 from '../components/texts/title1';
-import Subtitle1 from '../components/texts/subtitle1';
-import CustomTextInput from '../components/inputs/custom_text_input1';
-import Button1 from '../components/buttons/button1';
-import CustomCheckbox1 from '../components/inputs/custom_checkbox1';
-import ClickableText from '../components/inputs/custom_text';
+import MainCont from '../../components/general/background';
+import Title1 from '../../components/texts/title1';
+import Subtitle1 from '../../components/texts/subtitle1';
+import CustomTextInput from '../../components/inputs/custom_text_input1';
+import Button1 from '../../components/buttons/button1';
+import CustomCheckbox1 from '../../components/inputs/custom_checkbox1';
+import ClickableText from '../../components/inputs/custom_text';
 import { router } from 'expo-router';
 
 const SignIn = () => {
@@ -20,9 +20,9 @@ const SignIn = () => {
     };
 
     return (
-        <MainCont>
+        <MainCont showPetImage={true}>
             <Image
-                source={require('../assets/images/general/furry-fresh-logo.png')}
+                source={require('../../assets/images/general/furry-fresh-logo.png')}
                 style={styles.loaderImage}
             />
             <Subtitle1 text="PET GROOMING • QUALITY SUPPLIES" />
@@ -59,9 +59,9 @@ const SignIn = () => {
                 <Button1 title="Sign In" isPrimary={true} borderRadius={15} onPress={() => { }} />
                 <View style={styles.container3}>
                     <Text style={styles.accountReg}>Don't have an account?</Text>
-                    <TouchableOpacity style={styles.clicker} onPress={() => {router.push('./screens/sign_up')}}>
+                    <TouchableOpacity style={styles.clicker} onPress={() => {router.push('./screens/auth/sign_up_1')}}>
                         <Text style={styles.signup}>Sign up</Text>
-                    </TouchableOpacity>
+                    </TouchableOpacity> 
                 </View>
             </View>
         </MainCont>

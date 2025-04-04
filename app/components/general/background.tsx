@@ -6,9 +6,10 @@ import { LinearGradient } from 'expo-linear-gradient';
 
 interface MainContProps {
   children: React.ReactNode;
+  showPetImage?: boolean;
 }
 
-const MainCont: React.FC<MainContProps> = ({ children }) => {
+const MainCont: React.FC<MainContProps> = ({ children, showPetImage = false }) => {
   return (
     <View style={styles.container}>
       <LinearGradient
@@ -21,10 +22,16 @@ const MainCont: React.FC<MainContProps> = ({ children }) => {
         style={[styles.circle, styles.bottomLeftCircle]}
       />
 
-      <Image 
+      
+       {
+        showPetImage ? (
+          <Image 
         source={require('../../assets/images/general/pet-enjoy.png')}
         style={styles.petenjoy} 
        />
+        ) : (<></>)
+
+       }
 
       {children}
     </View>

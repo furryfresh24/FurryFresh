@@ -70,7 +70,8 @@ const RootLayout = () => {
       <Stack>
         <Stack.Screen name="index" options={{ headerShown: false }} />
         <Stack.Screen name="screens/get_started" options={{ headerTitle: 'Home' }} />
-        <Stack.Screen name="screens/sign_up" options={{ headerShown: false }} />
+        <Stack.Screen name="screens/auth/sign_in" options={{ headerShown: false }} />
+        <Stack.Screen name="screens/auth/sign_up_1" options={{ headerShown: false }} />
       </Stack>
     </ThemeProvider>
   );

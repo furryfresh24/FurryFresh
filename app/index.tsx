@@ -3,7 +3,7 @@ import { View, Text, Pressable, StyleSheet, ActivityIndicator } from 'react-nati
 import { router, useLocalSearchParams } from 'expo-router'; // Use searchParams to access passed props
 import Button1 from '../app/components/buttons/button1';
 import GetStarted from '../app/screens/get_started';
-import SignIn from '../app/screens/sign_in';
+import SignIn from '../app/screens/auth/sign_in';
 
 const MainPage = () => {
   const { isFirstTime } = useLocalSearchParams(); 

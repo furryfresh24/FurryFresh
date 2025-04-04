@@ -1,12 +1,12 @@
 import { StyleSheet, Text, View } from 'react-native'
 import React from 'react'
-import MainCont from '../components/general/background'
+import MainCont from '../../components/general/background'
 
 type Props = {}
 
 const SignUp = (props: Props) => {
   return (
-    <MainCont>
+    <MainCont showPetImage={true}>
       <Text>SignUp</Text>
     </MainCont>
   )
