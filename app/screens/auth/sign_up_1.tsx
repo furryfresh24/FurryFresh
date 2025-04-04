@@ -16,7 +16,7 @@ const SignUp = (props: Props) => {
   const [password, setPassword] = useState('');
 
   return (
-    <MainCont showPetImage={true} paddingHorizontal={dimensions.screenWidth * 0.02}>
+    <MainCont showPetImage={true} paddingHorizontal={dimensions.screenWidth * 0.03}>
       <View style={styles.header}>
         <Title1 
           text='Sign Up' 
