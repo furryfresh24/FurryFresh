@@ -3,13 +3,19 @@ import dimensions from '../../utils/sizing';
 import React from 'react';
 import { LinearGradient } from 'expo-linear-gradient';
 
-
 interface MainContProps {
   children: React.ReactNode;
   showPetImage?: boolean;
+  paddingHorizontal?: number | null;
+  paddingVertical?: number | null;
 }
 
-const MainCont: React.FC<MainContProps> = ({ children, showPetImage = false }) => {
+const MainCont: React.FC<MainContProps> = ({
+  children,
+  showPetImage = false,
+  paddingHorizontal = null,
+  paddingVertical = null,
+}) => {
   return (
     <View style={styles.container}>
       <LinearGradient
@@ -22,18 +28,16 @@ const MainCont: React.FC<MainContProps> = ({ children, showPetImage = false }) =
         style={[styles.circle, styles.bottomLeftCircle]}
       />
 
-      
-       {
-        showPetImage ? (
-          <Image 
-        source={require('../../assets/images/general/pet-enjoy.png')}
-        style={styles.petenjoy} 
-       />
-        ) : (<></>)
+      {showPetImage && (
+        <Image 
+          source={require('../../assets/images/general/pet-enjoy.png')}
+          style={styles.petenjoy} 
+        />
+      )}
 
-       }
-
-      {children}
+      <View style={{ paddingHorizontal, paddingVertical }}>
+        {children}
+      </View>
     </View>
   );
 };

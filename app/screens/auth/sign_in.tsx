@@ -38,6 +38,7 @@ const SignIn = () => {
                     placeholder="Enter your email"
                     iconName="email"
                     keyboardType="email-address"
+                    marginBottom={dimensions.screenHeight * 0.03}
                 />
                 <CustomTextInput
                     value={password}
@@ -46,7 +47,7 @@ const SignIn = () => {
                     placeholder="Enter your password"
                     secureTextEntry={true}
                     iconName="lock"
-                    marginBottom={0}
+                    marginBottom={dimensions.screenHeight * 0.005}
                 />
                 <View style={styles.container2}>
                     <CustomCheckbox1

@@ -5,13 +5,31 @@ import dimensions from '../../utils/sizing';
 interface SubtitleProps {
   text: string;
   style?: TextStyle;
-  fontFamily?: string; // fontFamily is optional
-  fontSize?: number
+  fontFamily?: string;
+  fontSize?: number;
+  color?: string;
+  opacity?: number; 
 }
 
-const Subtitle1: React.FC<SubtitleProps> = ({ text, style, fontFamily, fontSize }) => {
+const Subtitle1: React.FC<SubtitleProps> = ({
+  text,
+  style,
+  fontFamily,
+  fontSize,
+  color = '#808080', 
+  opacity = 1, 
+}) => {
   return (
-    <Text style={[styles.Subtitle, fontFamily ? { fontFamily } : null, style, fontSize ? { fontSize } : null]}>
+    <Text
+      style={[
+        styles.Subtitle,
+        fontFamily ? { fontFamily } : null,
+        style,
+        fontSize ? { fontSize } : null,
+        color ? { color } : null,
+        opacity !== undefined ? { opacity } : null,
+      ]}
+    >
       {text}
     </Text>
   );
@@ -19,9 +37,9 @@ const Subtitle1: React.FC<SubtitleProps> = ({ text, style, fontFamily, fontSize 
 
 const styles = StyleSheet.create({
   Subtitle: {
-    fontSize: dimensions.screenWidth * 0.027, 
-    fontFamily: "Poppins-SemiBold",
-    color: '#808080',
+    fontSize: dimensions.screenWidth * 0.027,
+    fontFamily: 'Poppins-SemiBold',
+    color: '#808080', 
     letterSpacing: 0.8,
     textAlign: 'center',
     margin: 0,

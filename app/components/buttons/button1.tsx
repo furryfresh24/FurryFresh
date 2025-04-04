@@ -37,7 +37,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: 25,
-    paddingVertical: dimensions.screenHeight * 0.014,
+    paddingVertical: dimensions.screenHeight * 0.017,
     width: '100%', // Makes the button take full width of its container
   },
   primaryButton: {
@@ -48,7 +48,7 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     color: '#fff',
-    fontSize: dimensions.screenWidth * 0.043,
+    fontSize: dimensions.screenWidth * 0.045,
     marginTop: dimensions.screenHeight * 0.001,
     fontFamily: 'Poppins-SemiBold',
   },
