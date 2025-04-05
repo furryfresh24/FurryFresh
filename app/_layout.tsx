@@ -20,7 +20,6 @@ const RootLayout = () => {
 
       if (firstTime === null) {
         setIsFirstTime(true);
-        await AsyncStorage.setItem('getStarted5', 'false');
       } else {
         setIsFirstTime(false);
       }
@@ -38,7 +37,7 @@ const RootLayout = () => {
 
   useEffect(() => {
     if (appReady && isFirstTime === true) {
-      router.replace('/screens/get_started');
+      router.replace('/screens/onboarding/get_started');
     }
   }, [appReady, isFirstTime]);
 
@@ -57,7 +56,7 @@ const RootLayout = () => {
     <ThemeProvider>
       <Stack>
         <Stack.Screen name="index" options={{ headerShown: false }} />
-        <Stack.Screen name="screens/get_started" options={{ headerShown: false }} />
+        <Stack.Screen name="screens/onboarding/get_started" options={{ headerShown: false }} />
         <Stack.Screen name="screens/auth/sign_in" options={{ headerShown: false }} />
         <Stack.Screen name="screens/auth/sign_up_1" options={{ headerShown: false }} />
       </Stack>

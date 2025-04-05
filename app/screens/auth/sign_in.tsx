@@ -20,7 +20,7 @@ const SignIn = () => {
     };
 
     return (
-        <MainCont showPetImage={true}>
+        <MainCont showPetImage={true} paddingHorizontal={dimensions.screenWidth * 0.04}>
             <Image
                 source={require('../../assets/images/general/furry-fresh-logo.png')}
                 style={styles.loaderImage}

@@ -48,7 +48,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#F8F8FF',
-    padding: 16,
     position: 'relative',
   },
   circle: {

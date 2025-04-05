@@ -61,7 +61,7 @@ const CustomTextInput: React.FC<CustomTextInputProps> = ({
   const labelStyle = {
     top: labelPosition.interpolate({
       inputRange: [0, 1],
-      outputRange: [dimensions.screenHeight * 0.022, dimensions.screenHeight * 0.01],
+      outputRange: [dimensions.screenHeight * 0.022, dimensions.screenHeight * 0.006],
     }),
     left: labelPosition.interpolate({
       inputRange: [0, 1],
@@ -130,12 +130,12 @@ const styles = StyleSheet.create({
     backgroundColor: '#F8F8FF',
     borderRadius: 15,
     paddingHorizontal: dimensions.screenWidth * 0.05,
-    height: dimensions.screenHeight * 0.072,
+    height: dimensions.screenHeight * 0.074,
     borderWidth: 2,
     position: "relative",
   },
   icon: {
-    marginRight: dimensions.screenWidth * 0.05,
+    marginRight: dimensions.screenWidth * 0.03,
   },
   input: {
     flex: 1,

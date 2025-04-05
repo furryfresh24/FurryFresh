@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
 import { View, Text, Pressable, StyleSheet, ActivityIndicator } from 'react-native';
-import { router, useLocalSearchParams } from 'expo-router'; // Use searchParams to access passed props
+import { router, useLocalSearchParams } from 'expo-router'; 
 import Button1 from '../app/components/buttons/button1';
-import GetStarted from '../app/screens/get_started';
+import GetStarted from '../app/screens/onboarding/get_started';
 import SignIn from '../app/screens/auth/sign_in';
 
 const MainPage = () => {
@@ -42,6 +42,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    backgroundColor: 'red'
   },
 });
 
