@@ -30,7 +30,7 @@ const GetStarted = () => {
 
   const handleGetStarted = async () => {
     if (currentIndex === slides.length - 1) {
-      await AsyncStorage.setItem('getStarted6', 'false');
+      await AsyncStorage.setItem('getStarted7', 'false');
       router.replace('../auth/sign_in'); 
     } else {
       handleNext();

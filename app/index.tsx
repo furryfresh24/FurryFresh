@@ -1,9 +1,6 @@
-import { useEffect, useState } from 'react';
-import { View, Text, Pressable, StyleSheet, ActivityIndicator } from 'react-native';
-import { router, useLocalSearchParams } from 'expo-router'; 
-import Button1 from '../app/components/buttons/button1';
+import { View, StyleSheet, ActivityIndicator, Image } from 'react-native';
+import { useLocalSearchParams } from 'expo-router'; 
 import GetStarted from '../app/screens/onboarding/get_started';
-import SignIn from '../app/screens/auth/sign_in';
 
 const MainPage = () => {
   const { isFirstTime } = useLocalSearchParams(); 
@@ -20,20 +17,13 @@ const MainPage = () => {
     return <GetStarted />;
   }
 
-  if(false) {
-    return (
-    <View style={styles.container}>
-      <Text>Home Page</Text>
-      <Pressable onPress={() => router.push('/screens/get_started')}>
-        <Text>Get Started</Text>
-      </Pressable>
-      <Button1 title="Get Started" isPrimary={false} onPress={() => {}} />
-    </View>
-    );
-  }
-
   return (
-    <SignIn />
+    <View style={styles.container}>
+      <Image
+        source={require('./assets/images/general/furry-fresh-logo.png')}
+        style={styles.loaderImage}
+      />
+    </View>
   );
 };
 
@@ -42,8 +32,13 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'red'
+    backgroundColor: '#F8F8FF',
   },
-});
+  loaderImage: {
+    width: 130,
+    height: 130,
+    resizeMode: 'contain',
+  },
+}); 
 
 export default MainPage;

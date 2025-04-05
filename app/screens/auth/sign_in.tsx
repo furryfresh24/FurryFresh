@@ -1,4 +1,4 @@
-import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, Image, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import dimensions from '../../utils/sizing';
 import React, { useState } from 'react';
 import MainCont from '../../components/general/background';
@@ -8,16 +8,44 @@ import CustomTextInput from '../../components/inputs/custom_text_input1';
 import Button1 from '../../components/buttons/button1';
 import CustomCheckbox1 from '../../components/inputs/custom_checkbox1';
 import ClickableText from '../../components/inputs/custom_text';
+import supabase from '../../utils/supabase';
 import { router } from 'expo-router';
 
 const SignIn = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [isChecked, setIsChecked] = useState(false);
+    const [loading, setLoading] = useState(false);
 
     const handleCheckboxChange = (newValue: boolean) => {
         setIsChecked(newValue);
     };
+
+    async function signInWithEmail() {
+        setLoading(true)
+        const { error } = await supabase.auth.signInWithPassword({
+          email: email,
+          password: password,
+        })
+    
+        if (error) Alert.alert(error.message)
+        setLoading(false)
+    }
+
+    async function signUpWithEmail() {
+        setLoading(true)
+        const {
+          data: { session },
+          error,
+        } = await supabase.auth.signUp({
+          email: email,
+          password: password,
+        })
+    
+        if (error) Alert.alert(error.message)
+        if (!session) Alert.alert('Please check your inbox for email verification!')
+        setLoading(false)
+    }
 
     return (
         <MainCont showPetImage={true} paddingHorizontal={dimensions.screenWidth * 0.04}>
@@ -57,7 +85,7 @@ const SignIn = () => {
                     />
                     <ClickableText fontSize={dimensions.screenWidth * 0.036} color='#ED7964' onPress={() => { console.log('Redirecting') }}>Forgot Password?</ClickableText>
                 </View>
-                <Button1 title="Sign In" isPrimary={true} borderRadius={15} onPress={() => { }} />
+                <Button1 title="Sign In" isPrimary={true} borderRadius={15} onPress={() => signInWithEmail()} />
                 <View style={styles.container3}>
                     <Text style={styles.accountReg}>Don't have an account?</Text>
                     <TouchableOpacity style={styles.clicker} onPress={() => {router.push('./screens/auth/sign_up_1')}}>

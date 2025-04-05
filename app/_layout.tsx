@@ -1,22 +1,42 @@
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Stack, useRouter } from 'expo-router';
-import { View, StyleSheet, Image } from 'react-native';
 import * as SplashScreen from 'expo-splash-screen';
 import useCustomFonts from './hooks/useFonts';
 import ThemeProvider from './providers/ThemeProvider';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import supabase from './utils/supabase'; 
+import { Session } from '@supabase/supabase-js';
+
 
 const RootLayout = () => {
   const fontsLoaded = useCustomFonts();
   const [appReady, setAppReady] = useState(false);
   const [isFirstTime, setIsFirstTime] = useState<boolean | null>(null);
+  const [session, setSession] = useState<Session | null>(null); 
   const router = useRouter();
+
+  useEffect(() => {
+    const fetchSession = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      setSession(session);
+    };
+    
+    fetchSession();
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session);
+    });
+
+    return () => {
+      subscription?.unsubscribe();
+    };
+  }, []);
 
   useEffect(() => {
     const prepare = async () => {
       await SplashScreen.preventAutoHideAsync();
 
-      const firstTime = await AsyncStorage.getItem('getStarted6');
+      const firstTime = await AsyncStorage.getItem('getStarted7');
 
       if (firstTime === null) {
         setIsFirstTime(true);
@@ -38,19 +58,12 @@ const RootLayout = () => {
   useEffect(() => {
     if (appReady && isFirstTime === true) {
       router.replace('/screens/onboarding/get_started');
+    } else if (appReady && session && session.user) {
+      router.replace('/screens/(tabs)'); 
+    } else if (appReady && !session) {
+      router.replace('/screens/auth/sign_in');
     }
-  }, [appReady, isFirstTime]);
-
-  if (!appReady || isFirstTime === null) {
-    return (
-      <View style={styles.container}>
-        <Image
-          source={require('./assets/images/general/furry-fresh-logo.png')}
-          style={styles.loaderImage}
-        />
-      </View>
-    );
-  }
+  }, [appReady, isFirstTime, session, router]);
 
   return (
     <ThemeProvider>
@@ -59,23 +72,10 @@ const RootLayout = () => {
         <Stack.Screen name="screens/onboarding/get_started" options={{ headerShown: false }} />
         <Stack.Screen name="screens/auth/sign_in" options={{ headerShown: false }} />
         <Stack.Screen name="screens/auth/sign_up_1" options={{ headerShown: false }} />
+        <Stack.Screen name="screens/(tabs)" options={{ headerShown: false }} />
       </Stack>
     </ThemeProvider>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#F8F8FF',
-  },
-  loaderImage: {
-    width: 130,
-    height: 130,
-    resizeMode: 'contain',
-  },
-});
 
 export default RootLayout;
