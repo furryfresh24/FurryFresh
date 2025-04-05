@@ -9,6 +9,7 @@ interface SubtitleProps {
   fontSize?: number;
   color?: string;
   opacity?: number; 
+  marginTop?: number;
 }
 
 const Subtitle1: React.FC<SubtitleProps> = ({
@@ -18,6 +19,7 @@ const Subtitle1: React.FC<SubtitleProps> = ({
   fontSize,
   color = '#808080', 
   opacity = 1, 
+  marginTop = 0
 }) => {
   return (
     <Text
@@ -28,6 +30,7 @@ const Subtitle1: React.FC<SubtitleProps> = ({
         fontSize ? { fontSize } : null,
         color ? { color } : null,
         opacity !== undefined ? { opacity } : null,
+        marginTop ? { marginTop } : null
       ]}
     >
       {text}

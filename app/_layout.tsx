@@ -16,11 +16,11 @@ const RootLayout = () => {
     const prepare = async () => {
       await SplashScreen.preventAutoHideAsync();
 
-      const firstTime = await AsyncStorage.getItem('getStarted5');
+      const firstTime = await AsyncStorage.getItem('getStarted6');
 
       if (firstTime === null) {
         setIsFirstTime(true);
-        await AsyncStorage.setItem('getStarted1', 'false');
+        await AsyncStorage.setItem('getStarted5', 'false');
       } else {
         setIsFirstTime(false);
       }
@@ -57,7 +57,7 @@ const RootLayout = () => {
     <ThemeProvider>
       <Stack>
         <Stack.Screen name="index" options={{ headerShown: false }} />
-        <Stack.Screen name="screens/get_started" options={{ headerTitle: 'Home' }} />
+        <Stack.Screen name="screens/get_started" options={{ headerShown: false }} />
         <Stack.Screen name="screens/auth/sign_in" options={{ headerShown: false }} />
         <Stack.Screen name="screens/auth/sign_up_1" options={{ headerShown: false }} />
       </Stack>
