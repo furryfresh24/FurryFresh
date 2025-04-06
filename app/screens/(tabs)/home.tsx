@@ -1,15 +1,16 @@
-import { View, Text, StyleSheet, TouchableOpacity, Image, FlatList } from 'react-native'
-import React, { useState, useEffect } from 'react'
-import { Ionicons } from '@expo/vector-icons'
-import MainContPlain from '../../components/general/background_plain'
-import dimensions from '../../utils/sizing'
-import { router } from 'expo-router'
-import supabase from '../../utils/supabase'
-import { Session } from '@supabase/supabase-js'
-import PetCareIcon from '../../components/svgs/home/PetCareIcon'
-import PetSuppliesIcon from '../../components/svgs/home/PetSuppliesIcon'
-import Voucher from '../../interfaces/voucher'
-import VoucherTemp1 from '../../components/vouchers/voucher1'
+import { View, Text, StyleSheet, TouchableOpacity, Image, FlatList } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { Ionicons } from '@expo/vector-icons';
+import MainContPlain from '../../components/general/background_plain';
+import dimensions from '../../utils/sizing';
+import { router } from 'expo-router';
+import supabase from '../../utils/supabase';
+import { Session } from '@supabase/supabase-js';
+import PetCareIcon from '../../components/svgs/home/PetCareIcon';
+import PetSuppliesIcon from '../../components/svgs/home/PetSuppliesIcon';
+import Voucher from '../../interfaces/voucher';
+import VoucherTemp1 from '../../components/vouchers/voucher1';
+import Button1 from '../../components/buttons/button1';
 
 type Service = {
   id: number;
@@ -21,13 +22,13 @@ const services = [
   {
     id: 1,
     title: 'Pet Care',
-    icon: PetCareIcon
+    icon: PetCareIcon,
   },
   {
     id: 2,
     title: 'Pet Supplies',
-    icon: PetSuppliesIcon
-  }
+    icon: PetSuppliesIcon,
+  },
 ];
 
 const vouchers: Voucher[] = [
@@ -43,54 +44,56 @@ const vouchers: Voucher[] = [
     usageLimit: 1,
     minOrderValue: 20,
     applicableCategories: ['Grooming'],
-  }
+  },
 ];
 
 const Home = () => {
   const [activeService, setActiveService] = useState<number | null>(1);
-
 
   const renderItem = ({ item }: { item: Service }) => {
     const isActive = item.id === activeService;
     const id = item.id;
     const IconComponent = item.icon;
     const iconColor = isActive ? '#fff' : '#808080';
-  
+
     return (
       <TouchableOpacity
-      style={[styles.button, isActive && styles.activeButton, { marginLeft: id == 1 ? dimensions.screenWidth * 0.02 : 0 }]}
-      onPress={() => setActiveService(item.id)}
-    >
-      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-        <IconComponent
-          color={iconColor}
-          width={dimensions.screenWidth * 0.05}
-          height={dimensions.screenWidth * 0.05}
-        />
-        <Text style={[styles.buttonText, isActive && styles.activeButtonText]}>
-          {item.title}
-        </Text>
-      </View>
-    </TouchableOpacity>
+        style={[
+          styles.button,
+          isActive && styles.activeButton,
+          { marginLeft: id == 1 ? dimensions.screenWidth * 0.02 : 0 },
+        ]}
+        onPress={() => setActiveService(item.id)}
+      >
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+          <IconComponent
+            color={iconColor}
+            width={dimensions.screenWidth * 0.05}
+            height={dimensions.screenWidth * 0.05}
+          />
+          <Text style={[styles.buttonText, isActive && styles.activeButtonText]}>
+            {item.title}
+          </Text>
+        </View>
+      </TouchableOpacity>
     );
   };
-  
- 
+
   return (
     <MainContPlain paddingHorizontal={dimensions.screenWidth * 0.02}>
       <View style={styles.search}>
-        <Ionicons 
-          name='search' 
+        <Ionicons
+          name='search'
           style={{
             marginRight: dimensions.screenWidth * 0.04,
           }}
           size={dimensions.screenWidth * 0.05}
-          color="#808080"
+          color='#808080'
         />
         <Text style={styles.searchText}>Search something here</Text>
       </View>
       <View>
-      <FlatList
+        <FlatList
           data={services}
           renderItem={renderItem}
           keyExtractor={(item) => item.id.toString()}
@@ -100,12 +103,20 @@ const Home = () => {
       </View>
       <View>
         <VoucherTemp1 voucher={vouchers[0]} />
+        <Button1
+          title='Force Logout'
+          isPrimary={true} // Add this prop to match the ButtonProps type
+          onPress={async () => {
+            await supabase.auth.signOut();
+            router.replace('/sign_up'); // or your actual login/signup screen
+          }}
+        />
       </View>
     </MainContPlain>
-  )
-}
+  );
+};
 
-export default Home
+export default Home;
 
 const styles = StyleSheet.create({
   container: {
@@ -118,7 +129,7 @@ const styles = StyleSheet.create({
     height: dimensions.screenWidth * 0.12,
     backgroundColor: '#466AA2',
     marginRight: dimensions.screenWidth * 0.04,
-    borderRadius: 100
+    borderRadius: 100,
   },
   pets: {
     backgroundColor: '#fff',
@@ -128,9 +139,9 @@ const styles = StyleSheet.create({
   },
   headerLeft: {
     display: 'flex',
-    flexDirection: 'row'
+    flexDirection: 'row',
   },
-  header: { 
+  header: {
     backgroundColor: '#fff',
     paddingTop: dimensions.screenHeight * 0.06,
     paddingBottom: dimensions.screenHeight * 0.014,
@@ -139,7 +150,7 @@ const styles = StyleSheet.create({
     borderBottomRightRadius: 15,
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center', 
+    alignItems: 'center',
     elevation: 4,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
@@ -153,14 +164,14 @@ const styles = StyleSheet.create({
     padding: 0,
     opacity: 0.5,
     marginTop: dimensions.screenHeight * 0.005,
-    margin: 0
+    margin: 0,
   },
   subtitle: {
     fontSize: dimensions.screenWidth * 0.05,
     fontFamily: 'Poppins-SemiBold',
     lineHeight: dimensions.screenWidth * 0.06,
     padding: 0,
-    margin: 0
+    margin: 0,
   },
   search: {
     backgroundColor: '#F2F2F2',
@@ -170,12 +181,12 @@ const styles = StyleSheet.create({
     marginTop: dimensions.screenHeight * 0.03,
     borderRadius: 15,
     display: 'flex',
-    flexDirection: 'row'
+    flexDirection: 'row',
   },
   searchText: {
     fontFamily: 'Poppins-SemiBold',
     fontSize: dimensions.screenWidth * 0.035,
-    color: '#808080'
+    color: '#808080',
   },
   button: {
     backgroundColor: '#E0E0E0',
@@ -185,42 +196,42 @@ const styles = StyleSheet.create({
     marginRight: 10,
     marginTop: 20,
     display: 'flex',
-    flexDirection: 'row'
+    flexDirection: 'row',
   },
-  
+
   buttonText: {
     color: '#808080',
     fontFamily: 'Poppins-SemiBold',
-    fontSize: dimensions.screenWidth * 0.035
+    fontSize: dimensions.screenWidth * 0.035,
   },
-  
+
   activeButton: {
     backgroundColor: '#ED7964',
   },
-  
+
   activeButtonText: {
     color: '#fff',
   },
-})
+});
 
 export const homeOptions = {
   header: (session: Session | null) => (
     <View style={styles.header}>
       <View style={styles.headerLeft}>
         <Image
-          source={require("../../assets/images/general/pet-enjoy.png")}
+          source={require('../../assets/images/general/pet-enjoy.png')}
           style={styles.profileImage}
         />
         <View>
           <Text style={styles.title}>Hello!</Text>
-          <Text style={styles.subtitle}>{session?.user.user_metadata['first_name'] ?? 'User'}</Text>
+          <Text style={styles.subtitle}>
+            {session?.user.user_metadata['first_name'] ?? 'User'}
+          </Text>
         </View>
       </View>
-      <TouchableOpacity onPress={() => router.push('../pets/pets')} style={styles.pets}>
-        <Ionicons name="paw-outline" size={24} color="#000" />
+      <TouchableOpacity onPress={() => router.push('./sign_in')} style={styles.pets}>
+        <Ionicons name='paw-outline' size={24} color='#000' />
       </TouchableOpacity>
     </View>
-  )
-}
-
-
+  ),
+};

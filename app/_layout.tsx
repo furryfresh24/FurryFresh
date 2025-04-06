@@ -76,6 +76,10 @@ const RootLayout = () => {
         <Stack.Screen name="screens/auth/sign_up_1" options={{ headerShown: false }} />
         <Stack.Screen name="screens/auth/sign_up_2" options={{ headerShown: false }} />
         <Stack.Screen name="screens/auth/sign_up_3" options={{ headerShown: false }} />
+        <Stack.Screen name="screens/auth/forgot_password_1" options={{ headerShown: false }} />
+        <Stack.Screen name="screens/auth/forgot_password_2" options={{ headerShown: false }} />
+        <Stack.Screen name="screens/auth/forgot_password_3" options={{ headerShown: false }} />
+
         <Stack.Screen 
           name="screens/(tabs)" 
           options={{ 

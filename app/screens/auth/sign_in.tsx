@@ -67,6 +67,7 @@ const SignIn = () => {
                     iconName="email"
                     keyboardType="email-address"
                     marginBottom={dimensions.screenHeight * 0.03}
+                    
                 />
                 <CustomTextInput
                     value={password}
@@ -83,7 +84,7 @@ const SignIn = () => {
                         value={isChecked}
                         onValueChange={handleCheckboxChange}
                     />
-                    <ClickableText fontSize={dimensions.screenWidth * 0.036} color='#ED7964' onPress={() => { console.log('Redirecting') }}>Forgot Password?</ClickableText>
+                    <ClickableText fontSize={dimensions.screenWidth * 0.036} color='#ED7964' onPress={() => { router.push('./forgot_password_1') }}>Forgot Password?</ClickableText>
                 </View>
                 <Button1 title="Sign In" isPrimary={true} borderRadius={15} onPress={() => signInWithEmail()} />
                 <View style={styles.container3}>
