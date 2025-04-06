@@ -6,6 +6,7 @@ import HomeIcon from '../../components/svgs/home/HomeIcon';
 import NavbarItem from '../../components/general/navbar_item';
 import ActivityIcon from '../../components/svgs/home/ActivityIcon';
 import ProfileIcon from '../../components/svgs/home/ProfileIcon';
+import { homeOptions } from './home';
 
 
 
@@ -13,13 +14,13 @@ export default () => {
   return (
     <Tabs
       screenOptions={{
-        tabBarStyle: styles.tabBar, // Custom tab bar style
-        tabBarActiveTintColor: '#466AA2', // Active tab color
-        tabBarInactiveTintColor: '#8e8e8e', // Inactive tab color
-        tabBarLabelStyle: [styles.tabLabel, ], // Label style
-        tabBarIconStyle: styles.tabIcon, // Icon style
+        tabBarStyle: styles.tabBar, 
+        tabBarActiveTintColor: '#466AA2', 
+        tabBarInactiveTintColor: '#8e8e8e', 
+        tabBarLabelStyle: [styles.tabLabel, ], 
+        tabBarIconStyle: styles.tabIcon,
         tabBarShowLabel: false,
-        tabBarPressColor: 'transparent', // Remove highlight effect on press
+        tabBarPressColor: 'transparent',
         tabBarPressOpacity: 1,
         tabBarRippleEffect: false,
       }}
@@ -43,6 +44,7 @@ export default () => {
                 />
               </View>
             ),
+            header: homeOptions.header
           }}
         />
         <Tabs.Screen

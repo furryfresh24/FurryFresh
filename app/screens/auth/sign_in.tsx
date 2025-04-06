@@ -1,7 +1,7 @@
 import { View, Text, Image, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import dimensions from '../../utils/sizing';
 import React, { useState } from 'react';
-import MainCont from '../../components/general/background';
+import MainContCircle from '../../components/general/background_circle';
 import Title1 from '../../components/texts/title1';
 import Subtitle1 from '../../components/texts/subtitle1';
 import CustomTextInput from '../../components/inputs/custom_text_input1';
@@ -48,7 +48,7 @@ const SignIn = () => {
     }
 
     return (
-        <MainCont showPetImage={true} paddingHorizontal={dimensions.screenWidth * 0.04}>
+        <MainContCircle showPetImage={true} paddingHorizontal={dimensions.screenWidth * 0.04}>
             <Image
                 source={require('../../assets/images/general/furry-fresh-logo.png')}
                 style={styles.loaderImage}
@@ -93,7 +93,7 @@ const SignIn = () => {
                     </TouchableOpacity> 
                 </View>
             </View>
-        </MainCont>
+        </MainContCircle>
     );
 };
 

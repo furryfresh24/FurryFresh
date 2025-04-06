@@ -1,6 +1,6 @@
 import { StyleSheet, Text, View } from 'react-native'
 import React, { useState } from 'react'
-import MainCont from '../../components/general/background'
+import MainContCircle from '../../components/general/background_circle'
 import Title1 from '../../components/texts/title1'
 import dimensions from '../../utils/sizing'
 import Subtitle1 from '../../components/texts/subtitle1'
@@ -16,7 +16,7 @@ const SignUp = (props: Props) => {
   const [password, setPassword] = useState('');
 
   return (
-    <MainCont showPetImage={true} paddingHorizontal={dimensions.screenWidth * 0.08}>
+    <MainContCircle showPetImage={true} paddingHorizontal={dimensions.screenWidth * 0.08}>
       <View style={styles.header}>
         <Title1 
           text='Sign Up' 
@@ -69,7 +69,7 @@ const SignUp = (props: Props) => {
         />
       <Button1 title="Continue" isPrimary={true} borderRadius={15}  onPress={() => { }} />
       </View>
-    </MainCont>
+    </MainContCircle>
   )
 }
 

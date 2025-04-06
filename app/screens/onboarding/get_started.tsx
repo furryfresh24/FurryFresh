@@ -1,7 +1,7 @@
 import { View, Text, Alert, StyleSheet, FlatList, Animated, ViewToken } from "react-native";
 import React, { useState, useRef } from "react";
 import { useRouter } from 'expo-router';
-import MainCont from "../../components/general/background";
+import MainContCircle from "../../components/general/background_circle";
 import Title1 from "../../components/texts/title1";
 import dimensions from "../../utils/sizing";
 import Subtitle1 from "../../components/texts/subtitle1";
@@ -38,7 +38,7 @@ const GetStarted = () => {
   };
 
   return (
-    <MainCont paddingHorizontal={dimensions.screenWidth * 0.0}>
+    <MainContCircle paddingHorizontal={dimensions.screenWidth * 0.0}>
       <View style={styles.top}>
         <FlatList
           ref={flatListRef}
@@ -66,7 +66,7 @@ const GetStarted = () => {
           onPress={handleGetStarted}
         />
       </View>
-    </MainCont>
+    </MainContCircle>
   );
 };
 
