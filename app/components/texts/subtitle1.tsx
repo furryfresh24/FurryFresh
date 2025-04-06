@@ -10,6 +10,7 @@ interface SubtitleProps {
   color?: string;
   opacity?: number; 
   marginTop?: number;
+  textAlign?: TextStyle['textAlign'];
 }
 
 const Subtitle1: React.FC<SubtitleProps> = ({
@@ -19,18 +20,20 @@ const Subtitle1: React.FC<SubtitleProps> = ({
   fontSize,
   color = '#808080', 
   opacity = 1, 
-  marginTop = 0
+  marginTop = 0,
+  textAlign = 'center' 
 }) => {
   return (
     <Text
       style={[
         styles.Subtitle,
         fontFamily ? { fontFamily } : null,
-        style,
         fontSize ? { fontSize } : null,
         color ? { color } : null,
         opacity !== undefined ? { opacity } : null,
-        marginTop ? { marginTop } : null
+        marginTop ? { marginTop } : null,
+        textAlign ? { textAlign } : null,
+        style, 
       ]}
     >
       {text}

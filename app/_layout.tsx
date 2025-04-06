@@ -74,6 +74,8 @@ const RootLayout = () => {
         <Stack.Screen name="screens/onboarding/get_started" options={{ headerShown: false }} />
         <Stack.Screen name="screens/auth/sign_in" options={{ headerShown: false }} />
         <Stack.Screen name="screens/auth/sign_up_1" options={{ headerShown: false }} />
+        <Stack.Screen name="screens/auth/sign_up_2" options={{ headerShown: false }} />
+        <Stack.Screen name="screens/auth/sign_up_3" options={{ headerShown: false }} />
         <Stack.Screen 
           name="screens/(tabs)" 
           options={{ 

@@ -88,7 +88,7 @@ const SignIn = () => {
                 <Button1 title="Sign In" isPrimary={true} borderRadius={15} onPress={() => signInWithEmail()} />
                 <View style={styles.container3}>
                     <Text style={styles.accountReg}>Don't have an account?</Text>
-                    <TouchableOpacity style={styles.clicker} onPress={() => {router.push('./screens/auth/sign_up_1')}}>
+                    <TouchableOpacity style={styles.clicker} onPress={() => {router.push('./sign_up_1')}}>
                         <Text style={styles.signup}>Sign up</Text>
                     </TouchableOpacity> 
                 </View>
