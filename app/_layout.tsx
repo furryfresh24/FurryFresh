@@ -63,6 +63,7 @@ const RootLayout = () => {
     } else if (appReady && !session) {
       router.replace('/screens/auth/sign_in');
     }
+    
   }, [appReady, isFirstTime, session, router]);
 
   return (
@@ -72,7 +73,12 @@ const RootLayout = () => {
         <Stack.Screen name="screens/onboarding/get_started" options={{ headerShown: false }} />
         <Stack.Screen name="screens/auth/sign_in" options={{ headerShown: false }} />
         <Stack.Screen name="screens/auth/sign_up_1" options={{ headerShown: false }} />
-        <Stack.Screen name="screens/(tabs)" options={{ headerShown: false }} />
+        <Stack.Screen 
+          name="screens/(tabs)" 
+          options={{ 
+            headerShown: false
+          }} 
+        />
       </Stack>
     </ThemeProvider>
   );

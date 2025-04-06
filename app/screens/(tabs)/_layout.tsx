@@ -7,10 +7,26 @@ import NavbarItem from '../../components/general/navbar_item';
 import ActivityIcon from '../../components/svgs/home/ActivityIcon';
 import ProfileIcon from '../../components/svgs/home/ProfileIcon';
 import { homeOptions } from './home';
+import { useEffect, useState } from 'react';
+import { Session } from '@supabase/supabase-js';
+import supabase from '../../utils/supabase';
 
 
 
 export default () => {
+
+  const [session, setSession] = useState<Session | null>(null);
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session)
+    })
+    supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session)
+    })
+  }, []);
+
+
   return (
     <Tabs
       screenOptions={{
@@ -44,7 +60,7 @@ export default () => {
                 />
               </View>
             ),
-            header: homeOptions.header
+            header: () => homeOptions.header(session),
           }}
         />
         <Tabs.Screen
