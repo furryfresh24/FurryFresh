@@ -15,7 +15,7 @@ const NavbarItem: React.FC<NavbarItemProps> = ({ icon, title, color }) => {
       <Text 
         style={[
             styles.textStyle, 
-            { fontFamily: color == "#466AA2" ? "Poppins-SemiBold" : "Poppins-Regular" },
+            { fontFamily: color == "#466AA2" ? "Poppins-Bold" : "Poppins-Regular" },
             { color: color }
         ]}
     >{title}</Text>

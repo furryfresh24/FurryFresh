@@ -1,13 +1,14 @@
 import { StyleSheet, Text, View } from 'react-native'
 import React from 'react'
+import MainContPaw from '../../components/general/background_paw'
 
 type Props = {}
 
 const Pets = (props: Props) => {
   return (
-    <View>
+    <MainContPaw>
       <Text>Pets</Text>
-    </View>
+    </MainContPaw>
   )
 }
 
