@@ -11,7 +11,8 @@ const Home = () => {
  
   return (
     <MainContPlain paddingHorizontal={dimensions.screenWidth * 0.02}>
-      <Text>Home Screen Content</Text>
+      {/* DITO KA MAG SISIMULA MAG CODE PROVIDS */}
+      <Text>Home Screen Contengyut</Text>
     </MainContPlain>
   )
 }
@@ -19,7 +20,6 @@ const Home = () => {
 export default Home
 
 export const homeOptions = {
-  
   header: (session: Session | null) => (
     <View style={styles.header}>
       <View style={styles.headerLeft}>
@@ -62,7 +62,7 @@ const styles = StyleSheet.create({
     display: 'flex',
     flexDirection: 'row'
   },
-  header: {
+  header: { 
     backgroundColor: '#fff',
     paddingTop: dimensions.screenHeight * 0.06,
     paddingBottom: dimensions.screenHeight * 0.014,
@@ -71,7 +71,7 @@ const styles = StyleSheet.create({
     borderBottomRightRadius: 15,
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center',
+    alignItems: 'center', 
     elevation: 4,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },

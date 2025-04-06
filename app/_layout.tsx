@@ -6,6 +6,7 @@ import ThemeProvider from './providers/ThemeProvider';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import supabase from './utils/supabase'; 
 import { Session } from '@supabase/supabase-js';
+import AppbarDefault from './components/bars/appbar_default';
 
 
 const RootLayout = () => {
@@ -77,6 +78,12 @@ const RootLayout = () => {
           name="screens/(tabs)" 
           options={{ 
             headerShown: false
+          }} 
+        />
+        <Stack.Screen 
+          name="screens/pets/pets" 
+          options={{ 
+            header: () => <AppbarDefault title='Pets' session={session} />
           }} 
         />
       </Stack>
