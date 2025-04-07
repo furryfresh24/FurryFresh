@@ -14,6 +14,8 @@ import Profile from './profile';
 import Activity from './activity';
 import { NavigationContainer, useFocusEffect } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import Explore from './explore';
+import ExploreIcon from '../../components/svgs/hub/ExploreIcon';
 
 const Tab = createBottomTabNavigator();
 
@@ -58,7 +60,7 @@ export default () => {
           name="home"
           component={HomeWithAnimation}
           options={{
-            tabBarIcon: ({ color } : {color: string}) => (
+            tabBarIcon: ({ color }: { color: string }) => (
               <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
                 <NavbarItem
                   color={color}
@@ -71,17 +73,32 @@ export default () => {
           }}
         />
         <Tab.Screen
+          name="explore"
+          component={ExploreWithAnimation}
+          options={{
+            tabBarIcon: ({ color }: { color: string }) => (
+              <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+                <NavbarItem
+                  color={color}
+                  title="Explore"
+                  icon={<ExploreIcon color={color} width={dimensions.screenWidth * 0.07} height={dimensions.screenWidth * 0.07}  props={undefined} />}
+                />
+              </View>
+            ),
+          }}
+        />
+        <Tab.Screen
           name="activity"
           component={ActivityWithAnimation}
           options={{
-            tabBarIcon: ({ color } : {color: string}) => (
+            tabBarIcon: ({ color }: { color: string }) => (
               <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
                 <NavbarItem
                   color={color}
                   title="Activity"
                   icon={<ActivityIcon color={color} width={dimensions.screenWidth * 0.07} height={dimensions.screenWidth * 0.07} props={undefined} />}
                 />
-              </View> 
+              </View>
             ),
             tabBarBadge: 10,
           }}
@@ -90,7 +107,7 @@ export default () => {
           name="profile"
           component={ProfileWithAnimation}
           options={{
-            tabBarIcon: ({ color } : {color: string}) => (
+            tabBarIcon: ({ color }: { color: string }) => (
               <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
                 <NavbarItem
                   color={color}
@@ -142,7 +159,7 @@ const HomeWithAnimation = () => {
         duration: 200,
         useNativeDriver: true,
       }).start();
-      
+
       return () => {
         Animated.timing(slideAnim, {
           toValue: 300,
@@ -160,6 +177,34 @@ const HomeWithAnimation = () => {
   );
 };
 
+const ExploreWithAnimation = () => {
+  const slideAnim = useRef(new Animated.Value(300)).current;
+
+  useFocusEffect(
+    React.useCallback(() => {
+      Animated.timing(slideAnim, {
+        toValue: 0,
+        duration: 200,
+        useNativeDriver: true,
+      }).start();
+
+      return () => {
+        Animated.timing(slideAnim, {
+          toValue: 300,
+          duration: 250,
+          useNativeDriver: true,
+        }).start();
+      };
+    }, [slideAnim])
+  );
+
+  return (
+    <Animated.View style={{ flex: 1, transform: [{ translateX: slideAnim }] }}>
+      <Explore />
+    </Animated.View>
+  );
+};
+
 const ActivityWithAnimation = () => {
   const slideAnim = useRef(new Animated.Value(300)).current;
 
@@ -170,7 +215,7 @@ const ActivityWithAnimation = () => {
         duration: 200,
         useNativeDriver: true,
       }).start();
-      
+
       return () => {
         Animated.timing(slideAnim, {
           toValue: 300,
@@ -198,7 +243,7 @@ const ProfileWithAnimation = () => {
         duration: 200,
         useNativeDriver: true,
       }).start();
-      
+
       return () => {
         Animated.timing(slideAnim, {
           toValue: 300,

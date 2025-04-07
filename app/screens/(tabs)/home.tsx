@@ -11,6 +11,14 @@ import PetSuppliesIcon from '../../components/svgs/home/PetSuppliesIcon';
 import type { Voucher } from '../../interfaces/voucher';
 import VoucherTemp1 from '../../components/vouchers/voucher1';
 import Button1 from '../../components/buttons/button1';
+import Category from '../../interfaces/categories';
+import Title1 from '../../components/texts/title1';
+import { ListItem } from '@rneui/themed';
+import DefaultListIcon from '../../components/svgs/home/services/DefaultListIcon';
+import Subcategories from '../../interfaces/subcategories';
+import Price from '../../components/general/price';
+import svgValue from '../../hooks/fetchSvg';
+import SvgValue from '../../hooks/fetchSvg';
 
 type Service = {
   id: number;
@@ -23,7 +31,7 @@ const services = [
     id: 1,
     title: 'Pet Care',
     icon: PetCareIcon,
-  }, 
+  },
   {
     id: 2,
     title: 'Pet Supplies',
@@ -48,7 +56,56 @@ const vouchers: Voucher[] = [
 ];
 
 const Home = () => {
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [subcategories, setSubcategories] = useState<Subcategories[]>([]);
   const [activeService, setActiveService] = useState<number | null>(1);
+
+  const fetchCategories = async (): Promise<void> => {
+    const { data, error } = await supabase
+      .from('categories')
+      .select('*');
+
+    if (error) {
+      console.error('Error fetching categories:', error);
+      return;
+    }
+
+    const parsed = data?.map((item) => ({
+      ...item,
+      created_at: new Date(item.created_at),
+      updated_at: item.updated_at ? new Date(item.updated_at) : undefined,
+    })) as Category[];
+
+    console.log(parsed.length);
+
+    setCategories(parsed);
+  };
+
+  const fetchSubcategories = async (): Promise<void> => {
+    const { data, error } = await supabase
+      .from('subcategories')
+      .select('*');
+
+    if (error) {
+      console.error('Error fetching categories:', error);
+      return;
+    }
+
+    const parsed = data?.map((item) => ({
+      ...item,
+      created_at: new Date(item.created_at),
+      updated_at: item.updated_at ? new Date(item.updated_at) : undefined,
+    })) as Subcategories[];
+
+    console.log(parsed.length);
+
+    setSubcategories(parsed);
+  };
+
+  useEffect(() => {
+    fetchCategories();
+    fetchSubcategories();
+  }, []);
 
   const renderItem = ({ item }: { item: Service }) => {
     const isActive = item.id === activeService;
@@ -103,9 +160,69 @@ const Home = () => {
       </View>
       <View>
         <VoucherTemp1 voucher={vouchers[0]} />
+        <View style={{ marginTop: dimensions.screenHeight * 0.025 }}>
+          <FlatList
+            data={categories.filter(cat =>
+              activeService === 1 ? cat.category === 'PetCare' : cat.category === 'PetSupplies'
+            )}
+            scrollEnabled={false}
+            keyExtractor={(catItem) => catItem.id}
+            renderItem={({ item: catItem, index: catIndex }) => (
+              <View style={[styles.listCont]}>
+                <Title1 style={styles.catTitle} text={catItem.title} />
+                <FlatList
+                  data={subcategories.filter(subcat => subcat.category_id == catItem.id)}
+                  keyExtractor={(subcatItem) => subcatItem.id}
+                  scrollEnabled={false}
+                  renderItem={({ item: subcatItem, index: subcatIndex }) => {
+                    const icon = subcatItem.svg_icon ? <SvgValue svgIcon={subcatItem.svg_icon} color='#fff' width={dimensions.screenWidth * 0.11} height={dimensions.screenWidth * 0.11} /> : null;
+                    
+                    return (
+                      <View style={[styles.listItem, { marginTop: subcatIndex == 0 ? dimensions.screenHeight * 0.02 : 0 }]}>
+                        <View style={styles.listSvgIconBG}>
+                          { !icon ? (
+                            <DefaultListIcon color='#fff' width={dimensions.screenWidth * 0.11} height={dimensions.screenWidth * 0.11} props />
+                          ) : (
+                            icon 
+                          )}
+                        </View>
+                        <View style={styles.listItemDetails}>
+                          <Text style={styles.l1title}>{subcatItem.title}</Text>
+                          <Text style={styles.l1description}>{subcatItem.description}</Text>
+                        </View>
+                        {subcatItem.price ? (
+                        <View style={{ height: '100%' }}>
+                          <View style={{ 
+                              backgroundColor: '#ED7964', 
+                              paddingVertical: dimensions.screenHeight * 0.001 ,
+                              paddingHorizontal: dimensions.screenWidth * 0.02,
+                              borderRadius: 10,
+                              marginTop: dimensions.screenHeight * 0.01
+                            }}>
+                            {subcatItem.price ? (
+                              <Price 
+                                value={subcatItem.price ?? 0.0}
+                                color='#fff'
+                                fontFamily='Poppins-SemiBold'
+                                fontSize={dimensions.screenWidth * 0.03}
+                                lineHeight={dimensions.screenWidth * 0.045}
+                                currencySize={dimensions.screenWidth * 0.03}
+                              />
+                            ) : (<></>)}
+                          </View>
+                        </View> ) : (<></>)} 
+                      </View>
+                    );
+                  }}
+                />
+              </View>
+            )}
+          />
+        </View>
+
         <Button1
           title='Force Logout'
-          isPrimary={true} 
+          isPrimary={true}
           onPress={async () => {
             await supabase.auth.signOut();
             router.replace('../auth/sign_in');
@@ -198,20 +315,67 @@ const styles = StyleSheet.create({
     display: 'flex',
     flexDirection: 'row',
   },
-
   buttonText: {
     color: '#808080',
     fontFamily: 'Poppins-SemiBold',
     fontSize: dimensions.screenWidth * 0.035,
   },
-
   activeButton: {
     backgroundColor: '#ED7964',
   },
-
   activeButtonText: {
     color: '#fff',
   },
+  listCont: {
+    width: '100%',
+    textAlign: 'left',
+    display: 'flex',
+    justifyContent: 'flex-start',
+    flexDirection: 'column',
+    paddingHorizontal: dimensions.screenWidth * 0.02,
+  },
+  catTitle: {
+    alignSelf: 'flex-start'
+  },
+  listItem: {
+    flexDirection: 'row',
+    backgroundColor: '#fff',
+    paddingHorizontal: dimensions.screenWidth * 0.03,
+    paddingVertical: dimensions.screenHeight * 0.01,
+    marginBottom: dimensions.screenHeight * 0.02,
+    borderRadius: 12,
+    elevation: 7,
+    alignItems: 'center',
+    width: '100%',
+    alignSelf: 'stretch',
+  },
+  listSvgIconBG: {
+    backgroundColor: '#466AA2',
+    borderRadius: 12,
+    marginRight: dimensions.screenWidth * 0.03,
+    padding: (dimensions.screenWidth + dimensions.screenHeight) * 0.008
+  },
+  listItemDetails: {
+    flexGrow: 1,
+    width: '0%',
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'flex-start',
+    marginRight: dimensions.screenWidth * 0.02
+  },
+  l1title: {
+    fontFamily: 'Poppins-SemiBold',
+    color: '#466AA2',
+    fontSize: dimensions.screenWidth * 0.04,
+    lineHeight: dimensions.screenWidth * 0.055,
+  },
+  l1description: {
+    fontFamily: 'Poppins-Regular',
+    color: '#808080',
+    fontSize: dimensions.screenWidth * 0.029,
+    lineHeight: dimensions.screenWidth * 0.045,
+    letterSpacing: .4,
+  }
 });
 
 export const homeOptions = {
@@ -229,7 +393,7 @@ export const homeOptions = {
           </Text>
         </View>
       </View>
-      <TouchableOpacity onPress={() => router.push('./sign_in')} style={styles.pets}>
+      <TouchableOpacity onPress={() => router.push('../pets/pets')} style={styles.pets}>
         <Ionicons name='paw-outline' size={24} color='#000' />
       </TouchableOpacity>
     </View>

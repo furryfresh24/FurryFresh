@@ -1,4 +1,4 @@
-import { StyleSheet, View, Image } from 'react-native';
+import { StyleSheet, View, Image, ScrollView } from 'react-native';
 import dimensions from '../../utils/sizing';
 import React from 'react';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -20,15 +20,22 @@ const MainContPlain: React.FC<MainContPlainProps> = ({
     <View style={styles.container}>
 
       {showPetImage && (
-        <Image 
+        <Image
           source={require('../../assets/images/general/pet-enjoy.png')}
-          style={styles.petenjoy} 
+          style={styles.petenjoy}
         />
       )}
 
-      <View style={{ paddingHorizontal, paddingVertical }}>
-        {children}
-      </View>
+      <ScrollView
+        contentContainerStyle={{ flexGrow: 1 }}
+        showsVerticalScrollIndicator={false}
+        bounces={true}
+        keyboardShouldPersistTaps="handled"
+      >
+        <View style={{ paddingHorizontal, paddingVertical }}>
+          {children}
+        </View>
+      </ScrollView>
     </View>
   );
 };
