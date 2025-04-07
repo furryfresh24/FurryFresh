@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { StyleSheet, View } from 'react-native';
+import React, { useEffect, useState, useRef } from 'react';
+import { StyleSheet, View, Animated } from 'react-native';
 import { Tabs } from 'expo-router';
 import { Session } from '@supabase/supabase-js';
 import supabase from '../../utils/supabase';
@@ -10,10 +10,10 @@ import ActivityIcon from '../../components/svgs/hub/ActivityIcon';
 import ProfileIcon from '../../components/svgs/hub/ProfileIcon';
 import NavbarItem from '../../components/general/navbar_item';
 import Home, { homeOptions } from './home';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Profile from './profile';
 import Activity from './activity';
-import { NavigationContainer } from '@react-navigation/native';
+import { NavigationContainer, useFocusEffect } from '@react-navigation/native';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 
 const Tab = createBottomTabNavigator();
 
@@ -56,9 +56,9 @@ export default () => {
       >
         <Tab.Screen
           name="home"
-          component={Home}  // Specify the Home screen component here
+          component={HomeWithAnimation}
           options={{
-            tabBarIcon: ({ color }) => (
+            tabBarIcon: ({ color } : {color: string}) => (
               <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
                 <NavbarItem
                   color={color}
@@ -72,24 +72,25 @@ export default () => {
         />
         <Tab.Screen
           name="activity"
-          component={Activity}
+          component={ActivityWithAnimation}
           options={{
-            tabBarIcon: ({ color }) => (
+            tabBarIcon: ({ color } : {color: string}) => (
               <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
                 <NavbarItem
                   color={color}
                   title="Activity"
                   icon={<ActivityIcon color={color} width={dimensions.screenWidth * 0.07} height={dimensions.screenWidth * 0.07} props={undefined} />}
                 />
-              </View>
+              </View> 
             ),
+            tabBarBadge: 10,
           }}
         />
         <Tab.Screen
           name="profile"
-          component={Profile}
+          component={ProfileWithAnimation}
           options={{
-            tabBarIcon: ({ color }) => (
+            tabBarIcon: ({ color } : {color: string}) => (
               <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
                 <NavbarItem
                   color={color}
@@ -99,11 +100,119 @@ export default () => {
               </View>
             ),
             headerShown: false,
-            tabBarBadge: 2,
           }}
         />
       </Tab.Navigator>
     </NavigationContainer>
+  );
+};
+
+const TabIcon = ({ icon }: { icon: React.ReactNode }) => {
+  const scale = useRef(new Animated.Value(1)).current;
+
+  useFocusEffect(
+    React.useCallback(() => {
+      Animated.spring(scale, {
+        toValue: 1.3,
+        useNativeDriver: true,
+      }).start();
+      return () => {
+        Animated.spring(scale, {
+          toValue: 1,
+          useNativeDriver: true,
+        }).start();
+      };
+    }, [scale])
+  );
+
+  return (
+    <Animated.View style={{ transform: [{ scale }] }}>
+      {icon}
+    </Animated.View>
+  );
+};
+
+const HomeWithAnimation = () => {
+  const slideAnim = useRef(new Animated.Value(300)).current;
+
+  useFocusEffect(
+    React.useCallback(() => {
+      Animated.timing(slideAnim, {
+        toValue: 0,
+        duration: 200,
+        useNativeDriver: true,
+      }).start();
+      
+      return () => {
+        Animated.timing(slideAnim, {
+          toValue: 300,
+          duration: 250,
+          useNativeDriver: true,
+        }).start();
+      };
+    }, [slideAnim])
+  );
+
+  return (
+    <Animated.View style={{ flex: 1, transform: [{ translateX: slideAnim }] }}>
+      <Home />
+    </Animated.View>
+  );
+};
+
+const ActivityWithAnimation = () => {
+  const slideAnim = useRef(new Animated.Value(300)).current;
+
+  useFocusEffect(
+    React.useCallback(() => {
+      Animated.timing(slideAnim, {
+        toValue: 0,
+        duration: 200,
+        useNativeDriver: true,
+      }).start();
+      
+      return () => {
+        Animated.timing(slideAnim, {
+          toValue: 300,
+          duration: 250,
+          useNativeDriver: true,
+        }).start();
+      };
+    }, [slideAnim])
+  );
+
+  return (
+    <Animated.View style={{ flex: 1, transform: [{ translateX: slideAnim }] }}>
+      <Activity />
+    </Animated.View>
+  );
+};
+
+const ProfileWithAnimation = () => {
+  const slideAnim = useRef(new Animated.Value(300)).current;
+
+  useFocusEffect(
+    React.useCallback(() => {
+      Animated.timing(slideAnim, {
+        toValue: 0,
+        duration: 200,
+        useNativeDriver: true,
+      }).start();
+      
+      return () => {
+        Animated.timing(slideAnim, {
+          toValue: 300,
+          duration: 250,
+          useNativeDriver: true,
+        }).start();
+      };
+    }, [slideAnim])
+  );
+
+  return (
+    <Animated.View style={{ flex: 1, transform: [{ translateX: slideAnim }] }}>
+      <Profile />
+    </Animated.View>
   );
 };
 
