@@ -8,7 +8,7 @@ import supabase from '../../utils/supabase';
 import { Session } from '@supabase/supabase-js';
 import PetCareIcon from '../../components/svgs/home/PetCareIcon';
 import PetSuppliesIcon from '../../components/svgs/home/PetSuppliesIcon';
-import Voucher from '../../interfaces/voucher';
+import type { Voucher } from '../../interfaces/voucher';
 import VoucherTemp1 from '../../components/vouchers/voucher1';
 import Button1 from '../../components/buttons/button1';
 
@@ -23,7 +23,7 @@ const services = [
     id: 1,
     title: 'Pet Care',
     icon: PetCareIcon,
-  },
+  }, 
   {
     id: 2,
     title: 'Pet Supplies',
@@ -105,10 +105,10 @@ const Home = () => {
         <VoucherTemp1 voucher={vouchers[0]} />
         <Button1
           title='Force Logout'
-          isPrimary={true} // Add this prop to match the ButtonProps type
+          isPrimary={true} 
           onPress={async () => {
             await supabase.auth.signOut();
-            router.replace('/sign_up'); // or your actual login/signup screen
+            router.replace('../auth/sign_in');
           }}
         />
       </View>

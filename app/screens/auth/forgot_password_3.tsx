@@ -11,11 +11,9 @@ import dimensions from "../../utils/sizing";
 type Props = {};
 
 const SignUpOTP = (props: Props) => {
-  const [password, setPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
 
-  const handleSendCode = () => {
-    router.push("./sign_in");
-  };
 
   return (
     <MainContCircle
@@ -24,7 +22,7 @@ const SignUpOTP = (props: Props) => {
     >
       <View style={styles.header}>
         <Title1
-          text="Set A New   Password"
+          text={"Set A New\nPassword"}
           fontSize={dimensions.screenWidth * 0.08}
           lineHeight={dimensions.screenWidth * 0.1}
           style={styles.title}
@@ -41,18 +39,18 @@ const SignUpOTP = (props: Props) => {
 
       <View style={styles.container}>
         <CustomTextInput
-          value={password}
+          value={newPassword}
           label="New Password"
-          onChangeText={setPassword}
+          onChangeText={setNewPassword}
           placeholder="Enter your password"
           secureTextEntry={true}
           iconName="lock"
           marginBottom={dimensions.screenHeight * 0.03}
         />
         <CustomTextInput
-          value={password}
+          value={confirmPassword}
           label="Confirm New Password"
-          onChangeText={setPassword}
+          onChangeText={setConfirmPassword}
           placeholder="Enter your password"
           secureTextEntry={true}
           iconName="lock"
@@ -64,7 +62,7 @@ const SignUpOTP = (props: Props) => {
           title="Reset"
           isPrimary
           borderRadius={15}
-          onPress={handleSendCode}
+          onPress={() => {}}
         />
       </View>
     </MainContCircle>

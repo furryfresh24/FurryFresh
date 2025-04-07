@@ -7,6 +7,8 @@ import Subtitle1 from "../../components/texts/subtitle1";
 import Button1 from "../../components/buttons/button1";
 import DogIcon from "../../components/svgs/signUp/DogIcon";
 import CatIcon from "../../components/svgs/signUp/CatIcon";
+import { useRouter } from "expo-router";
+import supabase from "../../utils/supabase";
 
 type Props = {};
 
@@ -30,7 +32,9 @@ const petButtons: PetButton[] = [
 ];
 
 const SignUpPet = (props: Props) => {
+  const router = useRouter();
   const [selectedPets, setSelectedPets] = useState<string[]>([]);
+  const [loading, setLoading] = useState(false);
 
   const togglePetSelection = (id: string) => {
     setSelectedPets((prevSelected) =>
@@ -38,6 +42,31 @@ const SignUpPet = (props: Props) => {
         ? prevSelected.filter((petId) => petId !== id)
         : [...prevSelected, id]
     );
+  };
+
+  const finishSetup = async () => {
+    if(loading) return;
+    try {
+      setLoading(true);
+
+      const { data: user, error } = await supabase.auth.getUser();
+
+      if (user) {
+        const { error: updateError } = await supabase.auth.updateUser({
+          data: { pets: selectedPets },
+        });
+
+        if (updateError) {
+          console.error("Error updating user metadata:", updateError.message);
+          return;
+        }
+        
+      } else {
+        console.error("No user found.");
+      }
+    } catch (error) {
+      console.error("Error finishing setup:", error);
+    }
   };
 
   return (
@@ -95,8 +124,9 @@ const SignUpPet = (props: Props) => {
         <Button1
           title="Finish Setup"
           isPrimary={true}
+          loading={loading}
           borderRadius={15}
-          onPress={() => {}}
+          onPress={selectedPets.length === 0 ? null : finishSetup}
         />
       </View>
     </MainContCircle>

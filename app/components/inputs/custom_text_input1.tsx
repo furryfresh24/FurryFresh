@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useRef } from "react";
-import { TextInput, StyleSheet, View, Text, Animated, TouchableOpacity } from "react-native";
+import React, { useState, useRef } from "react";
+import { TextInput, StyleSheet, View, Text, Animated, TouchableOpacity, TouchableWithoutFeedback, Keyboard } from "react-native";
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import dimensions from '../../utils/sizing';
 
@@ -8,7 +8,7 @@ interface CustomTextInputProps {
   onChangeText: (text: string) => void;
   placeholder: string;
   label?: string;
-  iconName?: keyof typeof MaterialCommunityIcons.glyphMap; 
+  iconName?: keyof typeof MaterialCommunityIcons.glyphMap;
   keyboardType?: "default" | "numeric" | "email-address" | "phone-pad";
   secureTextEntry?: boolean;
   autoCapitalize?: "none" | "sentences" | "words" | "characters";
@@ -33,6 +33,7 @@ const CustomTextInput: React.FC<CustomTextInputProps> = ({
   const [isFocused, setIsFocused] = useState(false);
   const [isPasswordVisible, setIsPasswordVisible] = useState(secureTextEntry);
   const labelPosition = useRef(new Animated.Value(value ? 1 : 0)).current;
+  const inputRef = useRef<TextInput>(null);
 
   const handleFocus = () => {
     setIsFocused(true);
@@ -65,7 +66,7 @@ const CustomTextInput: React.FC<CustomTextInputProps> = ({
     }),
     left: labelPosition.interpolate({
       inputRange: [0, 1],
-      outputRange: [dimensions.screenHeight * 0.07, dimensions.screenHeight * 0.068],
+      outputRange: [dimensions.screenWidth * 0.135, dimensions.screenWidth * 0.135],
     }),
     fontSize: labelPosition.interpolate({
       inputRange: [0, 1],
@@ -74,42 +75,47 @@ const CustomTextInput: React.FC<CustomTextInputProps> = ({
   };
 
   return (
-    <View style={[styles.container, { marginTop, marginBottom }]}>
-      <View
-        style={[styles.inputContainer, { borderColor: isFocused || value ? "#D97662" : "#ccc" }]}
-      >
-        {label && (
-          <Animated.Text
-            style={[styles.label, labelStyle]}
+    <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
+      <View style={[styles.container, { marginTop, marginBottom }]}>
+        <TouchableWithoutFeedback onPress={() => inputRef.current?.focus()}>
+          <View
+            style={[styles.inputContainer, { borderColor: isFocused || value ? "#D97662" : "#ccc" }]}
           >
-            {label}
-          </Animated.Text>
-        )}
-        <MaterialCommunityIcons name={iconName} size={20} color="#D97662" style={styles.icon} />
-        <TextInput
-          style={styles.input}
-          value={value}
-          onChangeText={onChangeText}
-          placeholder={placeholder}
-          keyboardType={keyboardType}
-          placeholderTextColor="transparent"
-          secureTextEntry={isPasswordVisible}
-          autoCapitalize={autoCapitalize}
-          autoCorrect={autoCorrect}
-          onFocus={handleFocus}
-          onBlur={handleBlur}
-        />
-        {secureTextEntry && (
-          <TouchableOpacity onPress={handleTogglePasswordVisibility} style={styles.eyeIconContainer}>
-            <MaterialCommunityIcons
-              name={isPasswordVisible ? "eye-off" : "eye"}
-              size={20}
-              color="#D97662"
+            {label && (
+              <Animated.Text
+                style={[styles.label, labelStyle]}
+              >
+                {label}
+              </Animated.Text>
+            )}
+            <MaterialCommunityIcons name={iconName} size={20} color="#D97662" style={styles.icon} />
+            <TextInput
+              ref={inputRef}
+              style={styles.input}
+              value={value}
+              onChangeText={onChangeText}
+              placeholder={placeholder}
+              keyboardType={keyboardType}
+              placeholderTextColor="transparent"
+              secureTextEntry={isPasswordVisible}
+              autoCapitalize={autoCapitalize}
+              autoCorrect={autoCorrect}
+              onFocus={handleFocus}
+              onBlur={handleBlur}
             />
-          </TouchableOpacity>
-        )}
+            {secureTextEntry && (
+              <TouchableOpacity onPress={handleTogglePasswordVisibility} style={styles.eyeIconContainer}>
+                <MaterialCommunityIcons
+                  name={isPasswordVisible ? "eye-off" : "eye"}
+                  size={20}
+                  color="#D97662"
+                />
+              </TouchableOpacity>
+            )}
+          </View>
+        </TouchableWithoutFeedback>
       </View>
-    </View>
+    </TouchableWithoutFeedback>
   );
 };
 
@@ -135,7 +141,7 @@ const styles = StyleSheet.create({
     position: "relative",
   },
   icon: {
-    marginRight: dimensions.screenWidth * 0.03,
+    marginRight: dimensions.screenWidth * 0.027,
   },
   input: {
     flex: 1,

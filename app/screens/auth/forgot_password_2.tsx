@@ -38,7 +38,7 @@ const SignUpOTP = (props: Props) => {
       </View>
       <View style={styles.otpstyle}>
         <OtpInput
-          numberOfDigits={5}
+          numberOfDigits={6}
           focusColor="#ED7964"
           autoFocus={false}
           hideStick={true}
@@ -62,9 +62,9 @@ const SignUpOTP = (props: Props) => {
           }}
           theme={{
             pinCodeContainerStyle: {
-              width: dimensions.screenWidth * 0.14,
+              width: dimensions.screenWidth * 0.12,
               height: dimensions.screenHeight * 0.07,
-              borderWidth: 1,
+              borderWidth: 2,
               borderRadius: 15,
               justifyContent: "center",
               alignItems: "center",
@@ -72,6 +72,9 @@ const SignUpOTP = (props: Props) => {
             pinCodeTextStyle: {
               fontSize: 20,
             },
+            containerStyle: {
+              
+            }
           }}
         />
       </View>

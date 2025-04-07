@@ -19,6 +19,8 @@ const SignUp = (props: Props) => {
   const [loading, setLoading] = useState(false);
 
   async function signUpWithEmail() {
+    if(loading) return;
+
     setLoading(true)
     const {
       data: { session },
@@ -35,28 +37,22 @@ const SignUp = (props: Props) => {
     }
 
     if (!session) {
-      Alert.alert('Please check your inbox for email verification!')
       setLoading(false)
+      
+      console.log("No session registered");
+
+      router.replace({
+        pathname: './sign_up_2',
+        params: {
+          email: email,
+          firstname: firstname,
+          lastname: lastname 
+        }
+      });
       return;
     }
-
-    // Insert first_name and last_name as user metadata
-    const { user } = session;
-
-    const { error: metadataError } = await supabase.auth.updateUser({
-      data: {
-        first_name: firstname,
-        last_name: lastname,
-      },
-    })
-
-    if (metadataError) {
-      Alert.alert("Error updating user metadata", metadataError.message)
-    } else {
-      Alert.alert("Account created successfully, check your email for verification!")
-    }
-
-    setLoading(false)
+    
+  
   }
 
   return (
@@ -111,7 +107,7 @@ const SignUp = (props: Props) => {
           iconName="lock"
           marginBottom={dimensions.screenHeight * 0.07}
         />
-        <Button1 title="Continue" isPrimary={true} borderRadius={15} onPress={signUpWithEmail} />
+        <Button1 title="Continue" isPrimary={true} loading={loading} borderRadius={15} onPress={signUpWithEmail} />
       </View>
     </MainContCircle>
   )

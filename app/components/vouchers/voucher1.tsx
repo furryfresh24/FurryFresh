@@ -1,6 +1,6 @@
 import { StyleSheet, Text, View } from 'react-native'
 import React from 'react'
-import Voucher from '../../interfaces/voucher'
+import type { Voucher } from '../../interfaces/voucher'
 import VoucherDefaultIcon from '../svgs/vouchers/VoucherDefaultIcon'
 import dimensions from '../../utils/sizing'
 import { Ionicons } from '@expo/vector-icons'

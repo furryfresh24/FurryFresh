@@ -59,6 +59,8 @@ const RootLayout = () => {
   useEffect(() => {
     if (appReady && isFirstTime === true) {
       router.replace('/screens/onboarding/get_started');
+    } else if (appReady && session && session.user && session.user['user_metadata'].pets == null) {
+      router.replace('/screens/auth/sign_up_3'); 
     } else if (appReady && session && session.user) {
       router.replace('/screens/(tabs)'); 
     } else if (appReady && !session) {

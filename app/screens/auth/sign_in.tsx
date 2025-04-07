@@ -22,29 +22,24 @@ const SignIn = () => {
     };
 
     async function signInWithEmail() {
-        setLoading(true)
-        const { error } = await supabase.auth.signInWithPassword({
-          email: email,
-          password: password,
-        })
-    
-        if (error) Alert.alert(error.message)
-        setLoading(false)
-    }
+        if (loading) return;
 
-    async function signUpWithEmail() {
-        setLoading(true)
-        const {
-          data: { session },
-          error,
-        } = await supabase.auth.signUp({
-          email: email,
-          password: password,
-        })
-    
-        if (error) Alert.alert(error.message)
-        if (!session) Alert.alert('Please check your inbox for email verification!')
-        setLoading(false)
+        console.log('Entered');
+      
+        setLoading(true);
+      
+        const { error } = await supabase.auth.signInWithPassword({
+          email,
+          password,
+        });
+      
+        if (error) {
+          Alert.alert(error.message);
+        }
+
+        setTimeout(() => {
+            setLoading(false);
+        }, 2000);
     }
 
     return (
@@ -86,7 +81,7 @@ const SignIn = () => {
                     />
                     <ClickableText fontSize={dimensions.screenWidth * 0.036} color='#ED7964' onPress={() => { router.push('./forgot_password_1') }}>Forgot Password?</ClickableText>
                 </View>
-                <Button1 title="Sign In" isPrimary={true} borderRadius={15} onPress={() => signInWithEmail()} />
+                <Button1 title="Sign In" loading={loading} isPrimary={true} borderRadius={15} onPress={() => signInWithEmail()} />
                 <View style={styles.container3}>
                     <Text style={styles.accountReg}>Don't have an account?</Text>
                     <TouchableOpacity style={styles.clicker} onPress={() => {router.push('./sign_up_1')}}>

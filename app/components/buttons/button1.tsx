@@ -1,28 +1,61 @@
 import React from 'react';
-import { TouchableOpacity, Text, StyleSheet, GestureResponderEvent, ViewStyle, TextStyle, View } from 'react-native';
+import {
+  TouchableOpacity,
+  Text,
+  StyleSheet,
+  GestureResponderEvent,
+  ViewStyle,
+  TextStyle,
+  View,
+  ActivityIndicator,
+} from 'react-native';
 import dimensions from '../../utils/sizing';
 
 interface ButtonProps {
   title: string;
-  onPress: (event: GestureResponderEvent) => void;
-  isPrimary: boolean;  // Determines if the button is primary
+  onPress?: ((event: GestureResponderEvent) => void) | null;
+  isPrimary: boolean;
   style?: ViewStyle;
   textStyle?: TextStyle;
   borderRadius?: number;
+  loading?: boolean;
 }
 
-const Button1: React.FC<ButtonProps> = ({ title, onPress, isPrimary, style, textStyle, borderRadius }) => {
+const Button1: React.FC<ButtonProps> = ({
+  title,
+  onPress,
+  isPrimary,
+  style,
+  textStyle,
+  borderRadius,
+  loading = false,
+}) => {
+  const isDisabled = loading || !onPress;
+
   return (
     <View style={[styles.buttonContainer, style]}>
       <TouchableOpacity
         style={[
           styles.button,
           isPrimary ? styles.primaryButton : styles.secondaryButton,
+          isDisabled && styles.disabledButton,
           borderRadius ? { borderRadius } : null,
         ]}
-        onPress={onPress}
+        onPress={onPress ?? undefined}
+        disabled={isDisabled}
       >
-        <Text style={[styles.buttonText, textStyle]}>{title}</Text>
+        {loading ? (
+          <ActivityIndicator
+            size="small"
+            color="#fff"
+            style={{
+              paddingVertical: dimensions.screenHeight * 0.008,
+              transform: [{ scale: 1.5 }],
+            }}
+          />
+        ) : (
+          <Text style={[styles.buttonText, textStyle]}>{title}</Text>
+        )}
       </TouchableOpacity>
     </View>
   );
@@ -30,7 +63,7 @@ const Button1: React.FC<ButtonProps> = ({ title, onPress, isPrimary, style, text
 
 const styles = StyleSheet.create({
   buttonContainer: {
-    width: '100%', // Ensures the container takes full width
+    width: '100%',
   },
   button: {
     flexDirection: 'row',
@@ -38,13 +71,16 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingHorizontal: 25,
     paddingVertical: dimensions.screenHeight * 0.017,
-    width: '100%', // Makes the button take full width of its container
+    width: '100%',
   },
   primaryButton: {
-    backgroundColor: '#466AA2',  // Primary color
+    backgroundColor: '#466AA2',
   },
   secondaryButton: {
-    backgroundColor: '#ED7964',  // Secondary color
+    backgroundColor: '#ED7964',
+  },
+  disabledButton: {
+    backgroundColor: '#A9A9A9',
   },
   buttonText: {
     color: '#fff',

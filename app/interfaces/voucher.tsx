@@ -1,4 +1,4 @@
-interface Voucher {
+export interface Voucher {
     id: string;
     title: string;
     description: string;
@@ -6,13 +6,11 @@ interface Voucher {
     discountType: 'percentage' | 'fixed';
     icon?: any;
     forFirstTime: boolean;
-    code: string; // e.g. "SAVE10"
-    expiryDate?: string; // ISO format "2025-05-01T00:00:00Z"
-    isActive: boolean; // can the user still use it?
-    usageLimit?: number; // optional - max total uses
-    usedCount?: number;  // optional - how many times it's been used
-    minOrderValue?: number; // optional - e.g., only valid for orders > $50
-    applicableCategories?: string[]; // e.g., ["Grooming", "Supplies"]
+    code: string;
+    expiryDate?: string;
+    isActive: boolean;
+    usageLimit?: number;
+    usedCount?: number;
+    minOrderValue?: number;
+    applicableCategories?: string[];
 }
-
-export default Voucher;
