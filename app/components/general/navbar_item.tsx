@@ -6,17 +6,19 @@ interface NavbarItemProps {
     icon: any;
     title: string;
     color: string;
+    marginTop?: number;
 }
 
-const NavbarItem: React.FC<NavbarItemProps> = ({ icon, title, color }) => {
+const NavbarItem: React.FC<NavbarItemProps> = ({ icon, title, color, marginTop }) => {
   return (
-    <View style={styles.cont}>
+    <View style={[styles.cont]}>
       {icon}
       <Text 
         style={[
             styles.textStyle, 
             { fontFamily: color == "#466AA2" ? "Poppins-Bold" : "Poppins-Regular" },
-            { color: color }
+            { color: color },
+            { marginTop: marginTop ?? dimensions.screenHeight * 0.002 }
         ]}
     >{title}</Text>
     </View>

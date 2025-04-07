@@ -11,8 +11,8 @@ interface ExploreProps {
 
 const ExploreIcon: React.FC<ExploreProps> = ({ color, width, height, props }) => (
   <Svg
-    width={width + dimensions.screenWidth * 0.012}
-    height={height + dimensions.screenWidth * 0.012}
+    width={width}
+    height={height}
     viewBox="0 0 24 24"
     fill="none"
     xmlns="http://www.w3.org/2000/svg"

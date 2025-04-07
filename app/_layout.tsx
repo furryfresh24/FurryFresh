@@ -57,12 +57,14 @@ const RootLayout = () => {
   }, [fontsLoaded]);
 
   useEffect(() => {
-    if (appReady && isFirstTime === true) {
-      router.replace('/screens/onboarding/get_started');
-    } else if (appReady && session && session.user && session.user['user_metadata'].pets == null) {
+    if (appReady && session && session.user && session.user['user_metadata'].pets == null) {
       router.replace('/screens/auth/sign_up_3'); 
     } else if (appReady && session && session.user) {
       router.replace('/screens/(tabs)'); 
+    } else if (appReady && isFirstTime === true) {
+      router.replace('/screens/onboarding/get_started');
+      console.log("AppReady: ", appReady);
+      console.log("isFirstTime: ", isFirstTime);
     } else if (appReady && !session) {
       router.replace('/screens/auth/sign_in');
     }
