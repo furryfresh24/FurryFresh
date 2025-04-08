@@ -19,6 +19,7 @@ import Subcategories from '../../interfaces/subcategories';
 import Price from '../../components/general/price';
 import svgValue from '../../hooks/fetchSvg';
 import SvgValue from '../../hooks/fetchSvg';
+import HorizontalButtonList from '../../components/list/horizontal_button_list';
 
 type Service = {
   id: number;
@@ -58,7 +59,7 @@ const vouchers: Voucher[] = [
 const Home = () => {
   const [categories, setCategories] = useState<Category[]>([]);
   const [subcategories, setSubcategories] = useState<Subcategories[]>([]);
-  const [activeService, setActiveService] = useState<number | null>(1);
+  const [activeService, setActiveService] = useState<number | string>(1);
 
   const fetchCategories = async (): Promise<void> => {
     const { data, error } = await supabase
@@ -107,35 +108,6 @@ const Home = () => {
     fetchSubcategories();
   }, []);
 
-  const renderItem = ({ item }: { item: Service }) => {
-    const isActive = item.id === activeService;
-    const id = item.id;
-    const IconComponent = item.icon;
-    const iconColor = isActive ? '#fff' : '#808080';
-
-    return (
-      <TouchableOpacity
-        style={[
-          styles.button,
-          isActive && styles.activeButton,
-          { marginLeft: id == 1 ? dimensions.screenWidth * 0.02 : 0 },
-        ]}
-        onPress={() => setActiveService(item.id)}
-      >
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-          <IconComponent
-            color={iconColor}
-            width={dimensions.screenWidth * 0.05}
-            height={dimensions.screenWidth * 0.05}
-          />
-          <Text style={[styles.buttonText, isActive && styles.activeButtonText]}>
-            {item.title}
-          </Text>
-        </View>
-      </TouchableOpacity>
-    );
-  };
-
   return (
     <MainContPlain paddingHorizontal={dimensions.screenWidth * 0.02}>
       <View style={styles.search}>
@@ -150,12 +122,10 @@ const Home = () => {
         <Text style={styles.searchText}>Search something here</Text>
       </View>
       <View>
-        <FlatList
-          data={services}
-          renderItem={renderItem}
-          keyExtractor={(item) => item.id.toString()}
-          horizontal
-          showsHorizontalScrollIndicator={false}
+        <HorizontalButtonList
+          services={services}
+          activeService={activeService}
+          setActiveService={setActiveService}
         />
       </View>
       <View>
@@ -176,42 +146,46 @@ const Home = () => {
                   scrollEnabled={false}
                   renderItem={({ item: subcatItem, index: subcatIndex }) => {
                     const icon = subcatItem.svg_icon ? <SvgValue svgIcon={subcatItem.svg_icon} color='#fff' width={dimensions.screenWidth * 0.11} height={dimensions.screenWidth * 0.11} /> : null;
-                    
+
                     return (
-                      <View style={[styles.listItem, { marginTop: subcatIndex == 0 ? dimensions.screenHeight * 0.02 : 0 }]}>
-                        <View style={styles.listSvgIconBG}>
-                          { !icon ? (
-                            <DefaultListIcon color='#fff' width={dimensions.screenWidth * 0.11} height={dimensions.screenWidth * 0.11} props />
-                          ) : (
-                            icon 
-                          )}
-                        </View>
-                        <View style={styles.listItemDetails}>
-                          <Text style={styles.l1title}>{subcatItem.title}</Text>
-                          <Text style={styles.l1description}>{subcatItem.description}</Text>
-                        </View>
-                        {subcatItem.price ? (
-                        <View style={{ height: '100%' }}>
-                          <View style={{ 
-                              backgroundColor: '#ED7964', 
-                              paddingVertical: dimensions.screenHeight * 0.001 ,
-                              paddingHorizontal: dimensions.screenWidth * 0.02,
-                              borderRadius: 10,
-                              marginTop: dimensions.screenHeight * 0.01
-                            }}>
-                            {subcatItem.price ? (
-                              <Price 
-                                value={subcatItem.price ?? 0.0}
-                                color='#fff'
-                                fontFamily='Poppins-SemiBold'
-                                fontSize={dimensions.screenWidth * 0.03}
-                                lineHeight={dimensions.screenWidth * 0.045}
-                                currencySize={dimensions.screenWidth * 0.03}
-                              />
-                            ) : (<></>)}
+                      <TouchableOpacity onPress={() => {
+                        if (catItem.category == 'PetSupplies') { router.push({ pathname: '../shop/shop', params: { title: subcatItem.title, id: subcatItem.id } }); }
+                      }}>
+                        <View style={[styles.listItem, { marginTop: subcatIndex == 0 ? dimensions.screenHeight * 0.02 : 0 }]}>
+                          <View style={styles.listSvgIconBG}>
+                            {!icon ? (
+                              <DefaultListIcon color='#fff' width={dimensions.screenWidth * 0.11} height={dimensions.screenWidth * 0.11} props />
+                            ) : (
+                              icon
+                            )}
                           </View>
-                        </View> ) : (<></>)} 
-                      </View>
+                          <View style={styles.listItemDetails}>
+                            <Text style={styles.l1title}>{subcatItem.title}</Text>
+                            <Text style={styles.l1description}>{subcatItem.description}</Text>
+                          </View>
+                          {subcatItem.price ? (
+                            <View style={{ height: '100%' }}>
+                              <View style={{
+                                backgroundColor: '#ED7964',
+                                paddingVertical: dimensions.screenHeight * 0.001,
+                                paddingHorizontal: dimensions.screenWidth * 0.02,
+                                borderRadius: 10,
+                                marginTop: dimensions.screenHeight * 0.01
+                              }}>
+                                {subcatItem.price ? (
+                                  <Price
+                                    value={subcatItem.price ?? 0.0}
+                                    color='#fff'
+                                    fontFamily='Poppins-SemiBold'
+                                    fontSize={dimensions.screenWidth * 0.03}
+                                    lineHeight={dimensions.screenWidth * 0.045}
+                                    currencySize={dimensions.screenWidth * 0.03}
+                                  />
+                                ) : (<></>)}
+                              </View>
+                            </View>) : (<></>)}
+                        </View>
+                      </TouchableOpacity>
                     );
                   }}
                 />

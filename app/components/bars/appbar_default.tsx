@@ -6,7 +6,7 @@ import { useRouter } from 'expo-router'; // For navigating back
 import { Session } from '@supabase/supabase-js';
 import PlaydateIcon from '../svgs/pets/PlaydateIcon';
 
-const AppbarDefault = ({ session, title }: { session: Session | null, title: string }) => {
+const AppbarDefault = ({ session, title, showLeading = false, leadingChildren = null, titleSize = dimensions.screenWidth * 0.05 }: { session: Session | null, title: string, showLeading: boolean, leadingChildren: any, titleSize: number }) => {
   const router = useRouter();
 
   return (
@@ -15,11 +15,10 @@ const AppbarDefault = ({ session, title }: { session: Session | null, title: str
         <Ionicons name="arrow-back" size={dimensions.screenWidth * 0.06} color="#000" />
       </TouchableOpacity>
 
-      <Text style={styles.title}>{title}</Text>
+      <Text style={[styles.title, { fontSize: titleSize }]}>{title}</Text>
 
-      <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-        <PlaydateIcon color='#000' width={dimensions.screenWidth * 0.08} height={dimensions.screenWidth * 0.08} props/>
-      </TouchableOpacity>
+      {showLeading ? leadingChildren : <View style={{ flex: 1, minHeight: dimensions.screenHeight * 0.0, backgroundColor: 'red', }}></View>
+      }
     </View>
   );
 };
@@ -30,7 +29,7 @@ const styles = StyleSheet.create({
   container: {
     backgroundColor: '#fff',
     paddingTop: dimensions.screenHeight * 0.06,
-    paddingBottom: dimensions.screenHeight * 0.006,
+    paddingBottom: dimensions.screenHeight * 0.02,
     paddingHorizontal: 16,
     borderBottomLeftRadius: 15,
     borderBottomRightRadius: 15,
@@ -44,7 +43,7 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
   },
   backButton: {
-    padding: 8,
+    flex: 1,
   },
   title: {
     fontSize: dimensions.screenWidth * 0.05,

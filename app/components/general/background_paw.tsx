@@ -7,6 +7,7 @@ interface MainContPawProps {
   showPetImage?: boolean;
   paddingHorizontal?: number | null;
   paddingVertical?: number | null;
+  allowScroll?: boolean;
 }
 
 const MainContPaw: React.FC<MainContPawProps> = ({
@@ -14,6 +15,7 @@ const MainContPaw: React.FC<MainContPawProps> = ({
   showPetImage = false,
   paddingHorizontal = null,
   paddingVertical = null,
+  allowScroll = true
 }) => {
   return (
     <View style={styles.container}>
@@ -39,14 +41,20 @@ const MainContPaw: React.FC<MainContPawProps> = ({
         />
       )}
 
-      <ScrollView
-        contentContainerStyle={{ flexGrow: 1 }}
-        showsVerticalScrollIndicator={false}
-        bounces={true}
-        keyboardShouldPersistTaps="handled"
-      >
+      {allowScroll ? (
+        <ScrollView
+          contentContainerStyle={{ flexGrow: 1 }}
+          showsVerticalScrollIndicator={false}
+          bounces={true}
+          keyboardShouldPersistTaps="handled"
+        >
+          <View style={{ paddingHorizontal, paddingVertical }}>{children}</View>
+        </ScrollView>
+      ) : (
         <View style={{ paddingHorizontal, paddingVertical }}>{children}</View>
-      </ScrollView>
+      )}
+
+
     </View>
   );
 };

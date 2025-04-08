@@ -1,34 +1,34 @@
 import * as React from "react";
 import Svg, { Path } from "react-native-svg";
-import dimensions from '../../../utils/sizing';
 
 interface ExploreProps {
-    color: string;
-    width: number;
-    height: number;
-    props: any;
+  color: string;
+  width: number;
+  height: number;
+  props: any;
 }
 
 const ExploreIcon: React.FC<ExploreProps> = ({ color, width, height, props }) => (
   <Svg
     width={width}
     height={height}
-    viewBox="0 0 24 24"
+    viewBox="2.3 2.3 19 19"
     fill="none"
     xmlns="http://www.w3.org/2000/svg"
+    xmlnsXlink="http://www.w3.org/1999/xlink"
     {...props}
   >
     <Path
-      d="M9.73319 10.4608C9.82276 10.1025 10.1025 9.82273 10.4608 9.73315L13.9187 8.86869C14.651 8.68559 15.3144 9.34899 15.1313 10.0814L14.2669 13.5392C14.1773 13.8975 13.8975 14.1773 13.5393 14.2668L10.0814 15.1313C9.34902 15.3144 8.68562 14.651 8.86872 13.9186L9.73319 10.4608Z"
+      d="M9.733 10.46a1 1 0 0 1 0.728 -0.727l3.458 -0.864a1 1 0 0 1 1.212 1.212l-0.864 3.458a1 1 0 0 1 -0.728 0.728l-3.458 0.864A1 1 0 0 1 8.87 13.92z"
       stroke={color}
-      strokeWidth={1.8}
+      strokeWidth={1.6}
       strokeLinecap="round"
       strokeLinejoin="round"
     />
     <Path
-      d="M12 3.5C5.5 3.5 3.5 5.5 3.5 12C3.5 18.5 5.5 20.5 12 20.5C18.5 20.5 20.5 18.5 20.5 12C20.5 5.5 18.5 3.5 12 3.5Z"
+      d="M12 3.5c-6.5 0 -8.5 2 -8.5 8.5s2 8.5 8.5 8.5 8.5 -2 8.5 -8.5 -2 -8.5 -8.5 -8.5"
       stroke={color}
-      strokeWidth={1.8}
+      strokeWidth={1.6}
       strokeLinecap="round"
       strokeLinejoin="round"
     />

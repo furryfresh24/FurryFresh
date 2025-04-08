@@ -177,8 +177,8 @@ const SignUpOTP = () => {
           type="numeric"
           secureTextEntry={false}
           focusStickBlinkingDuration={500}
-          onFocus={() => {}}
-          onBlur={() => {}}
+          onFocus={() => { }}
+          onBlur={() => { }}
           onTextChange={() => setOTPCode("")}
           onFilled={(text) => setOTPCode(text)}
           textInputProps={{
@@ -223,8 +223,8 @@ const SignUpOTP = () => {
             {isResending
               ? "Resending..."
               : timeLeft > 0
-              ? `Resend Code (${timeLeft}s)`
-              : "Resend Code"}
+                ? `Resend Code (${timeLeft}s)`
+                : "Resend Code"}
           </Text>
         </TouchableOpacity>
       </View>

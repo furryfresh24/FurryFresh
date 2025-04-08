@@ -1,74 +1,99 @@
-import React, { useEffect, useState } from 'react';
-import { Stack, useRouter } from 'expo-router';
+import React, { useEffect, useState, useRef } from 'react';
+import { Stack, useRouter, usePathname } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import useCustomFonts from './hooks/useFonts';
 import ThemeProvider from './providers/ThemeProvider';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import supabase from './utils/supabase'; 
+import supabase from './utils/supabase';
 import { Session } from '@supabase/supabase-js';
 import AppbarDefault from './components/bars/appbar_default';
-
+import { RouteProp } from '@react-navigation/native';
+import dimensions from '../app/utils/sizing';
 
 const RootLayout = () => {
   const fontsLoaded = useCustomFonts();
   const [appReady, setAppReady] = useState(false);
   const [isFirstTime, setIsFirstTime] = useState<boolean | null>(null);
-  const [session, setSession] = useState<Session | null>(null); 
+  const [session, setSession] = useState<Session | null>(null);
   const router = useRouter();
+  const pathname = usePathname();
+  const navigated = useRef(false);
 
+  // Session management
   useEffect(() => {
     const fetchSession = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       setSession(session);
     };
-    
+
     fetchSession();
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
     });
 
-    return () => {
-      subscription?.unsubscribe();
-    };
+    return () => subscription?.unsubscribe();
   }, []);
 
+  // App preparation logic
   useEffect(() => {
+    let timeoutId: NodeJS.Timeout;
+
     const prepare = async () => {
-      await SplashScreen.preventAutoHideAsync();
+      try {
+        await SplashScreen.preventAutoHideAsync();
+        const firstTime = await AsyncStorage.getItem('getStarted7');
+        setIsFirstTime(firstTime === null);
 
-      const firstTime = await AsyncStorage.getItem('getStarted7');
-
-      if (firstTime === null) {
-        setIsFirstTime(true);
-      } else {
-        setIsFirstTime(false);
-      }
-
-      if (fontsLoaded) {
-        setTimeout(async () => {
-          await SplashScreen.hideAsync();
-          setAppReady(true);
-        }, 1000);
+        if (fontsLoaded) {
+          timeoutId = setTimeout(async () => {
+            await SplashScreen.hideAsync();
+            setAppReady(true);
+          }, 1000);
+        }
+      } catch (error) {
+        console.error('App preparation error:', error);
       }
     };
 
     prepare();
+
+    return () => {
+      if (timeoutId) clearTimeout(timeoutId);
+    };
   }, [fontsLoaded]);
 
+  // Routing logic
   useEffect(() => {
-    if (appReady && session && session.user && session.user['user_metadata'].pets == null) {
-      router.replace('/screens/auth/sign_up_3'); 
-    } else if (appReady && session && session.user) {
-      router.replace('/screens/(tabs)'); 
-    } else if (appReady && isFirstTime === true) {
-      router.replace('/screens/onboarding/get_started');
-      console.log("AppReady: ", appReady);
-      console.log("isFirstTime: ", isFirstTime);
-    } else if (appReady && !session) {
-      router.replace('/screens/auth/sign_in');
+    if (!appReady || navigated.current) return;
+
+    const currentRoute = pathname.split('/').pop() || '';
+    const userMetadata = session?.user?.user_metadata;
+
+    const routeMap = {
+      authenticated: userMetadata?.pets ? '/screens/(tabs)' : '/screens/auth/sign_up_3',
+      firstTime: '/screens/onboarding/get_started',
+      default: '/screens/auth/sign_in'
+    };
+
+    if (session?.user) {
+      if (!currentRoute.includes('sign_up_3') && !userMetadata?.pets) {
+        navigated.current = true;
+        router.replace(routeMap.authenticated);
+      } else if (!currentRoute.includes('(tabs)')) {
+        navigated.current = true;
+        router.replace(routeMap.authenticated);
+      }
+    } else if (isFirstTime) {
+      if (!currentRoute.includes('get_started')) {
+        navigated.current = true;
+        router.replace(routeMap.firstTime);
+      }
+    } else if (!currentRoute.includes('sign_in')) {
+      navigated.current = true;
+      router.replace(routeMap.default);
     }
-  }, [appReady, isFirstTime, session, router]);
+  }, [appReady, isFirstTime, session, pathname]);
 
   return (
     <ThemeProvider>
@@ -82,17 +107,26 @@ const RootLayout = () => {
         <Stack.Screen name="screens/auth/forgot_password_1" options={{ headerShown: false }} />
         <Stack.Screen name="screens/auth/forgot_password_2" options={{ headerShown: false }} />
         <Stack.Screen name="screens/auth/forgot_password_3" options={{ headerShown: false }} />
-        <Stack.Screen 
-          name="screens/(tabs)" 
-          options={{ 
-            headerShown: false
-          }} 
+        <Stack.Screen
+          name="screens/(tabs)"
+          options={{ headerShown: false }}
         />
-        <Stack.Screen 
-          name="screens/pets/pets" 
-          options={{ 
-            header: () => <AppbarDefault title='Pets' session={session} />
-          }} 
+        <Stack.Screen
+          name="screens/pets/pets"
+          options={{
+            header: () => <AppbarDefault title='Pets' session={session} showLeading={false} leadingChildren={undefined} titleSize={dimensions.screenWidth * 0.05} />
+          }}
+        />
+        <Stack.Screen
+          name="screens/shop/shop"
+          options={({ route }: { route: RouteProp<Record<string, { title?: string }>, string>; }) => {
+            const titleParam = route?.params?.title;
+            const title = typeof titleParam === 'string' ? titleParam : 'Shop';
+
+            return {
+              header: () => <AppbarDefault title={title} session={session} showLeading={false} leadingChildren={undefined} titleSize={dimensions.screenWidth * 0.045} />
+            };
+          }}
         />
       </Stack>
     </ThemeProvider>

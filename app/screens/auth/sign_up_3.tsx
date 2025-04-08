@@ -40,7 +40,7 @@ const SignUpPet = (props: Props) => {
     setSelectedPets((prevSelected) =>
       prevSelected.includes(id)
         ? prevSelected.filter((petId) => petId !== id)
-        : [...prevSelected, id]
+        : [...prevSelected, id] 
     );
   };
 
@@ -60,6 +60,8 @@ const SignUpPet = (props: Props) => {
           console.error("Error updating user metadata:", updateError.message);
           return;
         }
+
+        router.replace('../(tabs)');
         
       } else {
         console.error("No user found.");
@@ -142,7 +144,7 @@ const styles = StyleSheet.create({
     alignItems: "flex-start",
   },
   wrapContainer: {
-    flexDirection: "row",
+    flexDirection: "row", 
     flexWrap: "wrap",
     marginTop: dimensions.screenHeight * 0.01,
     marginBottom: dimensions.screenHeight * 0.1,

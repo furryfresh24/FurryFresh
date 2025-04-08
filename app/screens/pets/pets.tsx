@@ -3,7 +3,7 @@ import React from 'react'
 import MainContPaw from '../../components/general/background_paw'
 import supabase from '../../utils/supabase'
 
-type Props = {}
+type Props = {} 
 
 const petTypes = [
   {
@@ -19,6 +19,7 @@ const Pets = (props: Props) => {
       <View>
         <FlatList 
           data={petTypes}
+          scrollEnabled={false}
           renderItem={({ item }) => (
             <View>
               <Text>{item.title}</Text>
