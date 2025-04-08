@@ -66,7 +66,7 @@ const CustomTextInput: React.FC<CustomTextInputProps> = ({
     }),
     left: labelPosition.interpolate({
       inputRange: [0, 1],
-      outputRange: [dimensions.screenWidth * 0.135, dimensions.screenWidth * 0.135],
+      outputRange: [dimensions.screenWidth * 0.135, dimensions.screenWidth * 0.125],
     }),
     fontSize: labelPosition.interpolate({
       inputRange: [0, 1],
