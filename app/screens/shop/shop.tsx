@@ -114,8 +114,6 @@ const Shop = () => {
         }
     }; 
     
-    
-
     useEffect(() => {
         const init = async () => {
             const subcats = await fetchSupplySubcategories();
@@ -136,9 +134,6 @@ const Shop = () => {
         init();
     }, []);
     
-    
-    
-
     const servicesFromSubcategories = supplySubcategories.map((subcat) => ({
         id: subcat.id,
         title: subcat.name,
