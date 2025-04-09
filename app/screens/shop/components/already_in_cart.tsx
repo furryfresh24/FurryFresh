@@ -1,6 +1,5 @@
-// components/cart/AlreadyInCartBar.tsx
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, Text, TouchableOpacity } from 'react-native';
+import { View, StyleSheet, Text, TouchableOpacity, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import dimensions from '../../../utils/sizing';
 import Cart from '../../../interfaces/cart';
@@ -21,7 +20,7 @@ const AlreadyInCartBar: React.FC<Props> = ({ isCarting, productPrice, cart }) =>
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    setQuantity(cart.quantity); 
+    setQuantity(cart.quantity);
   }, [cart]);
 
   const handleDecrement = async () => {
@@ -29,8 +28,28 @@ const AlreadyInCartBar: React.FC<Props> = ({ isCarting, productPrice, cart }) =>
       const newQuantity = quantity - 1;
       setQuantity(newQuantity);
       setPrice(productPrice * newQuantity);
-      setLoading(true); 
+      setLoading(true);
       await updateCart(newQuantity);
+    } else if (quantity === 1) {
+      // Show confirmation dialog if quantity is 1
+      Alert.alert(
+        'Remove Item',
+        'This will remove the item from your cart. Are you sure?',
+        [
+          {
+            text: 'Cancel',
+            onPress: () => console.log('Cancel pressed'),
+            style: 'cancel',
+          },
+          {
+            text: 'Remove',
+            onPress: async () => {
+              await removeItemFromCart();
+            },
+          },
+        ],
+        { cancelable: false }
+      );
     }
   };
 
@@ -39,8 +58,27 @@ const AlreadyInCartBar: React.FC<Props> = ({ isCarting, productPrice, cart }) =>
       const newQuantity = quantity + 1;
       setQuantity(newQuantity);
       setPrice(productPrice * newQuantity);
-      setLoading(true); 
+      setLoading(true);
       await updateCart(newQuantity);
+    }
+  };
+
+  const removeItemFromCart = async () => {
+    try {
+      const { error } = await supabase
+        .from('carts')
+        .delete()
+        .eq('id', cart.id);
+
+      if (error) {
+        console.error('Error removing item from cart:', error);
+      } else {
+        console.log('Item removed from cart!');
+        // You can update the context to reflect the change
+        fetchCarts(); // Fetch updated cart
+      }
+    } catch (err) {
+      console.error('Unexpected error removing item from cart:', err);
     }
   };
 
@@ -65,7 +103,7 @@ const AlreadyInCartBar: React.FC<Props> = ({ isCarting, productPrice, cart }) =>
     } catch (err) {
       console.error('Unexpected error updating cart:', err);
     } finally {
-      setLoading(false); 
+      setLoading(false);
     }
   };
 
@@ -83,9 +121,9 @@ const AlreadyInCartBar: React.FC<Props> = ({ isCarting, productPrice, cart }) =>
       </View>
 
       <View style={styles.incrementorCont}>
-        <TouchableOpacity 
-          onPress={handleDecrement} 
-          style={[styles.iconLeft, { backgroundColor: loading ? '#808080' : '#ED7964'}]} 
+        <TouchableOpacity
+          onPress={handleDecrement}
+          style={[styles.iconLeft, { backgroundColor: loading ? '#808080' : '#ED7964' }]}
           disabled={loading}
         >
           <Ionicons name="remove-circle" size={dimensions.screenWidth * 0.06} color="white" />
@@ -97,9 +135,9 @@ const AlreadyInCartBar: React.FC<Props> = ({ isCarting, productPrice, cart }) =>
           </Text>
         </View>
 
-        <TouchableOpacity 
-          onPress={handleIncrement} 
-          style={[styles.iconRight, { backgroundColor: loading ? '#808080' : '#ED7964'}]} 
+        <TouchableOpacity
+          onPress={handleIncrement}
+          style={[styles.iconRight, { backgroundColor: loading ? '#808080' : '#ED7964' }]}
           disabled={loading}
         >
           <Ionicons name="add-circle" size={dimensions.screenWidth * 0.06} color="white" />
@@ -132,7 +170,7 @@ const styles = StyleSheet.create({
   detailsCont: {
     flex: 1,
     width: 'auto',
-  },
+  }, 
   iconLeft: {
     backgroundColor: '#ED7964',
     width: dimensions.screenWidth * 0.1,

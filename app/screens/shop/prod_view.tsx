@@ -116,24 +116,20 @@ const ProductView = () => {
       if (!existingCart) {
         console.log('Product not found in cart. Adding new item...');
 
-        const { error: insertError } = await supabase.from('carts').insert({
+        const { data: newCart, error: insertError } = await supabase.from('carts').insert({
           user_id,
           product_id,
           quantity: 1,
           price: product.price,
-        });
+        }).select().single();
+
 
         if (insertError) {
           console.error('Error inserting into cart:', insertError);
         } else {
           console.log('Product added to cart successfully!');
 
-          addToCartContext({
-            product_id,
-            quantity: 1,
-            price: product.price,
-            user_id: session.user.id,
-          });
+          addToCartContext(newCart);
           setIsInCart(true);
         }
       } else {
@@ -211,8 +207,7 @@ const ProductView = () => {
   ];
 
   const addToCart = () => {
-    return (
-      isInCart ? <AlreadyInCartBar isCarting={isCarting} productPrice={product?.price ?? 0.0} cart={carts.find(item => item.product_id === (Array.isArray(id) ? id[0] : id)) as Cart} />
+    return (carts.find((cts) => cts.product_id == (Array.isArray(id) ? id[0] : id)) ? <AlreadyInCartBar isCarting={isCarting} productPrice={product?.price ?? 0.0} cart={carts.find(item => item.product_id === (Array.isArray(id) ? id[0] : id)) as Cart} />
       : <AddNewToCartBar isCarting={isCarting} onAddToCart={addToCartButton} />
     );
   };
