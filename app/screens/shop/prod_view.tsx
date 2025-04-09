@@ -26,7 +26,6 @@ const ProductView = () => {
   const { id, subcategory } = useLocalSearchParams();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [currentMenuIndex, setCurrentMenuIndex] = useState<string>('1');
-  const [isInCart, setIsInCart] = useState(false);
   const scrollX = React.useRef(new Animated.Value(0)).current;
   const flatListRef = useRef<FlatList>(null);
   const [product, setProduct] = useState<Product | null>(null);
@@ -42,7 +41,6 @@ const ProductView = () => {
 
   useEffect(() => {
     if (id) {
-      checkIfInCart(Array.isArray(id) ? id[0] : id);
       fetchProduct(Array.isArray(id) ? id[0] : id);
     }
   }, [id]); 
@@ -69,18 +67,12 @@ const ProductView = () => {
       } as Product;
 
       setProduct(parsed);
-      checkIfInCart(parsed.id);
 
     } catch (err) {
       console.error('Unexpected error fetching product:', err);
     } finally {
       setIsLoading(false);
     }
-  };
-
-  const checkIfInCart = (productId: string) => {
-    const cartItem = carts.find(item => item.product_id === productId);
-    setIsInCart(!!cartItem);
   };
 
   const addToCartButton = async () => {
@@ -92,7 +84,7 @@ const ProductView = () => {
     const user_id = session.user.id;
     const product_id = product.id;
 
-    if (isInCart) {
+    if ((carts.find((cts) => cts.product_id == (Array.isArray(id) ? id[0] : id)))) {
       console.log('Product already in cart');
       return;
     }
@@ -130,7 +122,6 @@ const ProductView = () => {
           console.log('Product added to cart successfully!');
 
           addToCartContext(newCart);
-          setIsInCart(true);
         }
       } else {
         console.log('Product found in cart. Updating quantity...');
@@ -155,8 +146,6 @@ const ProductView = () => {
             user_id: session.user.id,
             created_at: undefined
           });
-
-          setIsInCart(true);
         }
       }
     } catch (err) {
