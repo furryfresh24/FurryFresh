@@ -16,6 +16,7 @@ import { NavigationContainer, useFocusEffect } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Explore from './explore';
 import ExploreIcon from '../../components/svgs/hub/ExploreIcon';
+import { PortalProvider } from '@gorhom/portal';
 
 const Tab = createBottomTabNavigator();
 
@@ -32,95 +33,99 @@ export default () => {
   }, []);
 
   return (
-    <NavigationContainer>
-      <Tab.Navigator
-        screenOptions={{
-          tabBarShowLabel: false,
-          tabBarActiveTintColor: '#466AA2',
-          tabBarInactiveTintColor: '#8e8e8e',
-          tabBarBackground: () => (
-            <BlurView tint="light" intensity={100} style={StyleSheet.absoluteFill} />
-          ),
-          tabBarStyle: {
-            backgroundColor: '#fff',
-            position: 'absolute',
-            elevation: 15,
-            height: dimensions.screenHeight * 0.1,
-            paddingTop: dimensions.screenHeight * 0.01,
-            shadowColor: '#000',
-            shadowOffset: { width: 0, height: -30 },
-            shadowOpacity: 0.1,
-            shadowRadius: 5,
-            alignItems: 'center',
-            alignContent: 'center',
-          },
-        }}
-      >
-        <Tab.Screen
-          name="home"
-          component={HomeWithAnimation}
-          options={{
-            tabBarIcon: ({ color }: { color: string }) => (
-              <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-                <NavbarItem
-                  color={color}
-                  title="Home"
-                  icon={<HomeIcon color={color} width={dimensions.screenWidth * 0.07} height={dimensions.screenWidth * 0.07} props={undefined} />}
-                />
-              </View>
+    <PortalProvider>
+      <NavigationContainer>
+        <Tab.Navigator
+          screenOptions={{
+            tabBarShowLabel: false,
+            tabBarActiveTintColor: '#466AA2',
+            tabBarInactiveTintColor: '#8e8e8e',
+            tabBarBackground: () => (
+              <BlurView tint="light" intensity={100} style={StyleSheet.absoluteFill} />
             ),
-            header: () => homeOptions.header(session),
+            tabBarStyle: {
+              backgroundColor: '#fff',
+              position: 'absolute',
+              elevation: 15,
+              height: dimensions.screenHeight * 0.1,
+              paddingTop: dimensions.screenHeight * 0.01,
+              shadowColor: '#000',
+              shadowOffset: { width: 0, height: -30 },
+              shadowOpacity: 0.1,
+              shadowRadius: 5,
+              alignItems: 'center',
+              alignContent: 'center',
+            },
           }}
-        />
-        <Tab.Screen
-          name="explore"
-          component={ExploreWithAnimation}
-          options={{
-            tabBarIcon: ({ color }: { color: string }) => (
-              <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-                <NavbarItem
-                  color={color}
-                  title="Explore"
-                  icon={<ExploreIcon color={color} width={dimensions.screenWidth * 0.07} height={dimensions.screenWidth * 0.07}  props={undefined} />}
-                />
-              </View>
-            ),
-          }}
-        />
-        <Tab.Screen
-          name="activity"
-          component={ActivityWithAnimation}
-          options={{
-            tabBarIcon: ({ color }: { color: string }) => (
-              <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-                <NavbarItem
-                  color={color}
-                  title="Activity"
-                  icon={<ActivityIcon color={color} width={dimensions.screenWidth * 0.07} height={dimensions.screenWidth * 0.07} props={undefined} />}
-                />
-              </View>
-            ),
-            tabBarBadge: 10,
-          }}
-        />
-        <Tab.Screen
-          name="profile"
-          component={ProfileWithAnimation}
-          options={{
-            tabBarIcon: ({ color }: { color: string }) => (
-              <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-                <NavbarItem
-                  color={color}
-                  title="Profile"
-                  icon={<ProfileIcon color={color} width={dimensions.screenWidth * 0.07} height={dimensions.screenWidth * 0.07} props={undefined} />}
-                />
-              </View>
-            ),
-            headerShown: false,
-          }}
-        />
-      </Tab.Navigator>
-    </NavigationContainer>
+        >
+          <Tab.Screen
+            name="home"
+            component={HomeWithAnimation}
+            options={{
+              tabBarIcon: ({ color }: { color: string }) => (
+                <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+                  <NavbarItem
+                    color={color}
+                    title="Home"
+                    icon={<HomeIcon color={color} width={dimensions.screenWidth * 0.07} height={dimensions.screenWidth * 0.07} props={undefined} />}
+                  />
+                </View>
+              ),
+              header: () => homeOptions.header(session),
+              headerTransparent: true,
+              headerShown: false, // If you're using a custom header like `homeOptions.header`
+            }}
+          />
+          <Tab.Screen
+            name="explore"
+            component={ExploreWithAnimation}
+            options={{
+              tabBarIcon: ({ color }: { color: string }) => (
+                <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+                  <NavbarItem
+                    color={color}
+                    title="Explore"
+                    icon={<ExploreIcon color={color} width={dimensions.screenWidth * 0.07} height={dimensions.screenWidth * 0.07} props={undefined} />}
+                  />
+                </View>
+              ),
+            }}
+          />
+          <Tab.Screen
+            name="activity"
+            component={ActivityWithAnimation}
+            options={{
+              tabBarIcon: ({ color }: { color: string }) => (
+                <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+                  <NavbarItem
+                    color={color}
+                    title="Activity"
+                    icon={<ActivityIcon color={color} width={dimensions.screenWidth * 0.07} height={dimensions.screenWidth * 0.07} props={undefined} />}
+                  />
+                </View>
+              ),
+              tabBarBadge: 10,
+            }}
+          />
+          <Tab.Screen
+            name="profile"
+            component={ProfileWithAnimation}
+            options={{
+              tabBarIcon: ({ color }: { color: string }) => (
+                <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+                  <NavbarItem
+                    color={color}
+                    title="Profile"
+                    icon={<ProfileIcon color={color} width={dimensions.screenWidth * 0.07} height={dimensions.screenWidth * 0.07} props={undefined} />}
+                  />
+                </View>
+              ),
+              headerShown: false,
+            }}
+          />
+        </Tab.Navigator>
+      </NavigationContainer>
+    </PortalProvider>
   );
 };
 
