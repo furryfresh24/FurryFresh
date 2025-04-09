@@ -148,11 +148,16 @@ const ProductView = () => {
           ref={flatListRef}
           data={photoSlides}
           renderItem={({ item }) => (
-            <Image
-              source={{ uri: item }}
-              style={{ width: dimensions.screenWidth * 0.6, height: dimensions.screenWidth * 0.6 }}
-              resizeMode="cover"
-            />
+            <View style={{ width: dimensions.screenWidth, display: 'flex', alignItems: 'center'}}>
+              <Image
+                source={{ uri: item }}
+                style={{
+                  width: dimensions.screenWidth * 0.6,
+                  height: dimensions.screenWidth * 0.6,
+                }}
+                resizeMode="cover"
+              />
+            </View>
           )}
           horizontal
           showsHorizontalScrollIndicator={false}
