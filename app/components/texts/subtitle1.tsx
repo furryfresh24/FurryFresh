@@ -11,6 +11,7 @@ interface SubtitleProps {
   opacity?: number; 
   marginTop?: number;
   textAlign?: TextStyle['textAlign'];
+  lineHeight?: number;
 }
 
 const Subtitle1: React.FC<SubtitleProps> = ({
@@ -21,7 +22,8 @@ const Subtitle1: React.FC<SubtitleProps> = ({
   color = '#808080', 
   opacity = 1, 
   marginTop = 0,
-  textAlign = 'center' 
+  textAlign = 'center' ,
+  lineHeight
 }) => {
   return (
     <Text
@@ -33,6 +35,7 @@ const Subtitle1: React.FC<SubtitleProps> = ({
         opacity !== undefined ? { opacity } : null,
         marginTop ? { marginTop } : null,
         textAlign ? { textAlign } : null,
+        lineHeight ? { lineHeight } : null,
         style, 
       ]}
     >

@@ -1,9 +1,9 @@
-import { StyleSheet, Text, View, FlatList, Image } from 'react-native';
+import { StyleSheet, Text, View, FlatList, Image, TouchableOpacity } from 'react-native';
 import React, { useEffect, useState, useRef } from 'react';
 import SupplySubcategory from '../../interfaces/suppy_subcategory';
 import Product from '../../interfaces/product';
 import MainContPaw from '../../components/general/background_paw';
-import { useLocalSearchParams, useNavigation } from 'expo-router';
+import { router, useLocalSearchParams, useNavigation } from 'expo-router';
 import HorizontalButtonList from '../../components/list/horizontal_button_list';
 import supabase from '../../utils/supabase';
 import dimensions from '../../utils/sizing';
@@ -114,38 +114,50 @@ const Shop = () => {
     const servicesWithAll = [{ id: 'all', title: 'All' }, ...servicesFromSubcategories];
 
     return (
-        <MainContPaw allowScroll={false}> 
+        <MainContPaw allowScroll={false}>
             <View>
                 <HorizontalButtonList
                     services={servicesWithAll}
                     activeService={activeService}
                     setActiveService={(id) => {
-                        setActiveService(id);  // Update activeService state
-                        fetchMoreProducts(true, id);  // Fetch products for the selected service
+                        setActiveService(id);
+                        fetchMoreProducts(true, id);
                     }}
                     activeColor="#466AA2"
                     paddingHorizontal={dimensions.screenWidth * 0.06}
                 />
-                <Spacer height={dimensions.screenHeight * 0.02}/>
+                <Spacer height={dimensions.screenHeight * 0.02} />
                 <FlatList
                     data={products}
                     keyExtractor={(item) => item.id}
                     scrollEnabled={true}
                     renderItem={({ item }) => (
-                        <View style={styles.productCard}>
-                            <View style={styles.productImageCont}>
-                                <Image
-                                    source={{ uri: (item.product_images ?? [])[0] }} // Display the first image
-                                    style={styles.productImage} // Adjust styles as needed
-                                    resizeMode="cover" // Adjust the image display mode
-                                />
+                        <TouchableOpacity onPress={() => {
+                            router.push({
+                                pathname: './prod_view',
+                                params: {
+                                    id: item.id,
+                                    subcategory: (servicesWithAll.find((serv) => serv.id == item.subcategory_id)?.title ?? '')
+                                }
+                            })
+                        }}>
+                            <View style={styles.productCard}>
+                                <View style={styles.productImageCont}>
+                                    <Image
+                                        source={{ uri: (item.product_images ?? [])[0] }}
+                                        style={styles.productImage}
+                                        resizeMode="cover"
+                                    />
+                                </View>
+                                <View style={styles.productDetails}>
+                                    <Text style={styles.productSubcategory}>
+                                        {(servicesWithAll.find((serv) => serv.id == item.subcategory_id)?.title ?? '').toLocaleUpperCase()}
+                                    </Text>
+                                    <Text style={styles.productTitle}>{item.name}</Text>
+                                    <Price value={item.price} color='#808080' fontSize={dimensions.screenWidth * 0.035} />
+                                </View>
                             </View>
-                            <View style={styles.productDetails}>
-                                <Text style={styles.productSubcategory}>{(servicesWithAll.filter((serv) => serv.id == item.subcategory_id)[0].title ?? '').toLocaleUpperCase()}</Text>
-                                <Text style={styles.productTitle}>{item.name}</Text>
-                                <Price value={item.price} color='#808080' fontSize={dimensions.screenWidth * 0.035}/>
-                            </View>
-                        </View>
+                        </TouchableOpacity>
                     )}
                     onEndReached={() => products.length > LIMIT ? fetchMoreProducts(false, activeService) : null}
                     onEndReachedThreshold={0.5}

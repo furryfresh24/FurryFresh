@@ -19,6 +19,7 @@ interface ButtonProps {
   textStyle?: TextStyle;
   borderRadius?: number;
   loading?: boolean;
+  customStyle?: any
 }
 
 const Button1: React.FC<ButtonProps> = ({
@@ -28,6 +29,7 @@ const Button1: React.FC<ButtonProps> = ({
   style,
   textStyle,
   borderRadius,
+  customStyle,
   loading = false,
 }) => {
   const isDisabled = loading || !onPress;
@@ -35,8 +37,7 @@ const Button1: React.FC<ButtonProps> = ({
   return (
     <View style={[styles.buttonContainer, style]}>
       <TouchableOpacity
-        style={[
-          styles.button,
+        style={[customStyle ?? styles.button,
           isPrimary ? styles.primaryButton : styles.secondaryButton,
           isDisabled && styles.disabledButton,
           borderRadius ? { borderRadius } : null,
@@ -64,11 +65,13 @@ const Button1: React.FC<ButtonProps> = ({
 const styles = StyleSheet.create({
   buttonContainer: {
     width: '100%',
+    justifyContent: 'center', // Ensure the button itself is centered horizontally
+    alignItems: 'center', // Centers the button container
   },
   button: {
     flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: 'center', // Ensure content inside the button is vertically centered
+    justifyContent: 'center', // Ensure content is horizontally centered
     paddingHorizontal: 25,
     paddingVertical: dimensions.screenHeight * 0.017,
     width: '100%',
@@ -85,7 +88,7 @@ const styles = StyleSheet.create({
   buttonText: {
     color: '#fff',
     fontSize: dimensions.screenWidth * 0.045,
-    marginTop: dimensions.screenHeight * 0.001,
+    textAlign: 'center', // Ensures the text is centered
     fontFamily: 'Poppins-SemiBold',
   },
 });

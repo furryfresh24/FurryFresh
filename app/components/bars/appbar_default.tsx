@@ -15,7 +15,7 @@ const AppbarDefault = ({ session, title, showLeading = false, leadingChildren = 
         <Ionicons name="arrow-back" size={dimensions.screenWidth * 0.06} color="#000" />
       </TouchableOpacity>
 
-      <Text style={[styles.title, { fontSize: titleSize }]}>{title}</Text>
+      <Text numberOfLines={1} style={[styles.title, { fontSize: titleSize }]}>{title}</Text>
 
       {showLeading ? leadingChildren : <View style={{ flex: 1, minHeight: dimensions.screenHeight * 0.0, backgroundColor: 'red', }}></View>
       }
