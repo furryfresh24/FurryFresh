@@ -22,11 +22,17 @@ const ProductView = () => {
   const { id, subcategory } = useLocalSearchParams();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [currentMenuIndex, setCurrentMenuIndex] = useState<string>('1');
+  const [isInCart, setIsInCart] = useState(false);
   const scrollX = React.useRef(new Animated.Value(0)).current;
   const flatListRef = useRef<FlatList>(null);
   const [product, setProduct] = useState<Product | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [isCarting, setCarting] = useState(false);
   const [ratings, setRatings] = useState<number>(3.5);
+
+  const viewableItemsChanged = useRef(({ viewableItems }: { viewableItems: ViewToken[] }) => {
+    setCurrentIndex(viewableItems[0]?.index ?? 0);
+  }).current;
 
   const fetchProduct = async (id: string) => {
     setIsLoading(true);
@@ -51,9 +57,8 @@ const ProductView = () => {
         updated_at: data.updated_at ? new Date(data.updated_at) : undefined,
       } as Product;
 
-      console.log(parsed);
-
       setProduct(parsed);
+      checkIfInCart(parsed.id);
     } catch (err) {
       console.error('Unexpected error fetching product:', err);
     } finally {
@@ -61,9 +66,96 @@ const ProductView = () => {
     }
   };
 
-  const viewableItemsChanged = useRef(({ viewableItems }: { viewableItems: ViewToken[] }) => {
-    setCurrentIndex(viewableItems[0]?.index ?? 0);
-  }).current;
+  const checkIfInCart = async (productId: string) => {
+    if (!session) return;
+
+    const user_id = session.user.id;
+
+    const { data: existingCart, error } = await supabase
+      .from('carts')
+      .select('*')
+      .eq('user_id', user_id)
+      .eq('product_id', productId)
+      .maybeSingle();
+
+    if (error) {
+      console.error('Error checking cart:', error);
+      return;
+    }
+
+    setIsInCart(existingCart ? true : false);
+  };
+
+  const addToCartButton = async () => {
+    if (!session || !product) {
+      console.log('No session or product available.');
+      return;
+    }
+
+    const user_id = session.user.id;
+    const product_id = product.id;
+
+    if (isInCart) {
+      console.log('Product already in cart');
+      return;
+    }
+
+    console.log('Adding product to cart...');
+    setCarting(true);
+
+    try {
+      const { data: existingCart, error: fetchError } = await supabase
+        .from('carts')
+        .select('*')
+        .eq('user_id', user_id)
+        .eq('product_id', product_id)
+        .maybeSingle();
+
+      if (fetchError) {
+        console.error('Error checking cart:', fetchError);
+        return;
+      }
+
+      if (!existingCart) {
+        console.log('Product not found in cart. Adding new item...');
+
+        const { error: insertError } = await supabase.from('carts').insert({
+          user_id,
+          product_id,
+          quantity: 1,
+          price: product.price,
+        });
+
+        if (insertError) {
+          console.error('Error inserting into cart:', insertError);
+        } else {
+          console.log('Product added to cart successfully!');
+          setIsInCart(true);
+        }
+      } else {
+        console.log('Product found in cart. Updating quantity...');
+
+        const { error: updateError } = await supabase
+          .from('carts')
+          .update({
+            quantity: existingCart.quantity + 1,
+            price: product.price * (existingCart.quantity + 1),
+          })
+          .eq('id', existingCart.id);
+
+        if (updateError) {
+          console.error('Error updating cart:', updateError);
+        } else {
+          console.log('Cart quantity updated successfully!');
+          setIsInCart(true);  // Update UI to show the product is now in the cart
+        }
+      }
+    } catch (err) {
+      console.error('Unexpected error adding to cart:', err);
+    } finally {
+      setCarting(false);
+    }
+  };
 
   useEffect(() => {
     const fetchSession = async () => {
@@ -84,7 +176,7 @@ const ProductView = () => {
     if (id) {
       fetchProduct(Array.isArray(id) ? id[0] : id);
     }
-  }, [id]);
+  }, [id, session]);
 
   const photoSlides = product?.product_images || [];
 
@@ -102,6 +194,55 @@ const ProductView = () => {
       title: 'FAQs',
     },
   ];
+
+  const addToCart = () => {
+    return (
+      <View style={styles.addToCart}>
+        <LinearGradient
+          colors={['#FFFFFF', 'transparent']}
+          start={{ x: 0, y: 1 }}
+          end={{ x: 0, y: 0 }}
+          style={[styles.gradientBackground, { paddingHorizontal: isInCart ? dimensions.screenWidth * 0.14 : 0 }]}
+        >
+          {isInCart &&
+            <View style={{
+              backgroundColor: '#ED7964',
+              width: dimensions.screenWidth * 0.15,
+              height: '100%',
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              marginHorizontal: dimensions.screenWidth * 0.02,
+              borderRadius: 15,
+              elevation: 5
+            }}>
+              <Ionicons name='remove-circle' size={dimensions.screenWidth * 0.06} color="white" />
+            </View>}
+          <Button1
+            isPrimary={true}
+            title={isInCart ? "Already in Cart" : "Add to Cart"}
+            loading={isCarting}
+            onPress={addToCartButton}
+            customStyle={[styles.addToCartButton, isInCart && { backgroundColor: '#ccc' }]} // Disable button if in cart
+          />
+          {isInCart &&
+            <View style={{
+              backgroundColor: '#466AA2',
+              width: dimensions.screenWidth * 0.15,
+              height: '100%',
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              marginHorizontal: dimensions.screenWidth * 0.02,
+              borderRadius: 15,
+              elevation: 5
+            }}>
+              <Ionicons name='add-circle' size={dimensions.screenWidth * 0.06} color="white" />
+            </View>}
+        </LinearGradient>
+      </View>
+    );
+  };
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -121,26 +262,6 @@ const ProductView = () => {
     });
   }, [navigation, session]);
 
-  const addToCart = () => {
-    return (
-      <View style={styles.addToCart}>
-        <LinearGradient
-          colors={['#FFFFFF', 'transparent']}
-          start={{ x: 0, y: 1 }}
-          end={{ x: 0, y: 0 }}
-          style={styles.gradientBackground}
-        >
-          <Button1
-            isPrimary={true}
-            title="Add to Cart"
-            onPress={() => { }}
-            customStyle={styles.addToCartButton}
-          />
-        </LinearGradient>
-      </View>
-    );
-  }
-
   return (
     <MainContPlain floatingComponent={addToCart()} floatingPosition={{ bottom: 0, left: 0, right: 0 }}>
       <View style={styles.productImageCont}>
@@ -148,7 +269,7 @@ const ProductView = () => {
           ref={flatListRef}
           data={photoSlides}
           renderItem={({ item }) => (
-            <View style={{ width: dimensions.screenWidth, display: 'flex', alignItems: 'center'}}>
+            <View style={{ width: dimensions.screenWidth, display: 'flex', alignItems: 'center' }}>
               <Image
                 source={{ uri: item }}
                 style={{
@@ -171,8 +292,38 @@ const ProductView = () => {
           scrollEventThrottle={16}
           onViewableItemsChanged={viewableItemsChanged}
         />
+
+        {/* Left Arrow */}
+        {currentIndex > 0 && (
+          <TouchableOpacity
+            style={styles.arrowLeft}
+            onPress={() => {
+              if (currentIndex > 0) {
+                flatListRef.current?.scrollToIndex({ index: currentIndex - 1, animated: true });
+              }
+            }}
+          >
+            <Ionicons name="chevron-back" size={32} color="#333" />
+          </TouchableOpacity>
+        )}
+
+        {/* Right Arrow */}
+        {currentIndex < photoSlides.length - 1 && (
+          <TouchableOpacity
+            style={styles.arrowRight}
+            onPress={() => {
+              if (currentIndex < photoSlides.length - 1) {
+                flatListRef.current?.scrollToIndex({ index: currentIndex + 1, animated: true });
+              }
+            }}
+          >
+            <Ionicons name="chevron-forward" size={32} color="#333" />
+          </TouchableOpacity>
+        )}
+
         <Paginator data={photoSlides} scrollX={scrollX} />
       </View>
+
       <View style={styles.productDetailsCont}>
         <View style={styles.productFirstRow}>
           <Text style={styles.productSubcategory}>{(subcategory as string).toLocaleUpperCase()}</Text>
@@ -304,7 +455,7 @@ const styles = StyleSheet.create({
   addToCartButton: {
     backgroundColor: '#466AA2',
     paddingVertical: dimensions.screenHeight * 0.018,
-    paddingHorizontal: dimensions.screenWidth * 0.3,
+    width: '100%',
     borderRadius: 15,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 5 },
@@ -323,13 +474,34 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     width: '100%',
+    paddingHorizontal: dimensions.screenWidth * 0.06,
   },
   gradientBackground: {
     width: '100%',
     height: '100%',
     justifyContent: 'center',
     alignItems: 'center',
+    display: 'flex',
+    flexDirection: 'row',
     paddingBottom: dimensions.screenHeight * 0.04,
     paddingTop: dimensions.screenHeight * 0.02
+  },
+  arrowLeft: {
+    position: 'absolute',
+    left: 10,
+    top: '40%',
+    backgroundColor: 'rgba(255,255,255,0.7)',
+    borderRadius: 30,
+    padding: 5,
+    zIndex: 1,
+  },
+  arrowRight: {
+    position: 'absolute',
+    right: 10,
+    top: '40%',
+    backgroundColor: 'rgba(255,255,255,0.7)',
+    borderRadius: 30,
+    padding: 5,
+    zIndex: 1,
   },
 });

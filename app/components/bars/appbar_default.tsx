@@ -1,8 +1,8 @@
 import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
 import React from 'react';
-import { Ionicons } from '@expo/vector-icons'; // For back button icon
+import { Ionicons } from '@expo/vector-icons';
 import dimensions from '../../utils/sizing';
-import { useRouter } from 'expo-router'; // For navigating back
+import { useRouter } from 'expo-router';
 import { Session } from '@supabase/supabase-js';
 import PlaydateIcon from '../svgs/pets/PlaydateIcon';
 

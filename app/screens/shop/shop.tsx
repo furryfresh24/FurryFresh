@@ -14,6 +14,7 @@ const LIMIT = 20;
 
 const Shop = () => {
     const [supplySubcategories, setSupplySubcategories] = useState<SupplySubcategory[]>([]);
+    const [subcategoryIds, setSubcategoryIds] = useState<string[]>([]);
     const [activeService, setActiveService] = useState<number | string>('all');
     const [products, setProducts] = useState<Product[]>([]);
     const [isLoading, setIsLoading] = useState(false);
@@ -30,81 +31,113 @@ const Shop = () => {
         }
     }, [title]);
 
-    const fetchSupplySubcategories = async () => {
+    const fetchSupplySubcategories = async (): Promise<SupplySubcategory[]> => {
         const { data, error } = await supabase
             .from('supplies_subcategories')
             .select('*')
-            .eq('supply_id', id);
-
+            .eq('supply_id', id); 
+    
         if (error) {
             console.error('Error fetching categories:', error);
-            return;
+            return [];
         }
-
+    
         const parsed = data?.map((item) => ({
             ...item,
             created_at: new Date(item.created_at),
             updated_at: item.updated_at ? new Date(item.updated_at) : undefined,
         })) as SupplySubcategory[];
-
-        setSupplySubcategories(parsed);
+    
+        return parsed;
     };
+    
 
-    const fetchMoreProducts = async (reset = false, id: string | number) => {
-        console.log("Fetching");
-
+    const fetchMoreProducts = async (
+        reset = false,
+        id: string | number,
+        subcategoryList: string[] = subcategoryIds
+    ) => {
+        console.log("Fetching products for:", id);
+    
+        // ❗ FIX: Use the `subcategoryList` instead of subcategoryIds state
+        if (id === 'all' && (!subcategoryList || subcategoryList.length === 0)) {
+            console.warn("No subcategory IDs loaded. Skipping fetch.");
+            return;
+        }
+    
         if (reset) {
             setIsLoading(true);
             setHasMore(true);
             setProducts([]);
         }
-
+    
         const offset = reset ? 0 : products.length;
-
+    
         let query = supabase
             .from('products')
             .select('*')
             .eq('is_active', true)
             .order('created_at', { ascending: false })
             .range(offset, offset + LIMIT - 1);
-
-        // Only filter by subcategory_id if activeService is not 'all'
+    
         if (id !== 'all') {
             query = query.eq('subcategory_id', id);
+        } else {
+            query = query.in('subcategory_id', subcategoryList); // ✅ using the passed-in list
         }
-
+    
         try {
             const { data, error } = await query;
-
+    
             if (error) {
                 console.error('Fetch error:', error);
                 return;
             }
-
+    
             const parsed = data?.map((item) => ({
                 ...item,
                 created_at: new Date(item.created_at),
                 updated_at: item.updated_at ? new Date(item.updated_at) : undefined,
             })) as Product[];
-
+    
             if (reset) {
                 setProducts(parsed);
             } else {
                 setProducts((prev) => [...prev, ...parsed]);
             }
-
+    
             setHasMore(parsed.length === LIMIT);
         } catch (err) {
             console.error('Unexpected error fetching products:', err);
         } finally {
             setIsLoading(false);
         }
-    };
+    }; 
+    
+    
 
     useEffect(() => {
-        fetchSupplySubcategories();
-        fetchMoreProducts(true, activeService);
+        const init = async () => {
+            const subcats = await fetchSupplySubcategories();
+            if (subcats && subcats.length > 0) {
+                const ids = subcats.map((item) => item.id);
+    
+                setSupplySubcategories(subcats);
+                setSubcategoryIds(ids); 
+    
+                console.log("Subcategories loaded:", ids);
+    
+                await fetchMoreProducts(true, activeService, ids);
+            } else {
+                console.warn("No subcategories found. Skipping product fetch.");
+            }
+        };
+    
+        init();
     }, []);
+    
+    
+    
 
     const servicesFromSubcategories = supplySubcategories.map((subcat) => ({
         id: subcat.id,
@@ -131,6 +164,7 @@ const Shop = () => {
                     data={products}
                     keyExtractor={(item) => item.id}
                     scrollEnabled={true}
+                    showsVerticalScrollIndicator={false}
                     renderItem={({ item }) => (
                         <TouchableOpacity onPress={() => {
                             router.push({
@@ -153,7 +187,7 @@ const Shop = () => {
                                     <Text style={styles.productSubcategory}>
                                         {(servicesWithAll.find((serv) => serv.id == item.subcategory_id)?.title ?? '').toLocaleUpperCase()}
                                     </Text>
-                                    <Text style={styles.productTitle}>{item.name}</Text>
+                                    <Text style={styles.productTitle} numberOfLines={2}>{item.name}</Text>
                                     <Price value={item.price} color='#808080' fontSize={dimensions.screenWidth * 0.035} />
                                 </View>
                             </View>
@@ -179,13 +213,13 @@ const styles = StyleSheet.create({
         marginVertical: 8,
         marginHorizontal: 16,
         borderRadius: 12,
-        shadowColor: '#000',
+        shadowColor: '#808080',
         shadowOpacity: 0.1,
         shadowOffset: { width: 0, height: 2 },
         shadowRadius: 6,
         display: 'flex',
         flexDirection: 'row',
-        elevation: 3,
+        elevation: 5,
     },
     productImageCont: {
         width: dimensions.screenWidth * 0.25,
@@ -196,9 +230,9 @@ const styles = StyleSheet.create({
         marginRight: dimensions.screenWidth * 0.035
     },
     productImage: {
-        width: '100%', // The image will take the full width of the container
-        height: '100%', // The image will take the full height of the container
-        borderRadius: 10, // Optional, to match the container's rounded corners
+        width: '100%',
+        height: '100%',
+        borderRadius: 10, 
     },
     productDetails: {
         flex: 1,
