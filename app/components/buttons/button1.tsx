@@ -15,6 +15,7 @@ interface ButtonProps {
   title: string;
   onPress?: ((event: GestureResponderEvent) => void) | null;
   isPrimary: boolean;
+  backgroundColor?: string;
   style?: ViewStyle;
   textStyle?: TextStyle;
   borderRadius?: number;
@@ -26,6 +27,7 @@ const Button1: React.FC<ButtonProps> = ({
   title,
   onPress,
   isPrimary,
+  backgroundColor = null,
   style,
   textStyle,
   borderRadius,
@@ -35,10 +37,11 @@ const Button1: React.FC<ButtonProps> = ({
   const isDisabled = loading || !onPress;
 
   return (
-    <View style={[styles.buttonContainer, style]}>
+    <View style={[styles.buttonContainer, style ]}>
       <TouchableOpacity
         style={[customStyle ?? styles.button,
-          isPrimary ? styles.primaryButton : styles.secondaryButton,
+          { backgroundColor: backgroundColor },
+          backgroundColor == null ? isPrimary ? styles.primaryButton : styles.secondaryButton : null,
           isDisabled && styles.disabledButton,
           borderRadius ? { borderRadius } : null,
         ]}
@@ -65,13 +68,13 @@ const Button1: React.FC<ButtonProps> = ({
 const styles = StyleSheet.create({
   buttonContainer: {
     width: '100%',
-    justifyContent: 'center', // Ensure the button itself is centered horizontally
-    alignItems: 'center', // Centers the button container
+    justifyContent: 'center',
+    alignItems: 'center', 
   },
   button: {
     flexDirection: 'row',
-    alignItems: 'center', // Ensure content inside the button is vertically centered
-    justifyContent: 'center', // Ensure content is horizontally centered
+    alignItems: 'center',
+    justifyContent: 'center',
     paddingHorizontal: 25,
     paddingVertical: dimensions.screenHeight * 0.017,
     width: '100%',
@@ -88,7 +91,7 @@ const styles = StyleSheet.create({
   buttonText: {
     color: '#fff',
     fontSize: dimensions.screenWidth * 0.045,
-    textAlign: 'center', // Ensures the text is centered
+    textAlign: 'center', 
     fontFamily: 'Poppins-SemiBold',
   },
 });

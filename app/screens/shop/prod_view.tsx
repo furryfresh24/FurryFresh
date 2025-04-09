@@ -15,6 +15,10 @@ import Button1 from '../../components/buttons/button1';
 import { LinearGradient } from 'expo-linear-gradient';
 import AppbarDefault from '../../components/bars/appbar_default';
 import { Session } from '@supabase/supabase-js';
+import { useCart } from '../../context/cart_context';
+import AlreadyInCartBar from './components/already_in_cart';
+import AddNewToCartBar from './components/add_new_to_cart';
+import Cart from '../../interfaces/cart';
 
 const ProductView = () => {
   const navigation = useNavigation();
@@ -34,17 +38,24 @@ const ProductView = () => {
     setCurrentIndex(viewableItems[0]?.index ?? 0);
   }).current;
 
+  const { carts, fetchCarts, addToCartContext, updateCartContext } = useCart();
+
+  useEffect(() => {
+    if (id) {
+      checkIfInCart(Array.isArray(id) ? id[0] : id);
+      fetchProduct(Array.isArray(id) ? id[0] : id);
+    }
+  }, [id]); 
+
   const fetchProduct = async (id: string) => {
     setIsLoading(true);
 
-    let query = supabase
-      .from('products')
-      .select('*')
-      .eq('id', id)
-      .single();
-
     try {
-      const { data, error } = await query;
+      const { data, error } = await supabase
+        .from('products')
+        .select('*')
+        .eq('id', id)
+        .single();
 
       if (error) {
         console.error('Fetch error:', error);
@@ -59,6 +70,7 @@ const ProductView = () => {
 
       setProduct(parsed);
       checkIfInCart(parsed.id);
+
     } catch (err) {
       console.error('Unexpected error fetching product:', err);
     } finally {
@@ -66,24 +78,9 @@ const ProductView = () => {
     }
   };
 
-  const checkIfInCart = async (productId: string) => {
-    if (!session) return;
-
-    const user_id = session.user.id;
-
-    const { data: existingCart, error } = await supabase
-      .from('carts')
-      .select('*')
-      .eq('user_id', user_id)
-      .eq('product_id', productId)
-      .maybeSingle();
-
-    if (error) {
-      console.error('Error checking cart:', error);
-      return;
-    }
-
-    setIsInCart(existingCart ? true : false);
+  const checkIfInCart = (productId: string) => {
+    const cartItem = carts.find(item => item.product_id === productId);
+    setIsInCart(!!cartItem);
   };
 
   const addToCartButton = async () => {
@@ -130,6 +127,13 @@ const ProductView = () => {
           console.error('Error inserting into cart:', insertError);
         } else {
           console.log('Product added to cart successfully!');
+
+          addToCartContext({
+            product_id,
+            quantity: 1,
+            price: product.price,
+            user_id: session.user.id,
+          });
           setIsInCart(true);
         }
       } else {
@@ -147,7 +151,16 @@ const ProductView = () => {
           console.error('Error updating cart:', updateError);
         } else {
           console.log('Cart quantity updated successfully!');
-          setIsInCart(true);  // Update UI to show the product is now in the cart
+
+          // Update context with the updated quantity
+          updateCartContext({
+            product_id, quantity: existingCart.quantity + 1, price: product.price * (existingCart.quantity + 1),
+            id: existingCart.id,
+            user_id: session.user.id,
+            created_at: undefined
+          });
+
+          setIsInCart(true);
         }
       }
     } catch (err) {
@@ -156,6 +169,8 @@ const ProductView = () => {
       setCarting(false);
     }
   };
+
+
 
   useEffect(() => {
     const fetchSession = async () => {
@@ -197,50 +212,8 @@ const ProductView = () => {
 
   const addToCart = () => {
     return (
-      <View style={styles.addToCart}>
-        <LinearGradient
-          colors={['#FFFFFF', 'transparent']}
-          start={{ x: 0, y: 1 }}
-          end={{ x: 0, y: 0 }}
-          style={[styles.gradientBackground, { paddingHorizontal: isInCart ? dimensions.screenWidth * 0.14 : 0 }]}
-        >
-          {isInCart &&
-            <View style={{
-              backgroundColor: '#ED7964',
-              width: dimensions.screenWidth * 0.15,
-              height: '100%',
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'center',
-              marginHorizontal: dimensions.screenWidth * 0.02,
-              borderRadius: 15,
-              elevation: 5
-            }}>
-              <Ionicons name='remove-circle' size={dimensions.screenWidth * 0.06} color="white" />
-            </View>}
-          <Button1
-            isPrimary={true}
-            title={isInCart ? "Already in Cart" : "Add to Cart"}
-            loading={isCarting}
-            onPress={addToCartButton}
-            customStyle={[styles.addToCartButton, isInCart && { backgroundColor: '#ccc' }]} // Disable button if in cart
-          />
-          {isInCart &&
-            <View style={{
-              backgroundColor: '#466AA2',
-              width: dimensions.screenWidth * 0.15,
-              height: '100%',
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'center',
-              marginHorizontal: dimensions.screenWidth * 0.02,
-              borderRadius: 15,
-              elevation: 5
-            }}>
-              <Ionicons name='add-circle' size={dimensions.screenWidth * 0.06} color="white" />
-            </View>}
-        </LinearGradient>
-      </View>
+      isInCart ? <AlreadyInCartBar isCarting={isCarting} productPrice={product?.price ?? 0.0} cart={carts.find(item => item.product_id === (Array.isArray(id) ? id[0] : id)) as Cart} />
+      : <AddNewToCartBar isCarting={isCarting} onAddToCart={addToCartButton} />
     );
   };
 
@@ -443,14 +416,6 @@ const styles = StyleSheet.create({
   },
   productFifthRow: {
     paddingBottom: dimensions.screenHeight * 0.1
-  },
-  floatingButtonContainer: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    alignItems: 'center',
-    marginBottom: dimensions.screenHeight * 0.05,  // Adjust based on preference
   },
   addToCartButton: {
     backgroundColor: '#466AA2',

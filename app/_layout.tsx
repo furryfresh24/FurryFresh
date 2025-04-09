@@ -9,6 +9,9 @@ import { Session } from '@supabase/supabase-js';
 import AppbarDefault from './components/bars/appbar_default';
 import { RouteProp } from '@react-navigation/native';
 import dimensions from '../app/utils/sizing';
+import { SessionProvider } from './context/sessions_context';
+import { CartProvider } from './context/cart_context';
+import Providers from './context/context_handler';
 
 const RootLayout = () => {
   const fontsLoaded = useCustomFonts();
@@ -96,47 +99,49 @@ const RootLayout = () => {
   }, [appReady, isFirstTime, session, pathname]);
 
   return (
-    <ThemeProvider>
-      <Stack>
-        <Stack.Screen name="index" options={{ headerShown: false }} />
-        <Stack.Screen name="screens/onboarding/get_started" options={{ headerShown: false }} />
-        <Stack.Screen name="screens/auth/sign_in" options={{ headerShown: false }} />
-        <Stack.Screen name="screens/auth/sign_up_1" options={{ headerShown: false }} />
-        <Stack.Screen name="screens/auth/sign_up_2" options={{ headerShown: false }} />
-        <Stack.Screen name="screens/auth/sign_up_3" options={{ headerShown: false }} />
-        <Stack.Screen name="screens/auth/forgot_password_1" options={{ headerShown: false }} />
-        <Stack.Screen name="screens/auth/forgot_password_2" options={{ headerShown: false }} />
-        <Stack.Screen name="screens/auth/forgot_password_3" options={{ headerShown: false }} />
-        <Stack.Screen
-          name="screens/(tabs)"
-          options={{ headerShown: false }}
-        />
-        <Stack.Screen
-          name="screens/pets/pets"
-          options={{
-            header: () => <AppbarDefault title='Pets' session={session} showLeading={false} leadingChildren={undefined} titleSize={dimensions.screenWidth * 0.05} />
-          }}
-        />
-        <Stack.Screen
-          name="screens/shop/shop"
-          options={({ route }: { route: RouteProp<Record<string, { title?: string }>, string>; }) => {
-            const titleParam = route?.params?.title;
-            const title = typeof titleParam === 'string' ? titleParam : 'Shop';
+    <Providers>
+      <ThemeProvider>
+        <Stack>
+          <Stack.Screen name="index" options={{ headerShown: false }} />
+          <Stack.Screen name="screens/onboarding/get_started" options={{ headerShown: false }} />
+          <Stack.Screen name="screens/auth/sign_in" options={{ headerShown: false }} />
+          <Stack.Screen name="screens/auth/sign_up_1" options={{ headerShown: false }} />
+          <Stack.Screen name="screens/auth/sign_up_2" options={{ headerShown: false }} />
+          <Stack.Screen name="screens/auth/sign_up_3" options={{ headerShown: false }} />
+          <Stack.Screen name="screens/auth/forgot_password_1" options={{ headerShown: false }} />
+          <Stack.Screen name="screens/auth/forgot_password_2" options={{ headerShown: false }} />
+          <Stack.Screen name="screens/auth/forgot_password_3" options={{ headerShown: false }} />
+          <Stack.Screen
+            name="screens/(tabs)"
+            options={{ headerShown: false }}
+          />
+          <Stack.Screen
+            name="screens/pets/pets"
+            options={{
+              header: () => <AppbarDefault title='Pets' session={session} showLeading={false} leadingChildren={undefined} titleSize={dimensions.screenWidth * 0.05} />
+            }}
+          />
+          <Stack.Screen
+            name="screens/shop/shop"
+            options={({ route }: { route: RouteProp<Record<string, { title?: string }>, string>; }) => {
+              const titleParam = route?.params?.title;
+              const title = typeof titleParam === 'string' ? titleParam : 'Shop';
 
-            return {
-              header: () => <AppbarDefault title={title} session={session} showLeading={false} leadingChildren={undefined} titleSize={dimensions.screenWidth * 0.045} />
-            };
-          }}
-        />
-        <Stack.Screen
-          name="screens/shop/prod_view"
-          options={{
-            presentation: 'modal',
-            animation: 'slide_from_bottom',
-          }}
-        />
-      </Stack>
-    </ThemeProvider>
+              return {
+                header: () => <AppbarDefault title={title} session={session} showLeading={false} leadingChildren={undefined} titleSize={dimensions.screenWidth * 0.045} />
+              };
+            }}
+          />
+          <Stack.Screen
+            name="screens/shop/prod_view"
+            options={{
+              presentation: 'modal',
+              animation: 'slide_from_bottom',
+            }}
+          />
+        </Stack>
+      </ThemeProvider>
+    </Providers>
   );
 };
 
