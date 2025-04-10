@@ -13,11 +13,10 @@ import VoucherTemp1 from '../../components/vouchers/voucher1';
 import Button1 from '../../components/buttons/button1';
 import Category from '../../interfaces/categories';
 import Title1 from '../../components/texts/title1';
-import { ListItem } from '@rneui/themed';
+import { Icon, ListItem } from '@rneui/themed';
 import DefaultListIcon from '../../components/svgs/home/services/DefaultListIcon';
 import Subcategories from '../../interfaces/subcategories';
 import Price from '../../components/general/price';
-import svgValue from '../../hooks/fetchSvg';
 import SvgValue from '../../hooks/fetchSvg';
 import HorizontalButtonList from '../../components/list/horizontal_button_list';
 import BottomSheet, { BottomSheetBackdrop, BottomSheetView } from '@gorhom/bottom-sheet';
@@ -25,6 +24,7 @@ import { Portal } from '@gorhom/portal';
 import MainContCircle from '../../components/general/background_circle';
 import { LinearGradient } from 'expo-linear-gradient';
 import Subtitle1 from '../../components/texts/subtitle1';
+import { Grooming, Inclusion } from '../../interfaces/grooming';
 
 type Service = {
   id: number;
@@ -65,12 +65,13 @@ const Home = () => {
   const sheetRef = useRef<BottomSheet>(null);
   const [isOpen, setIsOpen] = useState(true);
   const [selectedGrooming, setSelectedGrooming] = useState<Subcategories>();
-  const snapPoints = useMemo(() => ['86.5%'], []);
+  const snapPoints = useMemo(() => ['95%'], []);
   const openSheet = () => sheetRef.current?.expand();
 
   const backDrop = useCallback((props: any) => <BottomSheetBackdrop {...props} appearsOnIndex={0} disappearsOnIndex={-1} />, []);
 
   const [categories, setCategories] = useState<Category[]>([]);
+  const [grooming, setGroomings] = useState<Grooming[]>([]);
   const [subcategories, setSubcategories] = useState<Subcategories[]>([]);
   const [activeService, setActiveService] = useState<number | string>(1);
 
@@ -101,7 +102,7 @@ const Home = () => {
       updated_at: item.updated_at ? new Date(item.updated_at) : undefined,
     })) as Category[];
 
-    console.log(parsed.length);
+    // console.log(parsed.length);
 
     setCategories(parsed);
   };
@@ -122,10 +123,46 @@ const Home = () => {
       updated_at: item.updated_at ? new Date(item.updated_at) : undefined,
     })) as Subcategories[];
 
-    console.log(parsed.length);
+    // console.log(parsed);
 
     setSubcategories(parsed);
   };
+
+  const basic = [
+    {
+      "title": "Bath & Blow Dry",
+      "svg": ""
+    },
+    {
+      "title": "Hair Trimming",
+      "svg": ""
+    }
+  ];
+
+  const fetchGroomings = async (): Promise<void> => {
+    const { data, error } = await supabase
+      .from('groomings')
+      .select('*');
+
+    if (error) {
+      console.error('Error fetching groomings: ', error);
+      return;
+    }
+
+    const parsed = data?.map((item) => ({
+      ...item,
+      created_at: new Date(item.created_at),
+      updated_at: item.updated_at ? new Date(item.updated_at) : undefined,
+      inclusions: item.inclusions as Inclusion[],
+    })) as Grooming[];
+
+    console.log(parsed[0].inclusions[0].title);
+    setGroomings(parsed);
+  };
+
+
+
+
 
   const handleSheetChange = (index: number) => {
     if (index === 0) {
@@ -137,6 +174,7 @@ const Home = () => {
   useEffect(() => {
     fetchCategories();
     fetchSubcategories();
+    fetchGroomings();
   }, []);
 
   return (
@@ -264,16 +302,153 @@ const Home = () => {
               style={[styles.circle, styles.bottomLeftCircle]}
             />
 
-            <View style={styles.handleBarCont}>
-              <View style={styles.handleBar}></View>
-            </View>
-            <View style={styles.closeAndTitleBoxCont}>
-              <View style={styles.titleBox}>
-                <Title1 text={selectedGrooming?.title ?? ''} style={{ fontFamily: 'Poppins-Bold' }} />
-                <Subtitle1 text={'For only ₱' + selectedGrooming?.price + ".00"} style={{ color: '#ED7964', fontSize: dimensions.screenWidth * 0.035, fontFamily: 'Poppins-SemiBold', alignSelf: 'flex-start', textAlign: 'left', letterSpacing: 0.3 }} />
+            <View style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', height: '100%' }}>
+              <View>
+                <View style={styles.handleBarCont}>
+                  <View style={styles.handleBar}></View>
+                </View>
+                <View style={styles.closeAndTitleBoxCont}>
+                  <View style={styles.titleBox}>
+                    <Title1 text={selectedGrooming?.title ?? ''} style={{ fontFamily: 'Poppins-Bold' }} />
+                    <Subtitle1 text={'Starts at ₱' + selectedGrooming?.price + ".00"} style={{ color: '#ED7964', fontSize: dimensions.screenWidth * 0.035, fontFamily: 'Poppins-SemiBold', alignSelf: 'flex-start', textAlign: 'left', letterSpacing: 0.3 }} />
+                  </View>
+                  <TouchableOpacity onPress={() => sheetRef.current?.close()}>
+                    <View style={styles.closeBox}>
+                      <Ionicons name='close' color="#949494" size={dimensions.screenWidth * 0.11} />
+                    </View>
+                  </TouchableOpacity> 
+                </View>
+                <View style={styles.inclusions}>
+                  <Text style={{ fontFamily: 'Poppins-Regular', fontSize: dimensions.screenWidth * 0.035, color: '#808080' }}>Inclusions for this package:</Text>
+                  <View style={styles.wrapContainer}>
+                    {(grooming.find((g) => g.subcategory_id == (selectedGrooming?.id ?? ''))?.inclusions ?? []).map((item, index) => {
+                      const title = item.title;
+                      const icon = item.svg ? <SvgValue svgIcon={item.svg} color='#466AA2' width={dimensions.screenWidth * 0.1} height={dimensions.screenWidth * 0.1} /> : null;
+
+                      return (
+                        <View style={styles.inclusion}>
+                          {icon}
+                          <Text style={{
+                            fontFamily: 'Poppins-SemiBold',
+                            fontSize: dimensions.screenWidth * 0.033,
+                            color: '#466AA2',
+                            textAlign: 'center'
+                          }} >{title}</Text>
+                        </View>
+                      );
+                    })}
+                  </View>
+                </View>
+                <View style={{ height: .8, backgroundColor: '#DEE4F2', marginHorizontal: dimensions.screenWidth * 0.16 }} />
+                <View style={styles.aboutPackageCont}>
+                  <Subtitle1
+                    text='About this Package'
+                    color='#ED7964' style={{ letterSpacing: 0.2, fontFamily: 'Poppins-SemiBold' }} fontSize={dimensions.screenWidth * 0.038} />
+                  <Text style={{
+                    textAlign: 'center',
+                    fontFamily: 'Poppins-Regular',
+                    fontSize: dimensions.screenWidth * 0.033,
+                    marginHorizontal: dimensions.screenWidth * 0.08,
+                    marginTop: dimensions.screenHeight * 0.015,
+                    lineHeight: dimensions.screenWidth * 0.055,
+                    color: '#808080'
+                  }}>{grooming.find((g) => g.subcategory_id == (selectedGrooming?.id ?? ''))?.description}</Text>
+                </View>
               </View>
-              <View style={styles.closeBox}>
-                <Ionicons name='close' color="#949494" size={dimensions.screenWidth * 0.11} />
+              <View style={styles.bottomPartView}>
+                <View style={{
+                  marginBottom: dimensions.screenHeight * 0.02,
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  flexDirection: 'row',
+                  gap: 30
+                }}>
+                  <View style={{
+                    backgroundColor: '#e2e7f3',
+                    borderRadius: 10,
+                    paddingHorizontal: dimensions.screenWidth * 0.02,
+                    flex: 1,
+                    paddingVertical: dimensions.screenHeight * 0.01,
+                    display: 'flex',
+                    flexDirection: 'row',
+                    alignItems: 'center'
+                  }}>
+                    <View
+                      style={{
+                        backgroundColor: '#466AA2',
+                        borderRadius: 100,
+                        width: dimensions.screenWidth * 0.08,
+                        height: dimensions.screenWidth * 0.08,
+                        alignItems: 'center',
+                        display: 'flex',
+                        justifyContent: 'center',
+                        marginRight: dimensions.screenWidth * 0.02,
+                      }}>
+                      <Ionicons
+                        name='heart'
+                        size={dimensions.screenWidth * 0.05}
+                        color="white"
+                      />
+                    </View>
+                    <View style={{ display: 'flex', flexDirection: 'column' }}>
+                      <Text style={{
+                        color: '#808080',
+                        fontFamily: 'Poppins-Regular',
+                        fontSize: dimensions.screenWidth * 0.025,
+                        lineHeight: dimensions.screenWidth * 0.04
+                      }}>Package Ratings</Text>
+                      <Text style={{
+                        color: '#808080',
+                        fontFamily: 'Poppins-SemiBold',
+                        fontSize: dimensions.screenWidth * 0.04,
+                        lineHeight: dimensions.screenWidth * 0.05
+                      }}>4.5</Text>
+                    </View>
+                  </View>
+                  <View style={{
+                    backgroundColor: '#e2e7f3',
+                    borderRadius: 10,
+                    paddingHorizontal: dimensions.screenWidth * 0.02,
+                    flex: 1,
+                    paddingVertical: dimensions.screenHeight * 0.01,
+                    display: 'flex',
+                    flexDirection: 'row',
+                    alignItems: 'center'
+                  }}>
+                    <View
+                      style={{
+                        backgroundColor: '#466AA2',
+                        borderRadius: 100,
+                        width: dimensions.screenWidth * 0.08,
+                        height: dimensions.screenWidth * 0.08,
+                        alignItems: 'center',
+                        display: 'flex',
+                        justifyContent: 'center',
+                        marginRight: dimensions.screenWidth * 0.02,
+                      }}>
+                      <Ionicons
+                        name='chatbox'
+                        size={dimensions.screenWidth * 0.05}
+                        color="white"
+                      />
+                    </View>
+                    <View style={{ display: 'flex', flexDirection: 'column' }}>
+                      <Text style={{
+                        color: '#808080',
+                        fontFamily: 'Poppins-Regular',
+                        fontSize: dimensions.screenWidth * 0.025,
+                        lineHeight: dimensions.screenWidth * 0.04
+                      }}>Package Comments</Text>
+                      <Text style={{
+                        color: '#808080',
+                        fontFamily: 'Poppins-SemiBold',
+                        fontSize: dimensions.screenWidth * 0.04,
+                        lineHeight: dimensions.screenWidth * 0.05
+                      }}>56</Text>
+                    </View>
+                  </View>
+                </View>
+                <Button1 isPrimary={false} onPress={() => { }} title={'Choose Package'} borderRadius={16} />
               </View>
             </View>
           </BottomSheetView>
@@ -294,6 +469,19 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 30,
     overflow: 'hidden'
   },
+  bottomPartView: {
+    paddingHorizontal: dimensions.screenWidth * 0.05,
+    paddingBottom: dimensions.screenHeight * 0.05,
+    paddingTop: dimensions.screenHeight * 0.03,
+  },
+  wrapContainer: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: 'center',
+    marginTop: dimensions.screenHeight * 0.02,
+    marginBottom: dimensions.screenHeight * 0.03,
+    gap: 15
+  },
   handleBarCont: {
     position: 'absolute',
     width: dimensions.screenWidth,
@@ -308,6 +496,23 @@ const styles = StyleSheet.create({
     display: 'flex',
     justifyContent: 'space-between',
     flexDirection: 'row',
+  },
+  inclusions: {
+    marginTop: dimensions.screenHeight * 0.025,
+    paddingHorizontal: dimensions.screenWidth * 0.05,
+  },
+  inclusion: {
+    backgroundColor: '#e2e7f3',
+    borderRadius: 20,
+    width: dimensions.screenWidth * 0.25,
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: dimensions.screenWidth * 0.03,
+    paddingVertical: dimensions.screenWidth * 0.03
+  },
+  aboutPackageCont: {
+    marginTop: dimensions.screenHeight * 0.026
   },
   titleBox: {
     marginTop: dimensions.screenHeight * 0.05,

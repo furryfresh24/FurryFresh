@@ -6,6 +6,8 @@ import PremiumGroomingIcon from '../components/svgs/home/services/PremiumGroomin
 import HealthWellnessIcon from '../components/svgs/home/services/HealthWellnessIcon';
 import FoodFeedingEssentialsIcon from '../components/svgs/home/services/FoodFeedingEssentialsIcon';
 import AccessoriesIcon from '../components/svgs/home/services/AccessoriesIcon';
+import BathBlowDryIcon from '../components/svgs/grooming-inclusions/BathBlowDryIcon';
+import HairTrimmingIcon from '../components/svgs/grooming-inclusions/HairTrimmingIcon';
 
 type Props = {
     svgIcon: string;
@@ -35,6 +37,12 @@ const SvgValue = (props: Props) => {
             break;
         case 'accessories':
             toReturnData = <AccessoriesIcon color={props.color} height={props.height} width={props.width} props />;
+            break;
+        case 'bath-blow-dry':
+            toReturnData = <BathBlowDryIcon color={props.color} height={props.height} width={props.width} props />;
+            break;
+        case 'hair-trimming':
+            toReturnData = <HairTrimmingIcon color={props.color} height={props.height} width={props.width} props />;
             break;
         default:
             toReturnData = null;

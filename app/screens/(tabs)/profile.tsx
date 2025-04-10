@@ -191,12 +191,13 @@ const styles = StyleSheet.create({
   },
   statNumber: {
     fontSize: 18,
+    fontFamily: 'Poppins-Regular',
     fontWeight: 'bold',
   },
   statLabel: {
     fontSize: 12,
     color: '#888',
-  },
+  }, 
   aboutContainer: {
     backgroundColor: '#F2F2F2',
     borderRadius: dimensions.screenHeight * 0.01,
