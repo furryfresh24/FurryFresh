@@ -137,10 +137,6 @@ const RootLayout = () => {
             />
             <Stack.Screen
               name="screens/shop/prod_view"
-              options={{
-                presentation: 'modal',
-                animation: 'slide_from_bottom',
-              }}
             />
           </Stack>
         </GestureHandlerRootView>
