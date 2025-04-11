@@ -139,7 +139,6 @@ const ProductView = () => {
         } else {
           console.log('Cart quantity updated successfully!');
 
-          // Update context with the updated quantity
           updateCartContext({
             product_id, quantity: existingCart.quantity + 1, price: product.price * (existingCart.quantity + 1),
             id: existingCart.id,
