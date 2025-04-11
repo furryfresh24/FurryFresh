@@ -8,6 +8,8 @@ import FoodFeedingEssentialsIcon from '../components/svgs/home/services/FoodFeed
 import AccessoriesIcon from '../components/svgs/home/services/AccessoriesIcon';
 import BathBlowDryIcon from '../components/svgs/grooming-inclusions/BathBlowDryIcon';
 import HairTrimmingIcon from '../components/svgs/grooming-inclusions/HairTrimmingIcon';
+import CatIcon from '../components/svgs/signUp/CatIcon';
+import DogIcon from '../components/svgs/signUp/DogIcon';
 
 type Props = {
     svgIcon: string;
@@ -43,6 +45,12 @@ const SvgValue = (props: Props) => {
             break;
         case 'hair-trimming':
             toReturnData = <HairTrimmingIcon color={props.color} height={props.height} width={props.width} props />;
+            break;
+        case 'dog':
+            toReturnData = <DogIcon color={props.color} height={props.height} width={props.width} props />;
+            break;
+        case 'cat':
+            toReturnData = <CatIcon color={props.color} height={props.height} width={props.width} props />;
             break;
         default:
             toReturnData = null;

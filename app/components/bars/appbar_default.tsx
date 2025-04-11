@@ -12,7 +12,7 @@ const AppbarDefault = ({
   const router = useRouter();
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container]}>
       <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
         <Ionicons name="arrow-back" size={dimensions.screenWidth * 0.06} color="#000" />
       </TouchableOpacity>

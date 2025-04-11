@@ -20,7 +20,8 @@ interface ButtonProps {
   textStyle?: TextStyle;
   borderRadius?: number;
   loading?: boolean;
-  customStyle?: any
+  customStyle?: any;
+  paddingVertical?: number;
 }
 
 const Button1: React.FC<ButtonProps> = ({
@@ -33,6 +34,7 @@ const Button1: React.FC<ButtonProps> = ({
   borderRadius,
   customStyle,
   loading = false,
+  paddingVertical
 }) => {
   const isDisabled = loading || !onPress;
 
@@ -44,6 +46,7 @@ const Button1: React.FC<ButtonProps> = ({
           backgroundColor == null ? isPrimary ? styles.primaryButton : styles.secondaryButton : null,
           isDisabled && styles.disabledButton,
           borderRadius ? { borderRadius } : null,
+          { paddingVertical: paddingVertical ?? dimensions.screenHeight * 0.017 } 
         ]}
         onPress={onPress ?? undefined}
         disabled={isDisabled}
