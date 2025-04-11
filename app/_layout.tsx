@@ -138,6 +138,9 @@ const RootLayout = () => {
             <Stack.Screen
               name="screens/shop/prod_view"
             />
+            <Stack.Screen 
+              name="screens/booking/booking_scheduling"
+            />
           </Stack>
         </GestureHandlerRootView>
       </ThemeProvider>

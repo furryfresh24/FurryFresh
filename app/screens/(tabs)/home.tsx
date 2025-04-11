@@ -610,7 +610,14 @@ const Home = () => {
                 </View>
                 <Button1
                   isPrimary={false}
-                  onPress={() => {}}
+                  onPress={() => { router.push(
+                    {
+                      pathname: '../booking/booking_scheduling',
+                      params: {
+                        object: JSON.stringify(selectedGrooming)
+                      }
+                    }
+                  ) }}
                   title={"Choose Package"}
                   borderRadius={16}
                 />

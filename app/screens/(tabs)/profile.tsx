@@ -17,6 +17,7 @@ const Profile = () => {
     <MainContPaw>
       <View style={styles.topContainer}>
         <View style={styles.titlePage}>
+          <View style={{ flex: 1 }}></View>
           <Text style={styles.titleText}>Profile</Text>
           <View style={styles.iconContainer}>
             <TouchableOpacity>
@@ -119,11 +120,12 @@ const styles = StyleSheet.create({
     fontFamily: "Poppins-SemiBold",
     textAlign: "center",
     marginVertical: dimensions.screenHeight * 0.03,
-    paddingLeft: dimensions.screenHeight * 0.05,
   },
   iconContainer: {
     flexDirection: "row",
     alignItems: "center",
+    justifyContent: 'flex-end',
+    flex: 1
   },
   iconMargin: {
     marginLeft: dimensions.screenHeight * 0.015,
@@ -228,10 +230,6 @@ const styles = StyleSheet.create({
     borderRadius: dimensions.screenHeight * 0.01,
     margin: dimensions.screenWidth * 0.05,
     marginTop: dimensions.screenHeight * 0.02,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
-    elevation: 5,
   },
   aboutHeader: {
     flexDirection: "row",
