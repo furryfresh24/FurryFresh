@@ -142,219 +142,160 @@ const BookingScheduling = () => {
 
   return (
     <PortalProvider>
-      {(
-        <AppbarDefault
-          title="Booking"
-          subtitle={grooming.title}
-          subtitleSize={dimensions.screenWidth * 0.03}
-          subtitleFont="Poppins-Regular"
-          session={session}
-          showLeading={false}
-          leadingChildren
-          titleSize={dimensions.screenWidth * 0.045}
-        />
-      )}
-      <MainContPlain>
-        <View style={styles.cont1}>
-          <Title1 text="To Book Service" fontSize={dimensions.screenWidth * 0.05} />
-          <View style={styles.groomTypeCont}>
-            <View style={styles.listSvgIconBG}>
-              {!icon ? (
-                <DefaultListIcon
-                  color="#fff"
-                  width={dimensions.screenWidth * 0.11}
-                  height={dimensions.screenWidth * 0.11}
-                  props
-                />
-              ) : (
-                icon
-              )}
-            </View>
-            <View style={styles.listItemDetails}>
-              <Text style={styles.l1title}>{grooming.title}</Text>
-              <Text style={styles.l1description}>{grooming.description}</Text>
-            </View>
-          </View>
-        </View>
-        <View style={styles.cont1}>
-          <Title1 text="Pet Selection" fontSize={dimensions.screenWidth * 0.05} />
-          <Spacer height={dimensions.screenHeight * 0.01} />
-          <View style={styles.cont2main}>
-            <View style={styles.cont2}>
-              <Text style={styles.cont2title}>Select Pet</Text>
-              <Text style={styles.cont2desc}>Choose a pet for this appointment</Text>
-            </View>
-            <View style={[styles.cont2, { alignItems: 'flex-end', flex: 1 }]}>
-              <Ionicons name="paw" size={dimensions.screenWidth * 0.06} color="#B5B5B5" />
-            </View>
-          </View>
-          <Spacer height={dimensions.screenHeight * 0.015} />
-          {
-            pet == null ? (
-              <Button1
-                title='Select a Pet'
-                isPrimary={false}
-                borderRadius={10}
-                onPress={() => { setSelectedPet(pet); openSheet(); }}
-                textStyle={{
-                  fontSize: dimensions.screenWidth * 0.04,
-                  color: 'white'
-                }}
-                paddingVertical={dimensions.screenHeight * 0.014}
-              />
-            ) : (
-              <View style={[sheetStyles.petCont, {
-                backgroundColor: '#e2e7f3',
-                marginBottom: 0,
-                width: '100%'
-              }]}>
-                <View style={[sheetStyles.iconCont, {
-                  width: dimensions.screenWidth * 0.12,
-                  height: dimensions.screenWidth * 0.12,
-                }]}>
-                  {
-                    pet.pet_avatar ?
-                      <Image source={{ uri: pet.pet_avatar }} />
-                      : <SvgValue
-                        svgIcon={pet.pet_type ? 'dog' : 'cat'}
-                        color="#fff"
-                        width={dimensions.screenWidth * 0.05}
-                        height={dimensions.screenWidth * 0.05}
-                      />
-                  }
-                </View>
-                <View style={[sheetStyles.petDetailsCont, { flex: 1 }]}>
-                  <Title1 text={pet.name} fontSize={dimensions.screenWidth * 0.04} lineHeight={dimensions.screenWidth * 0.055} />
-                  <Subtitle1 text={pet.pet_type} fontFamily='Poppins-Regular' />
-                </View>
-                <TouchableOpacity
-                  onPress={() => { setSelectedPet(pet); openSheet(); }}
-                  style={{
-                    alignItems: 'center',
-                    display: 'flex',
-                    justifyContent: 'center',
-                    borderRadius: 10,
-                  }}
-                >
-                  <View style={{
-                    backgroundColor: '#ED7964',
-                    alignItems: 'center',
-                    display: 'flex',
-                    justifyContent: 'center',
-                    borderRadius: 10,
-                    paddingVertical: dimensions.screenHeight * 0.01
-                  }}>
-                    <Text style={{
-                      fontFamily: 'Poppins-SemiBold',
-                      color: "white",
-                      paddingHorizontal: dimensions.screenWidth * 0.03,
-                      fontSize: dimensions.screenWidth * 0.037,
-                      lineHeight: dimensions.screenWidth * 0.05
-                    }}>Edit</Text>
-                  </View>
-                </TouchableOpacity>
+      <View style={{ height: '100%', backgroundColor: '#F8F8FF' }}>
+        {(
+          <AppbarDefault
+            title="Booking"
+            subtitle={grooming.title}
+            subtitleSize={dimensions.screenWidth * 0.03}
+            subtitleFont="Poppins-Regular"
+            session={session}
+            showLeading={false}
+            leadingChildren
+            titleSize={dimensions.screenWidth * 0.045}
+          />
+        )}
+        <MainContPlain>
+          <View style={styles.cont1}>
+            <Title1 text="To Book Service" fontSize={dimensions.screenWidth * 0.05} />
+            <View style={styles.groomTypeCont}>
+              <View style={styles.listSvgIconBG}>
+                {!icon ? (
+                  <DefaultListIcon
+                    color="#fff"
+                    width={dimensions.screenWidth * 0.11}
+                    height={dimensions.screenWidth * 0.11}
+                    props
+                  />
+                ) : (
+                  icon
+                )}
               </View>
-            )
-          }
-        </View>
-        <Spacer height={dimensions.screenHeight * 0.03} />
-        <View style={[{ paddingHorizontal: 0, backgroundColor: 'white' }]}>
-          <View style={[styles.cont1, { paddingBottom: 0, paddingTop: 0 }]}>
-            <Title1 text="Schedule Appointment" fontSize={dimensions.screenWidth * 0.05} />
+              <View style={styles.listItemDetails}>
+                <Text style={styles.l1title}>{grooming.title}</Text>
+                <Text style={styles.l1description}>{grooming.description}</Text>
+              </View>
+            </View>
+          </View>
+          <View style={styles.cont1}>
+            <Title1 text="Pet Selection" fontSize={dimensions.screenWidth * 0.05} />
             <Spacer height={dimensions.screenHeight * 0.01} />
             <View style={styles.cont2main}>
               <View style={styles.cont2}>
-                <Text style={styles.cont2title}>Select Date</Text>
-                <Text style={styles.cont2desc}>Choose a date for this booking</Text>
+                <Text style={styles.cont2title}>Select Pet</Text>
+                <Text style={styles.cont2desc}>Choose a pet for this appointment</Text>
               </View>
               <View style={[styles.cont2, { alignItems: 'flex-end', flex: 1 }]}>
-                <Ionicons name="calendar" size={dimensions.screenWidth * 0.06} color="#B5B5B5" />
+                <Ionicons name="paw" size={dimensions.screenWidth * 0.06} color="#B5B5B5" />
               </View>
             </View>
-          </View>
-          <FlatList
-            data={dateOptions}
-            style={{ paddingBottom: dimensions.screenHeight * 0.01 }}
-            keyExtractor={(item) => item.value}
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={{ marginTop: 15 }}
-            renderItem={({ item, index }) => {
-              const isSelected = item.value === selectedDate;
-              return (
-                <TouchableOpacity
-                  style={[
-                    styles.dateButton,
-                    isSelected && styles.dateButtonSelected,
-                    {
-                      borderColor: isSelected ? '#ED7964' : '#D1D1D1',
-                      marginLeft: index === 0 ? dimensions.screenWidth * 0.05 : 0,
-                    },
-                  ]}
-                  onPress={() => {
-                    setSelectedTime(null);
-                    setSelectedDate(item.value);
+            <Spacer height={dimensions.screenHeight * 0.015} />
+            {
+              pet == null ? (
+                <Button1
+                  title='Select a Pet'
+                  isPrimary={false}
+                  borderRadius={10}
+                  onPress={() => { setSelectedPet(pet); openSheet(); }}
+                  textStyle={{
+                    fontSize: dimensions.screenWidth * 0.04,
+                    color: 'white'
                   }}
-                >
-                  <Text
-                    style={[
-                      styles.dateText,
-                      isSelected && styles.dateTextSelected,
-                      {
-                        textAlign: 'center',
-                        color: isSelected ? 'white' : '#808080',
-                        fontSize: dimensions.screenWidth * 0.04,
-                      },
-                    ]}
+                  paddingVertical={dimensions.screenHeight * 0.014}
+                />
+              ) : (
+                <View style={[sheetStyles.petCont, {
+                  backgroundColor: '#e2e7f3',
+                  marginBottom: 0,
+                  width: '100%'
+                }]}>
+                  <View style={[sheetStyles.iconCont, {
+                    width: dimensions.screenWidth * 0.12,
+                    height: dimensions.screenWidth * 0.12,
+                  }]}>
+                    {
+                      pet.pet_avatar ?
+                        <Image source={{ uri: pet.pet_avatar }} />
+                        : <SvgValue
+                          svgIcon={pet.pet_type ? 'dog' : 'cat'}
+                          color="#fff"
+                          width={dimensions.screenWidth * 0.05}
+                          height={dimensions.screenWidth * 0.05}
+                        />
+                    }
+                  </View>
+                  <View style={[sheetStyles.petDetailsCont, { flex: 1 }]}>
+                    <Title1 text={pet.name} fontSize={dimensions.screenWidth * 0.04} lineHeight={dimensions.screenWidth * 0.055} />
+                    <Subtitle1 text={pet.pet_type} fontFamily='Poppins-Regular' />
+                  </View>
+                  <TouchableOpacity
+                    onPress={() => { setSelectedPet(pet); openSheet(); }}
+                    style={{
+                      alignItems: 'center',
+                      display: 'flex',
+                      justifyContent: 'center',
+                      borderRadius: 10,
+                    }}
                   >
-                    {item.month}
-                  </Text>
-                  <Text
-                    style={[
-                      styles.dateText,
-                      isSelected && styles.dateTextSelected,
-                      {
-                        textAlign: 'center',
+                    <View style={{
+                      backgroundColor: '#ED7964',
+                      alignItems: 'center',
+                      display: 'flex',
+                      justifyContent: 'center',
+                      borderRadius: 10,
+                      paddingVertical: dimensions.screenHeight * 0.01
+                    }}>
+                      <Text style={{
                         fontFamily: 'Poppins-SemiBold',
-                        color: isSelected ? 'white' : 'black',
-                      },
-                    ]}
-                  >
-                    {item.day}
-                  </Text>
-                </TouchableOpacity>
-              );
-            }}
-          />
-          <View style={[styles.cont1, { paddingBottom: 0, paddingTop: 0 }]}>
-            <View style={styles.cont2main}>
-              <View style={styles.cont2}>
-                <Text style={styles.cont2title}>Select Desired Time Slot</Text>
-                <Text style={styles.cont2desc}>Choose a specific time for this booking</Text>
-              </View>
-              <View style={[styles.cont2, { alignItems: 'flex-end', flex: 1 }]}>
-                <Ionicons name="time" size={dimensions.screenWidth * 0.06} color="#B5B5B5" />
+                        color: "white",
+                        paddingHorizontal: dimensions.screenWidth * 0.03,
+                        fontSize: dimensions.screenWidth * 0.037,
+                        lineHeight: dimensions.screenWidth * 0.05
+                      }}>Edit</Text>
+                    </View>
+                  </TouchableOpacity>
+                </View>
+              )
+            }
+          </View>
+          <Spacer height={dimensions.screenHeight * 0.03} />
+          <View style={[{ paddingHorizontal: 0, backgroundColor: 'white' }]}>
+            <View style={[styles.cont1, { paddingBottom: 0, paddingTop: 0 }]}>
+              <Title1 text="Schedule Appointment" fontSize={dimensions.screenWidth * 0.05} />
+              <Spacer height={dimensions.screenHeight * 0.01} />
+              <View style={styles.cont2main}>
+                <View style={styles.cont2}>
+                  <Text style={styles.cont2title}>Select Date</Text>
+                  <Text style={styles.cont2desc}>Choose a date for this booking</Text>
+                </View>
+                <View style={[styles.cont2, { alignItems: 'flex-end', flex: 1 }]}>
+                  <Ionicons name="calendar" size={dimensions.screenWidth * 0.06} color="#B5B5B5" />
+                </View>
               </View>
             </View>
-            <View style={styles.wrapContainer}>
-              {getTimeSlots(selectedDate).map((time, idx) => {
-                const isSelected = time === selectedTime;
-
+            <FlatList
+              data={dateOptions}
+              style={{ paddingBottom: dimensions.screenHeight * 0.01 }}
+              keyExtractor={(item) => item.value}
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={{ marginTop: 15 }}
+              renderItem={({ item, index }) => {
+                const isSelected = item.value === selectedDate;
                 return (
                   <TouchableOpacity
-                    key={idx}
                     style={[
                       styles.dateButton,
                       isSelected && styles.dateButtonSelected,
                       {
                         borderColor: isSelected ? '#ED7964' : '#D1D1D1',
-                        backgroundColor: isSelected ? '#ED7964' : bookedTimes.includes(time) ? '#D9D9D9' : '#FFF',
-                        width: dimensions.screenWidth * 0.265,
-                        marginBottom: dimensions.screenHeight * 0.015,
-                        marginRight: 0
+                        marginLeft: index === 0 ? dimensions.screenWidth * 0.05 : 0,
                       },
                     ]}
-                    onPress={!bookedTimes.includes(time) ? () => setSelectedTime(time) : () => { }}
+                    onPress={() => {
+                      setSelectedTime(null);
+                      setSelectedDate(item.value);
+                    }}
                   >
                     <Text
                       style={[
@@ -362,102 +303,170 @@ const BookingScheduling = () => {
                         isSelected && styles.dateTextSelected,
                         {
                           textAlign: 'center',
-                          color: isSelected ? '#FFF' : '#7E7E7E',
-                          textDecorationLine: bookedTimes.includes(time) ? 'line-through' : 'none',
-                          textDecorationStyle: 'dashed',
+                          color: isSelected ? 'white' : '#808080',
+                          fontSize: dimensions.screenWidth * 0.04,
                         },
                       ]}
                     >
-                      {moment(time, 'HH:mm').format('h:mm A')}
+                      {item.month}
+                    </Text>
+                    <Text
+                      style={[
+                        styles.dateText,
+                        isSelected && styles.dateTextSelected,
+                        {
+                          textAlign: 'center',
+                          fontFamily: 'Poppins-SemiBold',
+                          color: isSelected ? 'white' : 'black',
+                        },
+                      ]}
+                    >
+                      {item.day}
                     </Text>
                   </TouchableOpacity>
                 );
-              })}
-            </View>
-          </View>
-        </View>
-        <View style={buttonStyles.bookButtonCont}>
-          <Text>Book Button</Text>
-        </View>
-        <Portal>
-          <BottomSheet
-            ref={sheetRef}
-            snapPoints={snapPoints}
-            index={-1}
-            enablePanDownToClose={true}
-            handleComponent={null}
-            backgroundStyle={{ backgroundColor: "#FFF" }}
-            backdropComponent={backDrop}
-            onChange={handleSheetChange}
-            onClose={() => { setSelectedPet(null) }}
-          >
-            <BottomSheetView style={sheetStyles.bottomSheet}>
-              <View style={{
-                display: "flex",
-                flexDirection: "column",
-                justifyContent: "space-between",
-                height: "100%",
-              }}>
-                <View style={sheetStyles.mainCont}>
-                  <View style={sheetStyles.handle}></View>
-                  <Text
-                    style={{
-                      fontFamily: 'Poppins-SemiBold',
-                      alignSelf: 'center',
-                      fontSize: dimensions.screenWidth * 0.04,
-                      marginBottom: dimensions.screenHeight * 0.03
-                    }}
-                  >Select a Pet for Appointment</Text>
-                  <View>
-
-                  </View>
-                  <FlatList
-                    data={pets}
-                    style={sheetStyles.listStyle}
-                    renderItem={({ item, index }) => {
-                      return (
-                        <TouchableOpacity onPress={() => setSelectedPet(item)}>
-                          <View style={[sheetStyles.petCont, selectedPet?.id == item.id ? {
-                            backgroundColor: '#e2e7f3'
-                          } : null]}>
-                            <View style={sheetStyles.iconCont}>
-                              {
-                                item.pet_avatar ?
-                                  <Image source={{ uri: item.pet_avatar }} />
-                                  : <SvgValue
-                                    svgIcon={item.pet_type ? 'dog' : 'cat'}
-                                    color="#fff"
-                                    width={dimensions.screenWidth * 0.08}
-                                    height={dimensions.screenWidth * 0.08}
-                                  />
-                              }
-                            </View>
-                            <View style={sheetStyles.petDetailsCont}>
-                              <Title1 text={item.name} fontSize={dimensions.screenWidth * 0.04} lineHeight={dimensions.screenWidth * 0.055} />
-                              <Subtitle1 text={item.pet_type} fontFamily='Poppins-Regular' />
-                            </View>
-                          </View>
-                        </TouchableOpacity>
-                      );
-                    }}
-                  />
+              }}
+            />
+            <View style={[styles.cont1, { paddingBottom: 0, paddingTop: 0 }]}>
+              <View style={styles.cont2main}>
+                <View style={styles.cont2}>
+                  <Text style={styles.cont2title}>Select Desired Time Slot</Text>
+                  <Text style={styles.cont2desc}>Choose a specific time for this booking</Text>
                 </View>
-                <View style={{ paddingHorizontal: dimensions.screenWidth * 0.05, paddingBottom: dimensions.screenHeight * 0.03 }}>
-                  <Spacer height={dimensions.screenHeight * 0.015} />
-                  <Subtitle1 text='Your chosen pet will be used for this booking only.' fontFamily='Poppins-Regular' />
-                  <Spacer height={dimensions.screenHeight * 0.015} />
-                  <Button1
-                    title='Select Pet'
-                    isPrimary={false}
-                    borderRadius={15}
-                    onPress={selectedPet ? () => { setPet(selectedPet); sheetRef.current?.close(); } : null}
-                  />
+                <View style={[styles.cont2, { alignItems: 'flex-end', flex: 1 }]}>
+                  <Ionicons name="time" size={dimensions.screenWidth * 0.06} color="#B5B5B5" />
                 </View>
               </View>
-            </BottomSheetView>
-          </BottomSheet>
-        </Portal>
-      </MainContPlain >
+              <View style={styles.wrapContainer}>
+                {getTimeSlots(selectedDate).map((time, idx) => {
+                  const isSelected = time === selectedTime;
+
+                  return (
+                    <TouchableOpacity
+                      key={idx}
+                      style={[
+                        styles.dateButton,
+                        isSelected && styles.dateButtonSelected,
+                        {
+                          borderColor: isSelected ? '#ED7964' : '#D1D1D1',
+                          backgroundColor: isSelected ? '#ED7964' : bookedTimes.includes(time) ? '#D9D9D9' : '#FFF',
+                          width: dimensions.screenWidth * 0.265,
+                          marginBottom: dimensions.screenHeight * 0.015,
+                          marginRight: 0
+                        },
+                      ]}
+                      onPress={!bookedTimes.includes(time) ? () => setSelectedTime(time) : () => { }}
+                    >
+                      <Text
+                        style={[
+                          styles.dateText,
+                          isSelected && styles.dateTextSelected,
+                          {
+                            textAlign: 'center',
+                            color: isSelected ? '#FFF' : '#7E7E7E',
+                            textDecorationLine: bookedTimes.includes(time) ? 'line-through' : 'none',
+                            textDecorationStyle: 'dashed',
+                          },
+                        ]}
+                      >
+                        {moment(time, 'HH:mm').format('h:mm A')}
+                      </Text>
+                    </TouchableOpacity>
+                  );
+                })}
+              </View>
+            </View>
+          </View>
+          <Portal>
+            <BottomSheet
+              ref={sheetRef}
+              snapPoints={snapPoints}
+              index={-1}
+              enablePanDownToClose={true}
+              handleComponent={null}
+              backgroundStyle={{ backgroundColor: "#FFF" }}
+              backdropComponent={backDrop}
+              onChange={handleSheetChange}
+              onClose={() => { setSelectedPet(null) }}
+            >
+              <BottomSheetView style={sheetStyles.bottomSheet}>
+                <View style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: "space-between",
+                  height: "100%",
+                }}>
+                  <View style={sheetStyles.mainCont}>
+                    <View style={sheetStyles.handle}></View>
+                    <Text
+                      style={{
+                        fontFamily: 'Poppins-SemiBold',
+                        alignSelf: 'center',
+                        fontSize: dimensions.screenWidth * 0.04,
+                        marginBottom: dimensions.screenHeight * 0.03
+                      }}
+                    >Select a Pet for Appointment</Text>
+                    <View>
+
+                    </View>
+                    <FlatList
+                      data={pets}
+                      style={sheetStyles.listStyle}
+                      renderItem={({ item, index }) => {
+                        return (
+                          <TouchableOpacity onPress={() => setSelectedPet(item)}>
+                            <View style={[sheetStyles.petCont, selectedPet?.id == item.id ? {
+                              backgroundColor: '#e2e7f3'
+                            } : null]}>
+                              <View style={sheetStyles.iconCont}>
+                                {
+                                  item.pet_avatar ?
+                                    <Image source={{ uri: item.pet_avatar }} />
+                                    : <SvgValue
+                                      svgIcon={item.pet_type ? 'dog' : 'cat'}
+                                      color="#fff"
+                                      width={dimensions.screenWidth * 0.08}
+                                      height={dimensions.screenWidth * 0.08}
+                                    />
+                                }
+                              </View>
+                              <View style={sheetStyles.petDetailsCont}>
+                                <Title1 text={item.name} fontSize={dimensions.screenWidth * 0.04} lineHeight={dimensions.screenWidth * 0.055} />
+                                <Subtitle1 text={item.pet_type} fontFamily='Poppins-Regular' />
+                              </View>
+                            </View>
+                          </TouchableOpacity>
+                        );
+                      }}
+                    />
+                  </View>
+                  <View style={{ paddingHorizontal: dimensions.screenWidth * 0.05, paddingBottom: dimensions.screenHeight * 0.03 }}>
+                    <Spacer height={dimensions.screenHeight * 0.015} />
+                    <Subtitle1 text='Your chosen pet will be used for this booking only.' fontFamily='Poppins-Regular' />
+                    <Spacer height={dimensions.screenHeight * 0.015} />
+                    <Button1
+                      title='Select Pet'
+                      isPrimary={false}
+                      borderRadius={15}
+                      onPress={selectedPet ? () => { setPet(selectedPet); sheetRef.current?.close(); } : null}
+                    />
+                  </View>
+                </View>
+              </BottomSheetView>
+            </BottomSheet>
+          </Portal>
+        </MainContPlain >
+        {
+          selectedDate && pet && selectedTime ? (
+            <View style={buttonStyles.bookButtonCont}>
+              <View style={buttonStyles.bookButton}>
+                <Text style={buttonStyles.title}>Request a book</Text>
+                <Text style={buttonStyles.subtitle}>{moment(selectedDate).format('MMM D')} - {moment(selectedTime, 'HH:mm').format('h:mm A')}</Text>
+              </View>
+            </View>
+          ) : null
+        }
+      </View>
     </PortalProvider>
   );
 };
@@ -579,7 +588,33 @@ const styles = StyleSheet.create({
 const buttonStyles = StyleSheet.create({
   bookButtonCont: {
     position: 'absolute',
-    bottom: '0'
+    bottom: 0,
+    left: 0,
+    right: 0,
+    display: 'flex',
+    alignSelf: 'center',
+  },
+  bookButton: {
+    backgroundColor: '#466AA2',
+    paddingHorizontal: dimensions.screenWidth * 0.05,
+    marginHorizontal: dimensions.screenWidth * 0.05,
+    marginBottom: dimensions.screenHeight * 0.03,
+    paddingVertical: dimensions.screenHeight * 0.02,
+    borderRadius: 15,
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    flexDirection: 'row'
+  },
+  title: {
+    fontFamily: 'Poppins-SemiBold',
+    color: 'white',
+    fontSize: dimensions.screenWidth * 0.04,
+  },
+  subtitle: {
+    fontFamily: 'Poppins-Regular',
+    color: 'white',
+    fontSize: dimensions.screenWidth * 0.033,
   }
 });
 
