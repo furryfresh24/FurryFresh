@@ -19,23 +19,39 @@ const SignUp = (props: Props) => {
   const [loading, setLoading] = useState(false);
 
   async function signUpWithEmail() {
-    if(loading) return;
+    if (loading) return;
 
-    setLoading(true)
-    const { data: { session }, error } = await supabase.auth.signUp({
-      email: email,
-      password: password,
-    })
+    setLoading(true);
 
-    if (error) {
-      Alert.alert(error.message)
-      setLoading(false)
+    const { data: existing, error: checkError } = await supabase
+      .from('profiles')
+      .select('email')
+      .eq('email', email)
+      .single();
+
+    if (existing) {
+      Alert.alert('Email already exists. Try logging in instead.');
+      setLoading(false);
       return;
     }
 
-    if (!session) {
-      setLoading(false)
-      
+    const { data, error } = await supabase.auth.signUp({
+      email: email,
+      password: password,
+    });
+
+    if (error) {
+      if (error.message.includes('User already registered') || error.message.includes('email')) {
+        Alert.alert('Email is already registered. Please try logging in or use a different email.');
+      } else {
+        Alert.alert(error.message);
+      }
+      setLoading(false);
+      return;
+    }
+
+    if (!data.session) {
+      setLoading(false);
       console.log("No session registered");
 
       router.replace({
@@ -43,24 +59,25 @@ const SignUp = (props: Props) => {
         params: {
           email: email,
           firstname: firstname,
-          lastname: lastname 
-        }
+          lastname: lastname,
+        },
       });
       return;
     }
-    
-  
+
+    setLoading(false);
   }
+
 
   return (
     <MainContCircle showPetImage={true} paddingHorizontal={dimensions.screenWidth * 0.08}>
       <View style={styles.header}>
-        <Title1 
-          text='Sign Up' 
-          fontSize={dimensions.screenWidth * 0.08} 
+        <Title1
+          text='Sign Up'
+          fontSize={dimensions.screenWidth * 0.08}
           lineHeight={dimensions.screenWidth * 0.1}
         />
-        <Subtitle1 
+        <Subtitle1
           text='Start today your Furry Account'
           fontSize={dimensions.screenWidth * 0.038}
           fontFamily='Poppins-Regular'

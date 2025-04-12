@@ -20,6 +20,7 @@ import { Portal, PortalProvider } from '@gorhom/portal';
 import { usePet } from '../../context/pet_context';
 import { Icon } from '@rneui/themed';
 import Subtitle1 from '../../components/texts/subtitle1';
+import { getSizeCategory } from '../../hooks/fetchPetSize';
 
 const BookingScheduling = () => {
   const navigation = useNavigation();
@@ -28,8 +29,8 @@ const BookingScheduling = () => {
   const [selectedDate, setSelectedDate] = useState(moment().format('YYYY-MM-DD'));
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
   const [bookedTimes, setBookedTimes] = useState<string[]>([]);
-  const [pet, setPet] = useState<Pets | null>(null);
-  const [selectedPet, setSelectedPet] = useState<Pets | null>(null);
+  const [petChosen, setPetChosen] = useState<Pets[]>([]);
+  const [selectedPet, setSelectedPet] = useState<Pets[]>([]);
   const openSheet = () => sheetRef.current?.expand();
   const sheetRef = useRef<BottomSheet>(null);
   const snapPoints = useMemo(() => ["60%"], []);
@@ -191,12 +192,12 @@ const BookingScheduling = () => {
             </View>
             <Spacer height={dimensions.screenHeight * 0.015} />
             {
-              pet == null ? (
+              petChosen.length == 0 ? (
                 <Button1
                   title='Select a Pet'
                   isPrimary={false}
                   borderRadius={10}
-                  onPress={() => { setSelectedPet(pet); openSheet(); }}
+                  onPress={() => { setSelectedPet(petChosen); openSheet(); }}
                   textStyle={{
                     fontSize: dimensions.screenWidth * 0.04,
                     color: 'white'
@@ -204,56 +205,74 @@ const BookingScheduling = () => {
                   paddingVertical={dimensions.screenHeight * 0.014}
                 />
               ) : (
-                <View style={[sheetStyles.petCont, {
-                  backgroundColor: '#e2e7f3',
-                  marginBottom: 0,
-                  width: '100%'
-                }]}>
-                  <View style={[sheetStyles.iconCont, {
-                    width: dimensions.screenWidth * 0.12,
-                    height: dimensions.screenWidth * 0.12,
-                  }]}>
-                    {
-                      pet.pet_avatar ?
-                        <Image source={{ uri: pet.pet_avatar }} />
-                        : <SvgValue
-                          svgIcon={pet.pet_type ? 'dog' : 'cat'}
-                          color="#fff"
-                          width={dimensions.screenWidth * 0.05}
-                          height={dimensions.screenWidth * 0.05}
-                        />
-                    }
-                  </View>
-                  <View style={[sheetStyles.petDetailsCont, { flex: 1 }]}>
-                    <Title1 text={pet.name} fontSize={dimensions.screenWidth * 0.04} lineHeight={dimensions.screenWidth * 0.055} />
-                    <Subtitle1 text={pet.pet_type} fontFamily='Poppins-Regular' />
-                  </View>
-                  <TouchableOpacity
-                    onPress={() => { setSelectedPet(pet); openSheet(); }}
-                    style={{
-                      alignItems: 'center',
-                      display: 'flex',
-                      justifyContent: 'center',
-                      borderRadius: 10,
+                <View style={{ flex: 1, width: '100%' }}>
+                  <FlatList
+                    data={petChosen}
+                    scrollEnabled={false}
+                    style={{}}
+                    keyExtractor={(item) => item.id.toString()}
+                    renderItem={({ item, index }) => {
+                      const pet = item;
+                      return (
+                        <View key={item.id} style={[sheetStyles.petCont, {
+                          backgroundColor: '#e2e7f3',
+                          marginBottom: index != pets.length - 1 ? dimensions.screenHeight * 0.01 : 0,
+                          width: '100%'
+                        }]}>
+                          <View style={[sheetStyles.iconCont, {
+                            width: dimensions.screenWidth * 0.12,
+                            height: dimensions.screenWidth * 0.12,
+                          }]}>
+                            {
+                              pet.pet_avatar ?
+                                <Image source={{ uri: pet.pet_avatar }} />
+                                : <SvgValue
+                                  svgIcon={pet.pet_type ? 'dog' : 'cat'}
+                                  color="#fff"
+                                  width={dimensions.screenWidth * 0.05}
+                                  height={dimensions.screenWidth * 0.05}
+                                />
+                            }
+                          </View>
+                          <View style={[sheetStyles.petDetailsCont, { flex: 1 }]}>
+                            <Title1 text={pet.name} fontSize={dimensions.screenWidth * 0.04} lineHeight={dimensions.screenWidth * 0.055} />
+                            <Subtitle1 text={`${pet.pet_type}${pet.weight ? ' • ' + getSizeCategory(pet.weight)?.size : ''}`} fontFamily='Poppins-Regular' style={{ letterSpacing: .5 }} />
+                          </View>
+                          <TouchableOpacity
+                            onPress={() => {  
+                              setPetChosen(prev => prev.filter(p => p.id !== item.id)); 
+                            }}
+                            style={{
+                              alignItems: 'center',
+                              display: 'flex',
+                              justifyContent: 'center',
+                              borderRadius: 10,
+                            }}
+                          >
+                            <View style={{
+                              backgroundColor: '#ED7964',
+                              alignItems: 'center',
+                              display: 'flex',
+                              justifyContent: 'center',
+                              borderRadius: 10,
+                              paddingVertical: dimensions.screenHeight * 0.01
+                            }}>
+                              <Ionicons name='remove-circle' size={dimensions.screenWidth * 0.04} color="#fff" style={{ marginHorizontal: dimensions.screenWidth * 0.02 }} />
+                            </View>
+                          </TouchableOpacity>
+                        </View>
+                      );
                     }}
-                  >
-                    <View style={{
-                      backgroundColor: '#ED7964',
-                      alignItems: 'center',
-                      display: 'flex',
-                      justifyContent: 'center',
-                      borderRadius: 10,
-                      paddingVertical: dimensions.screenHeight * 0.01
-                    }}>
-                      <Text style={{
-                        fontFamily: 'Poppins-SemiBold',
-                        color: "white",
-                        paddingHorizontal: dimensions.screenWidth * 0.03,
-                        fontSize: dimensions.screenWidth * 0.037,
-                        lineHeight: dimensions.screenWidth * 0.05
-                      }}>Edit</Text>
-                    </View>
-                  </TouchableOpacity>
+                  />
+                  <Subtitle1
+                    text='For dogs, price may vary depending on the size of the chosen pet.'
+                    style={{
+                      textAlign: 'left',
+                      fontFamily: 'Poppins-Regular',
+                      marginTop: dimensions.screenHeight * 0.01,
+                      marginHorizontal: dimensions.screenWidth * 0.01
+                    }}
+                  />
                 </View>
               )
             }
@@ -387,7 +406,7 @@ const BookingScheduling = () => {
               backgroundStyle={{ backgroundColor: "#FFF" }}
               backdropComponent={backDrop}
               onChange={handleSheetChange}
-              onClose={() => { setSelectedPet(null) }}
+              onClose={() => { setSelectedPet([]) }}
             >
               <BottomSheetView style={sheetStyles.bottomSheet}>
                 <View style={{
@@ -414,8 +433,17 @@ const BookingScheduling = () => {
                       style={sheetStyles.listStyle}
                       renderItem={({ item, index }) => {
                         return (
-                          <TouchableOpacity onPress={() => setSelectedPet(item)}>
-                            <View style={[sheetStyles.petCont, selectedPet?.id == item.id ? {
+                          <TouchableOpacity onPress={() => {
+                            setSelectedPet(prev => {
+                              const exists = prev.find(p => p.id === item.id);
+                              return exists
+                                ? prev.filter(p => p.id !== item.id)
+                                : [...prev, item];
+                            });
+
+                            console.log(selectedPet);
+                          }}>
+                            <View style={[sheetStyles.petCont, selectedPet?.find((i) => i.id == item.id) ? {
                               backgroundColor: '#e2e7f3'
                             } : null]}>
                               <View style={sheetStyles.iconCont}>
@@ -423,7 +451,7 @@ const BookingScheduling = () => {
                                   item.pet_avatar ?
                                     <Image source={{ uri: item.pet_avatar }} />
                                     : <SvgValue
-                                      svgIcon={item.pet_type ? 'dog' : 'cat'}
+                                      svgIcon={item.pet_type == 'Dog' ? 'dog' : 'cat'}
                                       color="#fff"
                                       width={dimensions.screenWidth * 0.08}
                                       height={dimensions.screenWidth * 0.08}
@@ -433,6 +461,11 @@ const BookingScheduling = () => {
                               <View style={sheetStyles.petDetailsCont}>
                                 <Title1 text={item.name} fontSize={dimensions.screenWidth * 0.04} lineHeight={dimensions.screenWidth * 0.055} />
                                 <Subtitle1 text={item.pet_type} fontFamily='Poppins-Regular' />
+                              </View>
+                              <View style={sheetStyles.leadingCont}>
+                                <View style={sheetStyles.sizeCont}>
+                                  <Text style={sheetStyles.sizeTitle}>{getSizeCategory(item.weight)?.size}</Text>
+                                </View>
                               </View>
                             </View>
                           </TouchableOpacity>
@@ -448,8 +481,8 @@ const BookingScheduling = () => {
                       title='Select Pet'
                       isPrimary={false}
                       borderRadius={15}
-                      onPress={selectedPet ? () => { setPet(selectedPet); sheetRef.current?.close(); } : null}
-                    />
+                      onPress={selectedPet ? () => { setPetChosen(selectedPet); sheetRef.current?.close(); console.log("Now pets val", pets); } : null}
+                    /> 
                   </View>
                 </View>
               </BottomSheetView>
@@ -457,7 +490,7 @@ const BookingScheduling = () => {
           </Portal>
         </MainContPlain >
         {
-          selectedDate && pet && selectedTime ? (
+          selectedDate && petChosen && selectedTime ? (
             <View style={buttonStyles.bookButtonCont}>
               <View style={buttonStyles.bookButton}>
                 <Text style={buttonStyles.title}>Request a book</Text>
@@ -660,9 +693,25 @@ const sheetStyles = StyleSheet.create({
     display: 'flex',
     justifyContent: 'center',
     flexDirection: 'column',
+    flex: 1,
     alignItems: 'flex-start'
   },
   listStyle: {
     paddingHorizontal: dimensions.screenWidth * 0.05
+  },
+  leadingCont: {
+    paddingTop: dimensions.screenHeight * 0.005
+  },
+  sizeCont: {
+    backgroundColor: '#ED7964',
+    paddingHorizontal: dimensions.screenWidth * 0.026,
+    paddingVertical: dimensions.screenHeight * 0.001,
+    borderRadius: 30
+  },
+  sizeTitle: {
+    color: 'white',
+    fontFamily: 'Poppins-Bold',
+    fontSize: dimensions.screenWidth * 0.033,
+    lineHeight: dimensions.screenWidth * 0.05
   }
 });

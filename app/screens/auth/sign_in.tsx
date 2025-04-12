@@ -37,6 +37,8 @@ const SignIn = () => {
           Alert.alert(error.message);
         }
 
+        router.replace('../(tabs)');
+
         setTimeout(() => {
             setLoading(false);
         }, 2000);

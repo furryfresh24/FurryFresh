@@ -11,8 +11,15 @@ import MainContPaw from "../../components/general/background_paw";
 import dimensions from "../../utils/sizing";
 import Icon from "react-native-vector-icons/FontAwesome";
 import Subtitle1 from "../../components/texts/subtitle1";
+import { usePet } from "../../context/pet_context";
+import { useSession } from "../../context/sessions_context";
+import moment from "moment";
+import { Ionicons } from "@expo/vector-icons";
 
 const Profile = () => {
+  const { session } = useSession();
+  const { pets, fetchPets, addToPetContext, updatePetContext } = usePet();
+
   return (
     <MainContPaw>
       <View style={styles.topContainer}>
@@ -35,15 +42,20 @@ const Profile = () => {
         </View>
         <View style={styles.profileContainer}>
           <View style={styles.profilePicContainer}>
-            <Image
-              source={require("../../assets/images/general/pet-enjoy.png")}
-              style={styles.profilePic}
-            />
+            <View style={styles.profilePic}>
+              {
+                session?.user.user_metadata['avatar_url'] ? (
+                  <Image source={require("../../assets/images/general/pet-enjoy.png")} style={styles.profilePic} />
+                ) : (
+                  <Ionicons name="person" style={{ alignSelf: 'center', alignContent: 'center', color: 'white' }} size={dimensions.screenWidth * 0.12} />
+                )
+              }
+            </View>
             <TouchableOpacity style={styles.cameraButton}>
               <Icon name="camera" size={20} color="black" />
             </TouchableOpacity>
           </View>
-          <Text style={styles.userName}>Edber Pogi</Text>
+          <Text style={styles.userName}>{session?.user.user_metadata['first_name'] + ' ' + session?.user.user_metadata['last_name']}</Text>
           <View style={styles.buttonContainer}>
             <TouchableOpacity style={styles.editButton}>
               <Text style={styles.editButtonText}>Edit Profile</Text>
@@ -54,15 +66,15 @@ const Profile = () => {
               <Icon name="paw" size={20} color="white" />
             </TouchableOpacity>
           </View>
-          <View style={styles.statsContainer}>
+          <View style={[styles.statsContainer, { paddingTop: dimensions.screenWidth * 0.025 }]}>
             <View style={[styles.statItem, { flex: 1, alignItems: 'flex-start' }]}>
               <View style={{ alignItems: "center" }}>
-                <Text style={styles.statNumber}>3</Text>
+                <Text style={styles.statNumber}>{pets.length}</Text>
                 <Text style={styles.statLabel}>Pets</Text>
               </View>
             </View>
             <View style={[styles.statItem, { flex: 2 }]}>
-              <Text style={styles.statNumber}>May 23, 2002</Text>
+              <Text style={styles.statNumber}>{moment(session?.user.created_at).format('MMM DD, YYYY')}</Text>
               <Text style={styles.statLabel}>Joined On</Text>
             </View>
             <View style={[styles.statItem, { flex: 1, alignItems: 'flex-end' }]}>
@@ -105,11 +117,10 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     borderBottomLeftRadius: 25,
     borderBottomRightRadius: 25,
-    paddingTop: dimensions.screenHeight * 0.01,
     paddingHorizontal: dimensions.screenWidth * 0.03,
   },
   titlePage: {
-    marginTop: dimensions.screenHeight * 0.038,
+    marginTop: dimensions.screenHeight * 0.0,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
@@ -142,7 +153,10 @@ const styles = StyleSheet.create({
   profilePic: {
     width: dimensions.screenHeight * 0.18,
     height: dimensions.screenHeight * 0.18,
-    backgroundColor: "#5d86c5",
+    alignItems: 'center',
+    display: 'flex',
+    justifyContent: 'center',
+    backgroundColor: "#b1bfda",
     borderRadius: 100,
   },
   cameraButton: {
@@ -163,7 +177,7 @@ const styles = StyleSheet.create({
   },
   userName: {
     fontSize: 20,
-    fontWeight: "bold",
+    fontFamily: 'Poppins-SemiBold',
     marginVertical: dimensions.screenHeight * 0.009,
     paddingBottom: dimensions.screenHeight * 0.009,
   },
@@ -218,12 +232,15 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   statNumber: {
-    fontSize: 18,
+    fontSize: dimensions.screenWidth * 0.041,
+    lineHeight: dimensions.screenWidth * 0.05,
+    margin: 0,
     fontFamily: "Poppins-SemiBold",
   },
   statLabel: {
-    fontSize: 12,
+    fontSize: dimensions.screenWidth * 0.03,
     fontFamily: "Poppins-Regular",
+    lineHeight: dimensions.screenWidth * 0.04,
     color: "#888",
   },
   aboutContainer: {

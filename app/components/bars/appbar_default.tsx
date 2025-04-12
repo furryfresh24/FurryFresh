@@ -6,9 +6,9 @@ import { useRouter } from 'expo-router';
 import { Session } from '@supabase/supabase-js';
 import PlaydateIcon from '../svgs/pets/PlaydateIcon';
 
-const AppbarDefault = ({ 
-  session, title, subtitle, showLeading = false, leadingChildren = null, titleSize = dimensions.screenWidth * 0.05, subtitleSize = dimensions.screenWidth * 0.035, subtitleFont }: 
-    { session: Session | null, title: string, subtitle?: string, showLeading: boolean, leadingChildren: any, titleSize: number, subtitleSize?: number, subtitleFont?: string }) => {
+const AppbarDefault = ({
+  session, title, subtitle, showLeading = false, leadingChildren = null, titleSize = dimensions.screenWidth * 0.05, subtitleSize = dimensions.screenWidth * 0.035, subtitleFont }:
+  { session: Session | null, title: string, subtitle?: string, showLeading: boolean, leadingChildren: any, titleSize: number, subtitleSize?: number, subtitleFont?: string }) => {
   const router = useRouter();
 
   return (
@@ -17,9 +17,13 @@ const AppbarDefault = ({
         <Ionicons name="arrow-back" size={dimensions.screenWidth * 0.06} color="#000" />
       </TouchableOpacity>
 
-      <View style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+      <View style={{ display: 'flex', justifyContent: 'center', alignItems: 'center',  }}>
         <Text numberOfLines={1} style={[styles.title, { fontSize: titleSize }]}>{title}</Text>
-        <Text numberOfLines={1} style={[styles.subtitle, { fontSize: subtitleSize, fontFamily: subtitleFont }]}>{subtitle}</Text>
+        {
+          subtitle ? (
+            <Text numberOfLines={1} style={[styles.subtitle, { fontSize: subtitleSize, fontFamily: subtitleFont }]}>{subtitle}</Text>
+          ) : <></>
+        }
       </View>
 
       {showLeading ? leadingChildren : <View style={{ flex: 1, minHeight: dimensions.screenHeight * 0.0, backgroundColor: 'red', }}></View>
@@ -33,7 +37,7 @@ export default AppbarDefault;
 const styles = StyleSheet.create({
   container: {
     backgroundColor: '#fff',
-    paddingTop: dimensions.screenHeight * 0.06,
+    paddingTop: dimensions.screenHeight * 0.02,
     paddingBottom: dimensions.screenHeight * 0.02,
     paddingHorizontal: 16,
     borderBottomLeftRadius: 15,
