@@ -9,6 +9,7 @@ interface Pets {
     weight?: number;
     breed: string;
     birthday: Date;
+    size?: string;
     createdAt: Date;
     updatedAt?: Date;
 } 

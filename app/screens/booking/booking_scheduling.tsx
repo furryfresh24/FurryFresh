@@ -1,7 +1,7 @@
 import { StyleSheet, Text, View, TouchableOpacity, FlatList, Image, Button } from 'react-native';
 import React, { useLayoutEffect, useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import MainContPlain from '../../components/general/background_plain';
-import { useLocalSearchParams, useNavigation } from 'expo-router';
+import { router, useLocalSearchParams, useNavigation } from 'expo-router';
 import AppbarDefault from '../../components/bars/appbar_default';
 import { Session } from '@supabase/supabase-js';
 import dimensions from '../../utils/sizing';
@@ -20,7 +20,8 @@ import { Portal, PortalProvider } from '@gorhom/portal';
 import { usePet } from '../../context/pet_context';
 import { Icon } from '@rneui/themed';
 import Subtitle1 from '../../components/texts/subtitle1';
-import { getSizeCategory } from '../../hooks/fetchPetSize';
+import { dogSizes, getSizeCategory } from '../../hooks/fetchPetSize';
+import Price from '../../components/general/price';
 
 const BookingScheduling = () => {
   const navigation = useNavigation();
@@ -216,7 +217,7 @@ const BookingScheduling = () => {
                       return (
                         <View key={item.id} style={[sheetStyles.petCont, {
                           backgroundColor: '#e2e7f3',
-                          marginBottom: index != pets.length - 1 ? dimensions.screenHeight * 0.01 : 0,
+                          marginBottom: index != pets.length - 1 ? dimensions.screenHeight * 0.01 : dimensions.screenHeight * 0.015,
                           width: '100%'
                         }]}>
                           <View style={[sheetStyles.iconCont, {
@@ -236,11 +237,13 @@ const BookingScheduling = () => {
                           </View>
                           <View style={[sheetStyles.petDetailsCont, { flex: 1 }]}>
                             <Title1 text={pet.name} fontSize={dimensions.screenWidth * 0.04} lineHeight={dimensions.screenWidth * 0.055} />
-                            <Subtitle1 text={`${pet.pet_type}${pet.weight ? ' • ' + getSizeCategory(pet.weight)?.size : ''}`} fontFamily='Poppins-Regular' style={{ letterSpacing: .5 }} />
+                            <Subtitle1
+                              text={`${pet.pet_type}${pet.weight ? ' • ' + getSizeCategory(pet.weight)?.size : ''}`} fontFamily='Poppins-Regular' style={{ letterSpacing: .5 }}
+                            />
                           </View>
                           <TouchableOpacity
-                            onPress={() => {  
-                              setPetChosen(prev => prev.filter(p => p.id !== item.id)); 
+                            onPress={() => {
+                              setPetChosen(prev => prev.filter(p => p.id !== item.id));
                             }}
                             style={{
                               alignItems: 'center',
@@ -264,14 +267,135 @@ const BookingScheduling = () => {
                       );
                     }}
                   />
+                  <View>
+                    <Button1
+                      title='Modify'
+                      isPrimary={false}
+                      borderRadius={10}
+                      onPress={() => { setSelectedPet(petChosen); openSheet(); }}
+                      textStyle={{
+                        fontSize: dimensions.screenWidth * 0.04,
+                        color: 'white'
+                      }}
+                      paddingVertical={dimensions.screenHeight * 0.014}
+                    />
+                  </View>
                   <Subtitle1
                     text='For dogs, price may vary depending on the size of the chosen pet.'
                     style={{
                       textAlign: 'left',
                       fontFamily: 'Poppins-Regular',
-                      marginTop: dimensions.screenHeight * 0.01,
-                      marginHorizontal: dimensions.screenWidth * 0.01
+                      marginTop: dimensions.screenHeight * 0.02,
+                      marginHorizontal: dimensions.screenWidth * 0.025
                     }}
+                    tooltip={true}
+                    tooltipWidget={({ closeSheet }: { closeSheet: () => void }) => (
+                      <View>
+                        <View style={sheetStyles.mainCont}>
+                          <View style={sheetStyles.handle}></View>
+                          <Text
+                            style={{
+                              fontFamily: 'Poppins-SemiBold',
+                              alignSelf: 'center',
+                              fontSize: dimensions.screenWidth * 0.04,
+                              marginBottom: dimensions.screenHeight * 0.02
+                            }}
+                          >Size and Price Chart</Text>
+                          <View style={{ display: 'flex', flexDirection: 'row', paddingHorizontal: dimensions.screenWidth * 0.06 }}>
+                            <Text
+                              style={{
+                                fontFamily: 'Poppins-SemiBold'
+
+                              }}
+                            >
+                              For Dogs:
+                            </Text>
+                          </View>
+                          <FlatList
+                            data={dogSizes}
+                            style={sheetStyles.listStyle}
+                            scrollEnabled={false}
+                            renderItem={({ item, index }) => {
+                              const isEven = index % 2 == 0;
+
+                              return (
+                                <View
+                                  style={{
+                                    backgroundColor: '#e2e7f3',
+                                    paddingHorizontal: dimensions.screenWidth * 0.035,
+                                    paddingVertical: dimensions.screenHeight * 0.01,
+                                    borderRadius: 30,
+                                    marginBottom: dimensions.screenHeight * 0.01,
+                                    flexDirection: 'row',
+                                    display: 'flex',
+                                    justifyContent: 'space-between'
+                                  }}
+                                >
+                                  <View
+                                    style={{
+                                      flexDirection: 'row',
+                                      display: 'flex',
+                                      justifyContent: 'center',
+                                      alignItems: 'center'
+                                    }}
+                                  >
+                                    <Ionicons name='paw' size={dimensions.screenWidth * 0.05} color="#466AA2" />
+                                    <Spacer width={dimensions.screenWidth * 0.02} />
+                                    <View style={{
+                                      display: 'flex',
+                                      justifyContent: 'flex-start',
+                                      alignItems: 'flex-start',
+                                      flexDirection: 'column',
+
+                                    }}>
+                                      <Title1 fontSize={dimensions.screenWidth * 0.038} text={item.size} lineHeight={dimensions.screenWidth * 0.055} />
+                                      <Text
+                                        style={{
+                                          fontFamily: 'Poppins-Regular',
+                                          color: '#808080',
+                                          fontSize: dimensions.screenWidth * 0.03
+                                        }}
+                                      >{
+                                          item.start > 0 && item.end != Infinity ?
+                                            `${item.start}kg - ${item.end}kg` :
+                                            item.start == 0 ?
+                                              `${item.end}kg below` :
+                                              item.end == Infinity ?
+                                                `${item.start}kg up` : ''
+                                        }</Text>
+                                    </View>
+                                  </View>
+                                  <View
+                                    style={{
+                                      flexDirection: 'row',
+                                      display: 'flex',
+                                      alignItems: 'center'
+                                    }}
+                                  >
+                                    <Text
+                                      style={{
+                                        fontFamily: 'Poppins-Regular',
+                                        color: '#808080'
+                                      }}
+                                    >Base Price + </Text>
+                                    <Price value={item.addonPrice} color='#ED7964' fontFamily='Poppins-SemiBold' />
+                                  </View>
+                                </View>
+                              );
+                            }} />
+                        </View><View style={{ paddingHorizontal: dimensions.screenWidth * 0.05, paddingBottom: dimensions.screenHeight * 0.03 }}>
+                          <Spacer height={dimensions.screenHeight * 0.015} />
+                          <Subtitle1 text='Please note that the size and price chart applies only to dogs, as cat grooming services have a fixed rate.' fontFamily='Poppins-Regular' />
+                          <Spacer height={dimensions.screenHeight * 0.015} />
+                          <Button1
+                            title='Done'
+                            isPrimary={false}
+                            borderRadius={15}
+                            onPress={closeSheet}
+                          />
+                        </View>
+                      </View>
+                    )}
                   />
                 </View>
               )
@@ -346,7 +470,7 @@ const BookingScheduling = () => {
                 );
               }}
             />
-            <View style={[styles.cont1, { paddingBottom: 0, paddingTop: 0 }]}>
+            <View style={[styles.cont1, { paddingBottom: dimensions.screenHeight * 0.08, paddingTop: 0 }]}>
               <View style={styles.cont2main}>
                 <View style={styles.cont2}>
                   <Text style={styles.cont2title}>Select Desired Time Slot</Text>
@@ -482,7 +606,7 @@ const BookingScheduling = () => {
                       isPrimary={false}
                       borderRadius={15}
                       onPress={selectedPet ? () => { setPetChosen(selectedPet); sheetRef.current?.close(); console.log("Now pets val", pets); } : null}
-                    /> 
+                    />
                   </View>
                 </View>
               </BottomSheetView>
@@ -490,13 +614,42 @@ const BookingScheduling = () => {
           </Portal>
         </MainContPlain >
         {
-          selectedDate && petChosen && selectedTime ? (
-            <View style={buttonStyles.bookButtonCont}>
-              <View style={buttonStyles.bookButton}>
-                <Text style={buttonStyles.title}>Request a book</Text>
-                <Text style={buttonStyles.subtitle}>{moment(selectedDate).format('MMM D')} - {moment(selectedTime, 'HH:mm').format('h:mm A')}</Text>
+          selectedDate && petChosen.length > 0 && selectedTime ? (
+            <TouchableOpacity
+              onPress={() => {
+                console.log(selectedDate);
+                console.log(selectedTime);
+                console.log(grooming);
+                console.log(petChosen);
+
+                const simplifiedPets = petChosen.map(pet => ({
+                  id: pet.id,
+                  name: pet.name,
+                  weight: pet.weight,
+                  size: getSizeCategory(pet.weight)?.size,
+                  to_add_price: pet.pet_type == 'Dog' ? ((getSizeCategory(pet.weight)?.addonPrice ?? 0.0)) :  50,
+                  pet_type: pet.pet_type
+                }));
+
+                router.push({
+                  pathname: './confirm_scheduling',
+                  params: {
+                    selectedDate: selectedDate,
+                    selectedTime: selectedTime,
+                    groomingDetails: JSON.stringify(grooming),
+                    appointedPets: JSON.stringify(simplifiedPets)
+                  }
+                });
+              }}
+
+            >
+              <View style={buttonStyles.bookButtonCont}>
+                <View style={buttonStyles.bookButton}>
+                  <Text style={buttonStyles.title}>Request a book</Text>
+                  <Text style={buttonStyles.subtitle}>{moment(selectedDate).format('MMM D')} - {moment(selectedTime, 'HH:mm').format('h:mm A')}</Text>
+                </View>
               </View>
-            </View>
+            </TouchableOpacity>
           ) : null
         }
       </View>
