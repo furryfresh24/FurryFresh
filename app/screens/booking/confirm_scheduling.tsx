@@ -1,6 +1,6 @@
 import { StyleSheet, Text, View, ScrollView, TouchableOpacity, FlatList } from 'react-native';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useLocalSearchParams } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import Subcategories from '../../interfaces/subcategories';
 import AppbarDefault from '../../components/bars/appbar_default';
 import dimensions from '../../utils/sizing';
@@ -26,6 +26,7 @@ import { useSession } from '../../context/sessions_context';
 import CustomCheckbox1 from '../../components/inputs/custom_checkbox1';
 import { CheckBox } from '@rneui/themed';
 import { Voucher } from '../../interfaces/voucher';
+import Paypal from '../../components/payments/paypal';
 
 
 type Pet = {
@@ -38,9 +39,24 @@ type Pet = {
 };
 
 const ConfirmScheduling = () => {
-  const { selectedDate, selectedTime, groomingDetails, appointedPets } = useLocalSearchParams();
+  const { selectedDate, selectedTime, groomingDetails, appointedPets, paymentResult: rawResult } = useLocalSearchParams();
   const { session } = useSession();
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod | null>(null);
+  const hasHandledPayment = useRef(false);
+
+  const paymentResult = typeof rawResult === 'string' ? JSON.parse(rawResult) : null;
+
+  useEffect(() => {
+    if(hasHandledPayment.current) return;
+
+    if (paymentResult) {
+      const status = paymentResult.success;
+      const data = paymentResult.data;
+      console.log("✅ Payment Result after coming back: ");
+      console.log("✅ Status: ", status);
+      console.log("✅ Data: ", data);
+    }
+  }, [paymentResult]);
 
   const parsedGrooming: Subcategories = JSON.parse(groomingDetails as string);
   const parsedPets: Pet[] = JSON.parse(appointedPets as string);
@@ -380,15 +396,15 @@ const ConfirmScheduling = () => {
                 </View>
               </View>
               <Spacer height={dimensions.screenHeight * 0.02} />
-              <TouchableOpacity onPress={() => { 
-                  if(voucherSelected != null) {
-                    setHasVoucherChanges(true);
-                    setTempVoucherSelected(voucherSelected); 
-                  }
+              <TouchableOpacity onPress={() => {
+                if (voucherSelected != null) {
+                  setHasVoucherChanges(true);
+                  setTempVoucherSelected(voucherSelected);
+                }
 
-                  openSheet(); 
+                openSheet();
 
-                }}>
+              }}>
                 <View
                   style={{
                     borderColor: voucherSelected != null ? '#466AA2' : '#D1D1D1',
@@ -419,9 +435,9 @@ const ConfirmScheduling = () => {
                     }}
                   >{
 
-                    voucherSelected != null ? voucherSelected.name : 'Add Voucher'
+                      voucherSelected != null ? voucherSelected.name : 'Add Voucher'
 
-                  }</Text>
+                    }</Text>
                   {
                     false ? (
                       <></>
@@ -647,7 +663,24 @@ const ConfirmScheduling = () => {
           <Button1
             title='Confirm Booking'
             isPrimary={true}
-            onPress={() => { }}
+            onPress={paymentMethod ? () => {
+              if (paymentMethod.name == 'PayPal') {
+                console.log("Going paypal");
+
+                const items = [
+                  { name: 'Bath', price: 20 },
+                  { name: 'Nail Trim', price: 10 }
+                ];
+
+                router.push({
+                  pathname: '../payments/paypal',
+                  params: {
+                    items: JSON.stringify(items)
+                  }
+                });
+              }
+            } : null
+            }
             borderRadius={16}
           />
         </View>
