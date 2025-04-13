@@ -144,6 +144,12 @@ const RootLayout = () => {
                 headerShown: false
               }}
             />
+            <Stack.Screen 
+              name="screens/booking/confirm_scheduling"
+              options={{
+                headerShown: false
+              }}
+            />
           </Stack>
         </GestureHandlerRootView>
       </ThemeProvider>

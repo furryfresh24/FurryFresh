@@ -42,6 +42,8 @@ const BookingScheduling = () => {
       setPetChosen(selectedPet);
       sheetRef.current?.close();
       console.log("Now pets val", pets);
+    } else {
+      sheetRef.current?.close();
     }
   }, [selectedPet, petChosen, pets]);
 
@@ -117,7 +119,7 @@ const BookingScheduling = () => {
         setBookedTimes(times);
         console.log(times);
       }
-    };
+    }; 
     fetchBookingsForDate();
 
     return () => {
