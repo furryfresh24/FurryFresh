@@ -36,7 +36,7 @@ const MainContPaw: React.FC<MainContPawProps> = ({
 
       {showPetImage && (
         <Image
-          source={require("../../assets/images/general/pet-enjoy.png")}
+          source={require("../../assets/images/general/paw-watermark.png")}
           style={styles.petenjoy}
         />
       )}
