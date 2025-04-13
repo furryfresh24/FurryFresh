@@ -21,7 +21,6 @@ import supabase from "../../utils/supabase";
 import { Session } from "@supabase/supabase-js";
 import PetCareIcon from "../../components/svgs/home/PetCareIcon";
 import PetSuppliesIcon from "../../components/svgs/home/PetSuppliesIcon";
-import type { Voucher } from "../../interfaces/voucher";
 import VoucherTemp1 from "../../components/vouchers/voucher1";
 import Button1 from "../../components/buttons/button1";
 import Category from "../../interfaces/categories";
@@ -60,6 +59,23 @@ const services = [
     icon: PetSuppliesIcon,
   },
 ];
+
+interface Voucher {
+  id: string;
+  title: string;
+  description: string;
+  discountValue: number;
+  discountType: 'percentage' | 'fixed';
+  icon?: any;
+  forFirstTime: boolean;
+  code: string;
+  expiryDate?: string;
+  isActive: boolean;
+  usageLimit?: number;
+  usedCount?: number;
+  minOrderValue?: number;
+  applicableCategories?: string[];
+}
 
 const vouchers: Voucher[] = [
   {
@@ -754,7 +770,7 @@ const styles = StyleSheet.create({
   },
   header: {
     backgroundColor: "#fff",
-    paddingTop: dimensions.screenHeight * 0.02,
+    paddingTop: dimensions.screenHeight * 0.06,
     paddingBottom: dimensions.screenHeight * 0.014,
     paddingHorizontal: 16,
     borderBottomLeftRadius: 15,
