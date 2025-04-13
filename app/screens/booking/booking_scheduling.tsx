@@ -37,6 +37,15 @@ const BookingScheduling = () => {
   const snapPoints = useMemo(() => ["60%"], []);
   const { pets, fetchPets, addToPetContext, updatePetContext } = usePet();
 
+  const handleSelectPet = useCallback(() => {
+    if (selectedPet && JSON.stringify(selectedPet) !== JSON.stringify(petChosen)) {
+      setPetChosen(selectedPet);
+      sheetRef.current?.close();
+      console.log("Now pets val", pets);
+    }
+  }, [selectedPet, petChosen, pets]);
+
+
   const backDrop = useCallback(
     (props: any) => (
       <BottomSheetBackdrop
@@ -79,22 +88,44 @@ const BookingScheduling = () => {
     );
   }
 
+  const rawGroomingStr = useMemo(() => JSON.stringify(object), [object]);
+
+  const parsedGrooming = useMemo(() => {
+    try {
+      return JSON.parse(rawGroomingStr);
+    } catch (error) {
+      return null;
+    }
+  }, [rawGroomingStr]);
+
+
+  const groomingId = parsedGrooming?.id;
+
   useEffect(() => {
+    let isMounted = true;
     const fetchBookingsForDate = async () => {
+      if (!groomingId) return;
       const { data, error } = await supabase
         .from('bookings')
         .select('*')
         .eq('date', selectedDate)
-        .eq('grooming_id', grooming.id);
+        .eq('grooming_id', groomingId);
+
       if (error) return;
-      if (data) {
+      if (data && isMounted) {
         const times = data.map((item: any) => item.time_start);
         setBookedTimes(times);
         console.log(times);
       }
     };
     fetchBookingsForDate();
-  }, [selectedDate, grooming.id]);
+
+    return () => {
+      isMounted = false;
+    };
+  }, [selectedDate, groomingId]);
+
+
 
   const generateNext7Dates = () => {
     return Array.from({ length: 30 }, (_, i) => {
@@ -557,16 +588,16 @@ const BookingScheduling = () => {
                       style={sheetStyles.listStyle}
                       renderItem={({ item, index }) => {
                         return (
-                          <TouchableOpacity onPress={() => {
-                            setSelectedPet(prev => {
-                              const exists = prev.find(p => p.id === item.id);
-                              return exists
-                                ? prev.filter(p => p.id !== item.id)
-                                : [...prev, item];
-                            });
-
-                            console.log(selectedPet);
-                          }}>
+                          <TouchableOpacity
+                            onPress={() => {
+                              setSelectedPet(prev => {
+                                const exists = prev.find(p => p.id === item.id);
+                                return exists
+                                  ? prev.filter(p => p.id !== item.id)
+                                  : [...prev, item];
+                              });
+                            }}
+                          >
                             <View style={[sheetStyles.petCont, selectedPet?.find((i) => i.id == item.id) ? {
                               backgroundColor: '#e2e7f3'
                             } : null]}>
@@ -605,7 +636,7 @@ const BookingScheduling = () => {
                       title='Select Pet'
                       isPrimary={false}
                       borderRadius={15}
-                      onPress={selectedPet ? () => { setPetChosen(selectedPet); sheetRef.current?.close(); console.log("Now pets val", pets); } : null}
+                      onPress={handleSelectPet}
                     />
                   </View>
                 </View>
@@ -627,7 +658,7 @@ const BookingScheduling = () => {
                   name: pet.name,
                   weight: pet.weight,
                   size: getSizeCategory(pet.weight)?.size,
-                  to_add_price: pet.pet_type == 'Dog' ? ((getSizeCategory(pet.weight)?.addonPrice ?? 0.0)) :  50,
+                  to_add_price: pet.pet_type == 'Dog' ? ((getSizeCategory(pet.weight)?.addonPrice ?? 0.0)) : 50,
                   pet_type: pet.pet_type
                 }));
 
