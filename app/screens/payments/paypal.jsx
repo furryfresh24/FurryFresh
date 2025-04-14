@@ -19,10 +19,15 @@ class Paypal extends Component {
     }
 
     componentDidMount() {
-        const { items = [] } = this.props;
+        const { items = [], discount = 0 } = this.props;
 
-        // 💵 Calculate total amount
-        const total = items.reduce((sum, item) => sum + Number(item.price), 0).toFixed(2);
+        // 💵 Calculate subtotal and total after discount
+        const subtotal = items.reduce((sum, item) => sum + Number(item.price), 0);
+        const discountAmount = Number(discount);
+        const total = (subtotal - discountAmount).toFixed(2);
+
+        console.log('Items: ', items);
+        console.log('Discount: ', discount);
 
         const dataDetail = {
             "intent": "sale",
@@ -30,21 +35,21 @@ class Paypal extends Component {
             "transactions": [{
                 "amount": {
                     "total": total,
-                    "currency": "USD",
+                    "currency": "PHP",
                     "details": {
-                        "subtotal": total,
+                        "subtotal": subtotal.toFixed(2),
                         "tax": "0",
                         "shipping": "0",
                         "handling_fee": "0",
-                        "shipping_discount": "0",
+                        "shipping_discount": discountAmount.toFixed(2),
                         "insurance": "0"
                     }
                 },
                 "item_list": {
                     "items": items.map(item => ({
                         name: item.name,
-                        price: item.price.toFixed(2),
-                        currency: "USD",
+                        price: Number(item.price).toFixed(2),
+                        currency: "PHP",
                         quantity: 1
                     }))
                 },
@@ -172,8 +177,9 @@ class Paypal extends Component {
 }
 
 function PaypalScreen() {
-    const { items } = useLocalSearchParams(); // Retrieve the `items` query param
+    const { items, discount } = useLocalSearchParams(); // Retrieve the `items` query param
     const [parsedItems, setParsedItems] = useState(null); // Default to null to indicate loading
+    const [parsedDiscount, setParsedDiscount] = useState(0);
 
     useEffect(() => {
         if (items) {
@@ -183,7 +189,11 @@ function PaypalScreen() {
                 console.log('Error parsing items:', error);
             }
         }
-    }, [items]);
+
+        if (discount) {
+            setParsedDiscount(Number(discount));
+        }
+    }, [items, discount]);
 
     // Show a loading indicator until `items` is parsed
     if (parsedItems === null) {
@@ -194,12 +204,13 @@ function PaypalScreen() {
         <View style={{ flex: 1 }}>
             <Paypal
                 items={parsedItems}
+                discount={parsedDiscount}
                 onPaymentStatus={(result) => {
                     // handle success or fail
                     router.back();
                     router.setParams({
                         paymentResult: JSON.stringify(result)
-                      });
+                    });
                 }}
             />
         </View>

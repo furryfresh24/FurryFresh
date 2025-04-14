@@ -47,7 +47,7 @@ const ConfirmScheduling = () => {
   const paymentResult = typeof rawResult === 'string' ? JSON.parse(rawResult) : null;
 
   useEffect(() => {
-    if(hasHandledPayment.current) return;
+    if (hasHandledPayment.current) return;
 
     if (paymentResult) {
       const status = paymentResult.success;
@@ -55,6 +55,15 @@ const ConfirmScheduling = () => {
       console.log("✅ Payment Result after coming back: ");
       console.log("✅ Status: ", status);
       console.log("✅ Data: ", data);
+
+      if (status == true) {
+        console.log('Payment Successful');
+
+        // const insertData = async () => {
+        //   const { data: vouchersData, error: voucherError } = await supabase
+        //     .from('')
+        // }
+      }
     }
   }, [paymentResult]);
 
@@ -74,13 +83,11 @@ const ConfirmScheduling = () => {
   const [voucherError, setVoucherError] = useState<string | null>(null);
   const [isSearchingVouchers, setSearchingVouchers] = useState<boolean>(false);
 
-  // Compute the total price for all pets including grooming (assumed per-pet)
   const totalPrice = parsedPets.reduce(
     (sum, p) => sum + ((p.to_add_price || 0) + (parsedGrooming.price ?? 0)),
     0
   );
 
-  // Compute discount based on voucher type
   let discount = 0;
   if (voucherSelected?.type === 'Percent') {
     const percentDiscount = totalPrice * (voucherSelected.amount / 100);
@@ -95,7 +102,6 @@ const ConfirmScheduling = () => {
   const discountValue = totalPrice - discount;
   const discountValueString = `-₱${discountValue.toFixed(2)}`;
 
-  // Function to get total price by pet type (supports "All")
   const getPetTotal = (type: string): string => {
     const filteredPets =
       type.toLowerCase() === 'all'
@@ -110,7 +116,6 @@ const ConfirmScheduling = () => {
     return total.toFixed(2);
   };
 
-  // Function to return total value as number (optional)
   const finalValue = parseFloat(getPetTotal('all')) - discount;
 
   const backDrop = useCallback(
@@ -665,17 +670,29 @@ const ConfirmScheduling = () => {
             isPrimary={true}
             onPress={paymentMethod ? () => {
               if (paymentMethod.name == 'PayPal') {
-                console.log("Going paypal");
+                console.log("Going PayPal");
+                console.log(parsedGrooming);
+                console.log(parsedPets);
 
-                const items = [
-                  { name: 'Bath', price: 20 },
-                  { name: 'Nail Trim', price: 10 }
-                ];
+                // 🔄 Map each pet to a PayPal item entry
+                const items = parsedPets.map((pet) => {
+                  const price = (parsedGrooming.price ?? 0) + (pet.to_add_price || 0);
+                  return {
+                    name: `${parsedGrooming.title} for ${pet.name}`,
+                    price: Number(price).toFixed(2), // always 2 decimal places
+                    currency: "PHP",
+                    quantity: 1
+                  };
+                });
 
+                console.log(discount);
+
+                // ✅ Push to PayPal screen with discount
                 router.push({
                   pathname: '../payments/paypal',
                   params: {
-                    items: JSON.stringify(items)
+                    items: JSON.stringify(items),
+                    discount: discount.toFixed(2)
                   }
                 });
               }

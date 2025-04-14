@@ -201,6 +201,21 @@ const RootLayout = () => {
                   headerShown: false,
                 }}
               />
+              <Stack.Screen
+                name="screens/payments/paypal"
+                options={{
+                  headerShown: true,
+                  header: () => <AppbarDefault
+                    title="Payment"
+                    subtitleSize={dimensions.screenWidth * 0.03}
+                    subtitleFont="Poppins-Regular"
+                    session={session}
+                    showLeading={false}
+                    leadingChildren
+                    titleSize={dimensions.screenWidth * 0.045}
+                  />
+                }}
+              />
             </Stack>
           </PortalProvider>
         </GestureHandlerRootView>

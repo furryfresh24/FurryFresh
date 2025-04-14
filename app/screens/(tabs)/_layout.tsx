@@ -89,6 +89,7 @@ export default () => {
                   />
                 </View>
               ),
+              headerShown: false
             }}
           />
           <Tab.Screen
