@@ -59,10 +59,31 @@ const ConfirmScheduling = () => {
       if (status == true) {
         console.log('Payment Successful');
 
-        // const insertData = async () => {
-        //   const { data: vouchersData, error: voucherError } = await supabase
-        //     .from('')
-        // }
+        const insertData = async () => {
+          const { error, data: insertResult } = await supabase
+            .from('bookings')
+            .insert([
+              {
+                grooming_id: parsedGrooming?.id,
+                user_id: session?.user?.id,
+                pet_ids: parsedPets.map((p) => p.id),
+                date: selectedDate, // format: "YYYY-MM-DD"
+                time_start: selectedTime, // format: "HH:mm" or "10:30 AM"
+                note: '',
+                status: "pending", // or "pending", "paid", etc.
+                created_at: new Date().toISOString(),
+              }
+            ]);
+
+          if (error) {
+            console.log("❌ Booking insert error:", error);
+          } else {
+            console.log("✅ Booking inserted successfully:", insertResult);
+          }
+        };
+
+        insertData(); // 👈 This was missing
+        hasHandledPayment.current = true; // 👈 Set the flag after handling
       }
     }
   }, [paymentResult]);

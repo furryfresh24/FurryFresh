@@ -94,6 +94,7 @@ const BookingScheduling = () => {
 
   const parsedGrooming = useMemo(() => {
     try {
+      console.log("Raw: ", rawGroomingStr);
       return JSON.parse(rawGroomingStr);
     } catch (error) {
       return null;
@@ -101,12 +102,15 @@ const BookingScheduling = () => {
   }, [rawGroomingStr]);
 
 
-  const groomingId = parsedGrooming?.id;
+  const groomingId = grooming?.id;
 
   useEffect(() => {
     let isMounted = true;
+    console.log("Bookeds: ", groomingId);
     const fetchBookingsForDate = async () => {
       if (!groomingId) return;
+      
+      console.log("running");
       const { data, error } = await supabase
         .from('bookings')
         .select('*')
@@ -119,6 +123,8 @@ const BookingScheduling = () => {
         setBookedTimes(times);
         console.log(times);
       }
+
+      console.log('Booked Times: ', data);
     }; 
     fetchBookingsForDate();
 
