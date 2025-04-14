@@ -17,6 +17,7 @@ const Explore = () => {
         <AppbarDefault
           title={"Explore"}
           session={session}
+          showBack={false}
           showLeading={false}
           leadingChildren={null}
           titleSize={dimensions.screenWidth * 0.045}

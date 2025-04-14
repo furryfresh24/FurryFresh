@@ -7,17 +7,21 @@ import { Session } from '@supabase/supabase-js';
 import PlaydateIcon from '../svgs/pets/PlaydateIcon';
 
 const AppbarDefault = ({
-  session, title, subtitle, showLeading = false, leadingChildren = null, titleSize = dimensions.screenWidth * 0.05, subtitleSize = dimensions.screenWidth * 0.035, subtitleFont }:
-  { session: Session | null, title: string, subtitle?: string, showLeading: boolean, leadingChildren: any, titleSize: number, subtitleSize?: number, subtitleFont?: string }) => {
+  session, title, subtitle, showBack = true, showLeading = false, leadingChildren = null, titleSize = dimensions.screenWidth * 0.05, subtitleSize = dimensions.screenWidth * 0.035, subtitleFont }:
+  { session: Session | null, title: string, subtitle?: string, showBack?: boolean, showLeading: boolean, leadingChildren: any, titleSize: number, subtitleSize?: number, subtitleFont?: string }) => {
   const router = useRouter();
 
   return (
     <View style={[styles.container]}>
-      <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-        <Ionicons name="arrow-back" size={dimensions.screenWidth * 0.06} color="#000" />
-      </TouchableOpacity>
+      {
+        showBack ? (
+          <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+            <Ionicons name="arrow-back" size={dimensions.screenWidth * 0.06} color="#000" />
+          </TouchableOpacity>
+        ) : <View style={{ flex: 1, minHeight: dimensions.screenHeight * 0.0, backgroundColor: 'transparent', }}></View>
+      }
 
-      <View style={{ display: 'flex', justifyContent: 'center', alignItems: 'center',  }}>
+      <View style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', }}>
         <Text numberOfLines={1} style={[styles.title, { fontSize: titleSize }]}>{title}</Text>
         {
           subtitle ? (
