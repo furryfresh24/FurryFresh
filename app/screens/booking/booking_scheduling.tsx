@@ -860,7 +860,7 @@ const sheetStyles = StyleSheet.create({
   petCont: {
     display: 'flex',
     flexDirection: 'row',
-    marginBottom: dimensions.screenHeight * 0.03,
+    marginBottom: dimensions.screenHeight * 0.015,
     paddingHorizontal: dimensions.screenWidth * 0.03,
     paddingVertical: dimensions.screenHeight * 0.01,
     borderRadius: 15
