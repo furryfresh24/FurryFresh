@@ -32,9 +32,13 @@ const SignIn = () => {
           email,
           password,
         });
+
+        setLoading(false);
       
         if (error) {
           Alert.alert(error.message);
+
+          return;
         }
 
         router.replace('../(tabs)');

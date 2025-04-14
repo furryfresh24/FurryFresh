@@ -103,7 +103,7 @@ const ConfirmScheduling = () => {
   const [voucherResults, setVoucherResults] = useState<any>(null);
   const [voucherError, setVoucherError] = useState<string | null>(null);
   const [isSearchingVouchers, setSearchingVouchers] = useState<boolean>(false);
-
+ 
   const totalPrice = parsedPets.reduce(
     (sum, p) => sum + ((p.to_add_price || 0) + (parsedGrooming.price ?? 0)),
     0
