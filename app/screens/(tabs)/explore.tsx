@@ -11,9 +11,9 @@ const Explore = () => {
   const { session } = useSession();
   const navigation = useNavigation();
 
-  useLayoutEffect(() => {
-    navigation.setOptions({
-      header: () => (
+  return (
+    <View style={{ flex: 1, height: '100%', width: '100%' }}>
+      {
         <AppbarDefault
           title={"Explore"}
           session={session}
@@ -22,13 +22,7 @@ const Explore = () => {
           leadingChildren={null}
           titleSize={dimensions.screenWidth * 0.045}
         />
-      ),
-      headerShown: true
-    });
-  }, [navigation, session]);
-   
-  return (
-    <View style={{ flex: 1, height: '100%', width: '100%' }}>
+      }
       <MainContPlain>
         <Text>Explore</Text>
       </MainContPlain>
