@@ -40,9 +40,10 @@ export default AppbarDefault;
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#fff',
+    backgroundColor: '#fff', 
     paddingTop: dimensions.screenHeight * 0.06,
     paddingBottom: dimensions.screenHeight * 0.02,
+    marginBottom: dimensions.screenHeight * 0.01,
     paddingHorizontal: 16,
     borderBottomLeftRadius: 15,
     borderBottomRightRadius: 15,

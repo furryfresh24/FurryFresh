@@ -12,7 +12,7 @@ const Explore = () => {
   const navigation = useNavigation();
 
   return (
-    <View style={{ flex: 1, height: '100%', width: '100%' }}>
+    <View style={{ flex: 1, height: '100%', width: '100%', backgroundColor: '#F8F8FF' }}>
       {
         <AppbarDefault
           title={"Explore"}
