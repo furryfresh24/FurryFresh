@@ -89,6 +89,7 @@ export default () => {
                   />
                 </View>
               ),
+              headerShown: false
             }}
           />
           <Tab.Screen
@@ -102,6 +103,8 @@ export default () => {
                     title="Activity"
                     icon={<ActivityIcon color={color} width={dimensions.screenWidth * 0.07} height={dimensions.screenWidth * 0.07} props={undefined} />}
                   />
+                  
+              
                 </View>
               ),
               tabBarBadge: 10,

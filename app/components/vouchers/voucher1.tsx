@@ -1,9 +1,26 @@
 import { StyleSheet, Text, View } from 'react-native'
 import React from 'react'
-import type { Voucher } from '../../interfaces/voucher'
 import VoucherDefaultIcon from '../svgs/vouchers/VoucherDefaultIcon'
 import dimensions from '../../utils/sizing'
 import { Ionicons } from '@expo/vector-icons'
+
+
+interface Voucher {
+    id: string;
+    title: string;
+    description: string;
+    discountValue: number;
+    discountType: 'percentage' | 'fixed';
+    icon?: any;
+    forFirstTime: boolean;
+    code: string;
+    expiryDate?: string;
+    isActive: boolean;
+    usageLimit?: number;
+    usedCount?: number;
+    minOrderValue?: number;
+    applicableCategories?: string[];
+  }
 
 const VoucherTemp1 = ({ voucher }: { voucher: Voucher }) => {
 

@@ -1,12 +1,31 @@
 import { StyleSheet, Text, View } from 'react-native'
-import React from 'react'
+import React, { useLayoutEffect } from 'react'
+import { useNavigation } from 'expo-router';
+import MainContPlain from '../../components/general/background_plain';
+import AppbarDefault from '../../components/bars/appbar_default';
+import dimensions from '../../utils/sizing';
+import { useSession } from '../../context/sessions_context';
 
-type Props = {}
 
-const Explore = (props: Props) => {
+const Explore = () => {
+  const { session } = useSession();
+  const navigation = useNavigation();
+
   return (
-    <View>
-      <Text>Explore</Text>
+    <View style={{ flex: 1, height: '100%', width: '100%', backgroundColor: '#F8F8FF' }}>
+      {
+        <AppbarDefault
+          title={"Explore"}
+          session={session}
+          showBack={false}
+          showLeading={false}
+          leadingChildren={null}
+          titleSize={dimensions.screenWidth * 0.045}
+        />
+      }
+      <MainContPlain>
+        <Text>Explore</Text>
+      </MainContPlain>
     </View>
   )
 }

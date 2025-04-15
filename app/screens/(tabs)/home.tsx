@@ -21,7 +21,6 @@ import supabase from "../../utils/supabase";
 import { Session } from "@supabase/supabase-js";
 import PetCareIcon from "../../components/svgs/home/PetCareIcon";
 import PetSuppliesIcon from "../../components/svgs/home/PetSuppliesIcon";
-import type { Voucher } from "../../interfaces/voucher";
 import VoucherTemp1 from "../../components/vouchers/voucher1";
 import Button1 from "../../components/buttons/button1";
 import Category from "../../interfaces/categories";
@@ -60,6 +59,23 @@ const services = [
     icon: PetSuppliesIcon,
   },
 ];
+
+interface Voucher {
+  id: string;
+  title: string;
+  description: string;
+  discountValue: number;
+  discountType: 'percentage' | 'fixed';
+  icon?: any;
+  forFirstTime: boolean;
+  code: string;
+  expiryDate?: string;
+  isActive: boolean;
+  usageLimit?: number;
+  usedCount?: number;
+  minOrderValue?: number;
+  applicableCategories?: string[];
+}
 
 const vouchers: Voucher[] = [
   {
@@ -610,14 +626,16 @@ const Home = () => {
                 </View>
                 <Button1
                   isPrimary={false}
-                  onPress={() => { router.push(
-                    {
-                      pathname: '../booking/booking_scheduling',
-                      params: {
-                        object: JSON.stringify(selectedGrooming)
+                  onPress={() => {
+                    router.push(
+                      {
+                        pathname: '../booking/booking_scheduling',
+                        params: {
+                          object: JSON.stringify(selectedGrooming)
+                        }
                       }
-                    }
-                  ) }}
+                    )
+                  }}
                   title={"Choose Package"}
                   borderRadius={16}
                 />
@@ -733,9 +751,12 @@ const styles = StyleSheet.create({
   profileImage: {
     width: dimensions.screenWidth * 0.12,
     height: dimensions.screenWidth * 0.12,
-    backgroundColor: "#466AA2",
     marginRight: dimensions.screenWidth * 0.04,
     borderRadius: 100,
+    alignItems: 'center',
+    display: 'flex',
+    justifyContent: 'center',
+    backgroundColor: "#b1bfda",
   },
   pets: {
     backgroundColor: "#fff",
@@ -833,7 +854,6 @@ const styles = StyleSheet.create({
     paddingVertical: dimensions.screenHeight * 0.01,
     marginBottom: dimensions.screenHeight * 0.02,
     borderRadius: 12,
-    elevation: 7,
     alignItems: "center",
     width: "100%",
     alignSelf: "stretch",
@@ -871,10 +891,18 @@ export const homeOptions = {
   header: (session: Session | null) => (
     <View style={styles.header}>
       <View style={styles.headerLeft}>
-        <Image
-          source={require("../../assets/images/general/pet-enjoy.png")}
-          style={styles.profileImage}
-        />
+        <View style={styles.profileImage}>
+          {
+            session?.user.user_metadata['avatar_url'] ? (
+              <Image
+                source={require("../../assets/images/general/pet-enjoy.png")}
+                style={styles.profileImage}
+              />
+            ) : (
+              <Ionicons name="person" style={{ alignSelf: 'center', alignContent: 'center', color: 'white' }} size={dimensions.screenWidth * 0.05} />
+            )
+          }
+        </View>
         <View>
           <Text style={styles.title}>Hello!</Text>
           <Text style={styles.subtitle}>
