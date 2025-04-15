@@ -1,0 +1,318 @@
+import { StyleSheet } from 'react-native';
+
+export const petsStyles = StyleSheet.create({
+  container: {
+    flex: 1,
+    paddingTop: 10,
+  },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+  },
+  headerTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    flex: 1,
+    textAlign: 'center',
+  },
+  filterContainer: {
+    flexDirection: 'row',
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+  },
+  filterButton: {
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 20,
+    marginRight: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexDirection: 'row',
+  },
+  filterButtonActive: {
+    backgroundColor: '#ff6b6b',
+  },
+  filterButtonInactive: {
+    backgroundColor: '#f1f1f1',
+  },
+  filterText: {
+    color: '#fff',
+  },
+  filterTextInactive: {
+    color: '#777',
+  },
+  petItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 12,
+    marginHorizontal: 16,
+    marginVertical: 6,
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 2,
+  },
+  petImage: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    marginRight: 12,
+  },
+  petInfo: {
+    flex: 1,
+  },
+  petName: {
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  petType: {
+    fontSize: 14,
+    color: '#777',
+    marginTop: 2,
+  },
+  genderTag: {
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 12,
+    marginRight: 8,
+  },
+  maleTag: {
+    backgroundColor: '#007bff',
+  },
+  femaleTag: {
+    backgroundColor: '#ff6b6b',
+  },
+  genderText: {
+    color: '#fff',
+    fontSize: 12,
+  },
+  addButton: {
+    backgroundColor: '#4a7fff',
+    marginHorizontal: 16,
+    marginVertical: 20,
+    paddingVertical: 14,
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+  addButtonText: {
+    color: '#fff',
+    fontWeight: 'bold',
+    fontSize: 16,
+  },
+  chevron: {
+    marginLeft: 'auto',
+  },
+  // Add Pet Styles
+  addPetContainer: {
+    flex: 1,
+    backgroundColor: '#f8f8f8',
+  },
+  photoUploadContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginVertical: 20,
+  },
+  photoPlaceholder: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    backgroundColor: '#f1f1f1',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  photoPlaceholderText: {
+    color: '#aaa',
+    textAlign: 'center',
+    fontSize: 12,
+    marginTop: 5,
+  },
+  cameraIcon: {
+    position: 'absolute',
+    bottom: 0,
+    right: 10,
+    backgroundColor: '#fff',
+    borderRadius: 15,
+    width: 30,
+    height: 30,
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.2,
+    shadowRadius: 1,
+    elevation: 2,
+  },
+  formGroup: {
+    marginHorizontal: 16,
+    marginVertical: 10,
+  },
+  formLabel: {
+    fontSize: 14,
+    color: '#4a7fff',
+    marginBottom: 8,
+  },
+  textInput: {
+    backgroundColor: '#fff',
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    fontSize: 16,
+  },
+  pickerRow: {
+    flexDirection: 'row',
+    justifyContent: 'flex-start',
+    marginTop: 5,
+  },
+  optionButton: {
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderRadius: 8,
+    marginRight: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexDirection: 'row',
+  },
+  optionIcon: {
+    marginRight: 6,
+  },
+  createButton: {
+    backgroundColor: '#ff6b6b',
+    marginHorizontal: 16,
+    marginVertical: 20,
+    paddingVertical: 14,
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+  createButtonText: {
+    color: '#fff',
+    fontWeight: 'bold',
+    fontSize: 16,
+  },
+  // Pet Details Modal Styles
+  petDetailsModalContainer: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.1)',
+  },
+  petDetailsModalContent: {
+    backgroundColor: '#fff',
+    flex: 1,
+    marginTop: 60,
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    overflow: 'hidden',
+  },
+  petDetailsHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    paddingVertical: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: '#eee',
+  },
+  petDetailsHeaderLeft: {
+    flex: 1,
+  },
+  petDetailsName: {
+    fontSize: 20,
+    fontWeight: 'bold',
+  },
+  petDetailsType: {
+    fontSize: 14,
+    color: '#777',
+  },
+  petDetailsScrollView: {
+    flex: 1,
+  },
+  petDetailsImageContainer: {
+    alignItems: 'center',
+    marginVertical: 20,
+  },
+  petDetailsImage: {
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+  },
+  petDetailsSectionContainer: {
+    backgroundColor: '#f5f7fa',
+    marginHorizontal: 15,
+    borderRadius: 12,
+    padding: 15,
+    marginBottom: 20,
+  },
+  petDetailsRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 15,
+  },
+  petDetailsInfoItem: {
+    alignItems: 'center',
+    flex: 1,
+  },
+  petDetailsIconContainer: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    backgroundColor: '#e6f0ff',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 8,
+  },
+  petDetailsInfoLabel: {
+    fontSize: 12,
+    color: '#777',
+    marginBottom: 4,
+  },
+  petDetailsInfoValue: {
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  servicesSection: {
+    marginHorizontal: 15,
+    marginBottom: 20,
+  },
+  servicesSectionTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 12,
+  },
+  serviceCard: {
+    backgroundColor: '#f5f7fa',
+    borderRadius: 12,
+    padding: 15,
+    marginBottom: 10,
+  },
+  serviceCardHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 5,
+  },
+  serviceCardTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  serviceCardDescription: {
+    fontSize: 14,
+    color: '#777',
+  },
+  appointmentButton: {
+    backgroundColor: '#ff6b6b',
+    marginHorizontal: 15,
+    marginBottom: 30,
+    paddingVertical: 15,
+    borderRadius: 12,
+    alignItems: 'center',
+  },
+  appointmentButtonText: {
+    color: '#fff',
+    fontWeight: 'bold',
+    fontSize: 16,
+  },
+ 
+});
