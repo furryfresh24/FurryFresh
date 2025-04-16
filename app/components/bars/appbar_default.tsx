@@ -7,15 +7,24 @@ import { Session } from '@supabase/supabase-js';
 import PlaydateIcon from '../svgs/pets/PlaydateIcon';
 
 const AppbarDefault = ({
-  session, title, subtitle, showBack = true, showLeading = false, leadingChildren = null, titleSize = dimensions.screenWidth * 0.05, subtitleSize = dimensions.screenWidth * 0.035, subtitleFont }:
-  { session: Session | null, title: string, subtitle?: string, showBack?: boolean, showLeading: boolean, leadingChildren: any, titleSize: number, subtitleSize?: number, subtitleFont?: string }) => {
+  session, title, subtitle, leadFunction, showBack = true, showLeading = false, leadingChildren = null, titleSize = dimensions.screenWidth * 0.05, subtitleSize = dimensions.screenWidth * 0.035, subtitleFont }:
+  { session: Session | null, title: string, subtitle?: string, leadFunction?: () => void, showBack?: boolean, showLeading: boolean, leadingChildren: any, titleSize: number, subtitleSize?: number, subtitleFont?: string }) => {
   const router = useRouter();
+
+  const handleBackPress = () => {
+    if (typeof leadFunction === 'function') {
+      console.log("Happening");
+      leadFunction();
+    } else {
+      router.back();  // This will use router's back() if leadFunction is not provided
+    }
+  };
 
   return (
     <View style={[styles.container]}>
       {
         showBack ? (
-          <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+          <TouchableOpacity onPress={handleBackPress} style={styles.backButton}>
             <Ionicons name="arrow-back" size={dimensions.screenWidth * 0.06} color="#000" />
           </TouchableOpacity>
         ) : <View style={{ flex: 1, minHeight: dimensions.screenHeight * 0.0, backgroundColor: 'transparent', }}></View>

@@ -74,8 +74,7 @@ const AlreadyInCartBar: React.FC<Props> = ({ isCarting, productPrice, cart }) =>
         console.error('Error removing item from cart:', error);
       } else {
         console.log('Item removed from cart!');
-        // You can update the context to reflect the change
-        fetchCarts(); // Fetch updated cart
+        fetchCarts(); 
       }
     } catch (err) {
       console.error('Unexpected error removing item from cart:', err);
