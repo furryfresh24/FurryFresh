@@ -12,6 +12,8 @@ import CatIcon from '../components/svgs/signUp/CatIcon';
 import DogIcon from '../components/svgs/signUp/DogIcon';
 import PayPalIcon from '../components/svgs/payments/PayPalIcon';
 import PayOnServiceIcon from '../components/svgs/payments/PayOnServiceIcon';
+import MaleIcon from '../components/svgs/personal/MaleIcon';
+import FemaleIcon from '../components/svgs/personal/FemaleIcon';
 
 type Props = {
     svgIcon: string;
@@ -59,6 +61,12 @@ const SvgValue = (props: Props) => {
             break;
         case 'pay-on-service':
             toReturnData = <PayOnServiceIcon color={props.color} height={props.height} width={props.width} props />;
+            break;
+        case 'male':
+            toReturnData = <MaleIcon color={props.color} height={props.height} width={props.width} props />;
+            break;
+        case 'female':
+            toReturnData = <FemaleIcon color={props.color} height={props.height} width={props.width} props />;
             break;
         default:
             toReturnData = null;

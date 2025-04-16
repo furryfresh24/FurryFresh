@@ -109,7 +109,7 @@ const BookingScheduling = () => {
     console.log("Bookeds: ", groomingId);
     const fetchBookingsForDate = async () => {
       if (!groomingId) return;
-      
+
       console.log("running");
       const { data, error } = await supabase
         .from('bookings')
@@ -125,7 +125,7 @@ const BookingScheduling = () => {
       }
 
       console.log('Booked Times: ', data);
-    }; 
+    };
     fetchBookingsForDate();
 
     return () => {
@@ -612,7 +612,7 @@ const BookingScheduling = () => {
                               <View style={sheetStyles.iconCont}>
                                 {
                                   item.pet_avatar ?
-                                    <Image source={{ uri: item.pet_avatar }} />
+                                    <Image source={{ uri: item.pet_avatar }} style={{ width: '100%', height: '100%', borderRadius: 100 }} />
                                     : <SvgValue
                                       svgIcon={item.pet_type == 'Dog' ? 'dog' : 'cat'}
                                       color="#fff"
@@ -625,11 +625,13 @@ const BookingScheduling = () => {
                                 <Title1 text={item.name} fontSize={dimensions.screenWidth * 0.04} lineHeight={dimensions.screenWidth * 0.055} />
                                 <Subtitle1 text={item.pet_type} fontFamily='Poppins-Regular' />
                               </View>
-                              <View style={sheetStyles.leadingCont}>
-                                <View style={sheetStyles.sizeCont}>
-                                  <Text style={sheetStyles.sizeTitle}>{getSizeCategory(item.weight)?.size}</Text>
+                              {
+                                item.weight && <View style={sheetStyles.leadingCont}>
+                                  <View style={sheetStyles.sizeCont}>
+                                    <Text style={sheetStyles.sizeTitle}>{getSizeCategory(item.weight)?.size}</Text>
+                                  </View>
                                 </View>
-                              </View>
+                              }
                             </View>
                           </TouchableOpacity>
                         );

@@ -95,7 +95,6 @@ export const petsStyles = StyleSheet.create({
   },
   addButtonText: {
     color: '#fff',
-    fontWeight: 'bold',
     fontSize: 16,
   },
   chevron: {
@@ -152,6 +151,7 @@ export const petsStyles = StyleSheet.create({
     borderRadius: 8,
     paddingHorizontal: 12,
     paddingVertical: 10,
+    fontFamily: 'Poppins-Regular',
     fontSize: 16,
   },
   pickerRow: {

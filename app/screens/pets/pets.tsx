@@ -22,12 +22,16 @@ import { usePet } from "../../context/pet_context";
 import Pets from "../../interfaces/pets";
 import SvgValue from "../../hooks/fetchSvg";
 import AddPet from "./add_a_pet";
+import moment from "moment";
+import Button1 from "../../components/buttons/button1";
+import EditPet from "./edit_a_pet";
 
 type PetType = "Dog" | "Cat";
 type PetGender = "Male" | "Female";
 
 const PetsMain = () => {
   const [showAddPetModal, setShowAddPetModal] = useState(false);
+  const [showEditPetModal, setShowEditPetModal] = useState(false);
   const [showPetDetailsModal, setShowPetDetailsModal] = useState(false);
   const [selectedPet, setSelectedPet] = useState<Pets | null>(null);
   const [activeService, setActiveService] = useState<number | string>("all");
@@ -210,7 +214,7 @@ const PetsMain = () => {
         />
       </View>
 
-      <View style={{ paddingBottom: 120 }}>
+      <View style={{ paddingBottom: 250 }}>
         {filteredPets.map((item, index) => (
           <View key={item.id}>{renderPetItem({ item, index })}</View>
         ))}
@@ -234,10 +238,25 @@ const PetsMain = () => {
         transparent={false}
         onRequestClose={() => setShowAddPetModal(false)}
       >
-        <AddPet 
+        <AddPet
           back={() => {
             setShowAddPetModal(false);
           }}
+        />
+      </Modal>
+
+      {/* Edit Pet Modal */}
+      <Modal
+        visible={showEditPetModal}
+        animationType="slide"
+        transparent={false}
+        onRequestClose={() => setShowEditPetModal(false)}
+      >
+        <EditPet
+          back={() => {
+            setShowEditPetModal(false);
+          } } 
+          pet={selectedPet}        
         />
       </Modal>
 
@@ -262,17 +281,40 @@ const PetsMain = () => {
 
               <View style={styles.petProfileSection}>
                 <View style={styles.petImageContainer}>
-                  <Image
-                    source={{ uri: selectedPet.pet_avatar }}
-                    style={styles.petDetailImage}
-                  />
+                  {
+                    selectedPet.pet_avatar ?
+                      <Image
+                        source={{ uri: selectedPet.pet_avatar }}
+                        style={styles.petDetailImage}
+                      /> :
+                      <View
+                        style={[
+                          {
+                            backgroundColor: "#D1D1D1",
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center'
+                          },
+                          styles.petDetailImage
+                        ]}
+                      >
+                        <SvgValue
+                          svgIcon={selectedPet.pet_type == 'Dog' ? "dog" : "cat"}
+                          color="#fff"
+                          width={dimensions.screenWidth * 0.12}
+                          height={dimensions.screenWidth * 0.12}
+                        />
+                      </View>
+                  }
                 </View>
-                <Text style={styles.petDetailName}>{selectedPet.name}</Text>
+                <Text style={[styles.petDetailName, {
+                  fontFamily: 'Poppins-SemiBold'
+                }]}>{selectedPet.name}</Text>
                 <View style={styles.petDetailTags}>
                   <View
                     style={[
                       styles.petDetailTag,
-                      { backgroundColor: "#4a7fff" },
+                      { backgroundColor: "#808080" },
                     ]}
                   >
                     <FontAwesome5
@@ -281,7 +323,7 @@ const PetsMain = () => {
                           ? "dog"
                           : "cat"
                       }
-                      size={12}
+                      size={dimensions.screenWidth * 0.03}
                       color="#fff"
                       style={{ marginRight: 5 }}
                     />
@@ -322,7 +364,7 @@ const PetsMain = () => {
                     <View style={styles.petInfoTextContainer}>
                       <Text style={styles.petInfoLabel}>Birthday</Text>
                       <Text style={styles.petInfoValue}>
-                        {/* {selectedPet.birthday ?? ''} */}
+                        {moment(selectedPet.birthday).format('MMM D, YYYY')}
                       </Text>
                     </View>
                   </View>
@@ -343,9 +385,13 @@ const PetsMain = () => {
                 )}
               </View>
 
-              <TouchableOpacity style={styles.editPetButton}>
-                <Text style={styles.editPetButtonText}>Edit Pet Details</Text>
-              </TouchableOpacity>
+              <Button1
+                title="Edit Pet Details"
+                isPrimary={false}
+                borderRadius={15}
+                onPress={() => {console.log(selectedPet.pet_avatar);  setShowPetDetailsModal(false);  setShowEditPetModal(true);}}
+                style={{ marginTop: dimensions.screenHeight * 0.02 }}
+              />
             </View>
           </View>
         )}
@@ -354,33 +400,35 @@ const PetsMain = () => {
 
       <TouchableOpacity
         style={[petsStyles.addButton,
-          {
-            position: 'absolute',
-            bottom: dimensions.screenHeight * 0.2,
-            left: dimensions.screenWidth * 0.07,
-            right: dimensions.screenWidth * 0.07,
-            backgroundColor: '#466AA2',
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            paddingVertical: dimensions.screenHeight * 0.018,
-            borderRadius: 15,
-            flexDirection: 'row'
-          }
+        {
+          position: 'absolute',
+          bottom: dimensions.screenHeight * 0.2,
+          left: dimensions.screenWidth * 0.07,
+          right: dimensions.screenWidth * 0.07,
+          backgroundColor: '#466AA2',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          paddingVertical: dimensions.screenHeight * 0.015,
+          borderRadius: 15,
+          flexDirection: 'row'
+        }
         ]}
         onPress={() => setShowAddPetModal(true)}
       >
         <Text style={[petsStyles.addButtonText,
-          {
-            fontFamily: 'Poppins-SemiBold',
-            fontSize: dimensions.screenWidth * 0.043,
-            marginRight: dimensions.screenWidth * 0.02
-          }
+        {
+          fontFamily: 'Poppins-SemiBold',
+          fontSize: dimensions.screenWidth * 0.043,
+          marginRight: dimensions.screenWidth * 0.02,
+          lineHeight: dimensions.screenWidth * 0.08,
+          marginTop: dimensions.screenHeight * 0.005
+        }
         ]}>Add a Pet</Text>
-        <Ionicons 
+        <Ionicons
           name="paw"
           color="#fff"
-          size={dimensions.screenWidth * 0.04}
+          size={dimensions.screenWidth * 0.045}
         />
       </TouchableOpacity>
     </View>
@@ -425,13 +473,12 @@ const styles = StyleSheet.create({
     padding: 2,
   },
   petDetailImage: {
-    width: 150,
-    height: 150,
+    width: dimensions.screenWidth * 0.3,
+    height: dimensions.screenWidth * 0.3,
     borderRadius: 75,
   },
   petDetailName: {
     fontSize: 24,
-    fontWeight: "bold",
     marginTop: 15,
   },
   petDetailTags: {
@@ -447,14 +494,16 @@ const styles = StyleSheet.create({
     marginHorizontal: 5,
   },
   maleTagDetail: {
-    backgroundColor: "#007bff",
+    backgroundColor: "#466AA2",
   },
   femaleTagDetail: {
-    backgroundColor: "#ff6b6b",
+    backgroundColor: "#ED7964",
   },
   petDetailTagText: {
     color: "#fff",
-    fontSize: 14,
+    fontFamily: 'Poppins-Regular',
+    fontSize: dimensions.screenWidth * 0.033,
+    lineHeight: dimensions.screenWidth * 0.05
   },
   petInfoSection: {
     marginTop: 20,
@@ -470,12 +519,14 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   petInfoLabel: {
-    fontSize: 14,
+    fontSize: dimensions.screenWidth * 0.033,
     color: "#666",
+    fontFamily: 'Poppins-Light'
   },
   petInfoValue: {
-    fontSize: 16,
+    fontSize: dimensions.screenWidth * 0.039,
     marginTop: 3,
+    fontFamily: 'Poppins-Regular'
   },
   editPetButton: {
     backgroundColor: "#4a7fff",
