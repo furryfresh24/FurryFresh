@@ -1,16 +1,16 @@
 import { StyleSheet } from 'react-native';
+import dimensions from '../../../utils/sizing';
 
 export const petsStyles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingTop: 10,
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 16,
     paddingVertical: 12,
-  },
+  }, 
   headerTitle: {
     fontSize: 20,
     fontWeight: 'bold',
@@ -19,8 +19,7 @@ export const petsStyles = StyleSheet.create({
   },
   filterContainer: {
     flexDirection: 'row',
-    paddingHorizontal: 16,
-    paddingVertical: 10,
+    marginBottom: dimensions.screenHeight * 0.02
   },
   filterButton: {
     paddingHorizontal: 16,
@@ -58,46 +57,41 @@ export const petsStyles = StyleSheet.create({
     elevation: 2,
   },
   petImage: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    marginRight: 12,
+    width: dimensions.screenWidth * 0.14,
+    height: dimensions.screenWidth * 0.14,
+    borderRadius: 100,
   },
   petInfo: {
     flex: 1,
   },
   petName: {
-    fontSize: 16,
-    fontWeight: 'bold',
+    fontSize: dimensions.screenWidth * 0.038,
+    fontFamily: 'Poppins-SemiBold'
   },
   petType: {
-    fontSize: 14,
+    fontSize: dimensions.screenWidth * 0.033,
     color: '#777',
+    fontFamily: 'Poppins-Regular',
     marginTop: 2,
   },
   genderTag: {
-    paddingHorizontal: 10,
-    paddingVertical: 4,
+    paddingHorizontal: dimensions.screenWidth * 0.02,
+    paddingVertical: dimensions.screenHeight * 0.0012,
+    alignItems: 'center',
     borderRadius: 12,
-    marginRight: 8,
   },
   maleTag: {
-    backgroundColor: '#007bff',
+    backgroundColor: '#466AA2',
   },
   femaleTag: {
-    backgroundColor: '#ff6b6b',
+    backgroundColor: '#ED7964',
   },
   genderText: {
     color: '#fff',
-    fontSize: 12,
+    fontSize: dimensions.screenWidth * 0.028,
+    fontFamily: 'Poppins-SemiBold'
   },
   addButton: {
-    backgroundColor: '#4a7fff',
-    marginHorizontal: 16,
-    marginVertical: 20,
-    paddingVertical: 14,
-    borderRadius: 8,
-    alignItems: 'center',
   },
   addButtonText: {
     color: '#fff',
@@ -105,9 +99,8 @@ export const petsStyles = StyleSheet.create({
     fontSize: 16,
   },
   chevron: {
-    marginLeft: 'auto',
+    alignSelf: 'center'
   },
-  // Add Pet Styles
   addPetContainer: {
     flex: 1,
     backgroundColor: '#f8f8f8',

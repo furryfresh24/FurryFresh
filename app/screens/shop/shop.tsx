@@ -143,7 +143,7 @@ const Shop = () => {
 
     return (
         <MainContPaw allowScroll={false}>
-            <View>
+            <View style={{}}>   
                 <HorizontalButtonList
                     services={servicesWithAll}
                     activeService={activeService}
@@ -159,6 +159,9 @@ const Shop = () => {
                     data={products}
                     keyExtractor={(item) => item.id}
                     scrollEnabled={true}
+                    style={{
+                        height: '91%'
+                    }}
                     showsVerticalScrollIndicator={false}
                     renderItem={({ item }) => (
                         <TouchableOpacity onPress={() => {
