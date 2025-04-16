@@ -114,7 +114,6 @@ export const petsStyles = StyleSheet.create({
     width: 100,
     height: 100,
     borderRadius: 50,
-    backgroundColor: '#f1f1f1',
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -122,7 +121,6 @@ export const petsStyles = StyleSheet.create({
     color: '#aaa',
     textAlign: 'center',
     fontSize: 12,
-    marginTop: 5,
   },
   cameraIcon: {
     position: 'absolute',
@@ -141,13 +139,13 @@ export const petsStyles = StyleSheet.create({
     elevation: 2,
   },
   formGroup: {
-    marginHorizontal: 16,
-    marginVertical: 10,
+    marginHorizontal: dimensions.screenWidth * 0.05,
   },
   formLabel: {
-    fontSize: 14,
-    color: '#4a7fff',
-    marginBottom: 8,
+    fontSize: dimensions.screenWidth * 0.033,
+    color: '#808080',
+    fontFamily: 'Poppins-Regular',  
+    marginBottom: dimensions.screenHeight * 0.01, 
   },
   textInput: {
     backgroundColor: '#fff',

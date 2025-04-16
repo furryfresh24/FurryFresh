@@ -25,6 +25,7 @@ const RootLayout = () => {
   const pathname = usePathname();
   const navigated = useRef(false);
 
+
   // Session management
   useEffect(() => {
     const fetchSession = async () => {

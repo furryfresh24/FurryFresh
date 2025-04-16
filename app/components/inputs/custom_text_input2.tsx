@@ -1,5 +1,5 @@
 import React from "react";
-import { TextInput, StyleSheet, View, TouchableWithoutFeedback, Keyboard, Animated } from "react-native";
+import { TextInput, StyleSheet, View, TouchableWithoutFeedback, Keyboard } from "react-native";
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import dimensions from '../../utils/sizing';
 
@@ -13,8 +13,13 @@ interface PlainTextInputProps {
     autoCorrect?: boolean;
     marginBottom?: number;
     marginTop?: number;
-    allowClear?: boolean; // Allow clear icon to appear
-    type?: "normal" | "search"; // Input type: normal or search
+    allowClear?: boolean;
+    type?: "normal" | "search";
+    backgroundColor?: string;
+    borderColor?: string;
+    paddingVertical?: number;
+    paddingHorizontal?: number;
+    height?: number;
 }
 
 const PlainTextInput: React.FC<PlainTextInputProps> = ({
@@ -28,32 +33,37 @@ const PlainTextInput: React.FC<PlainTextInputProps> = ({
     marginTop = 0,
     marginBottom = dimensions.screenHeight * 0.04,
     allowClear = false,
-    type = "normal", // Default to normal type
+    type = "normal",
+    backgroundColor = "#f0f0f0",
+    borderColor,
+    paddingVertical = 0,
+    paddingHorizontal = dimensions.screenWidth * 0.05,
+    height = dimensions.screenHeight * 0.074,
 }) => {
     const [isFocused, setIsFocused] = React.useState(false);
     const inputRef = React.useRef<TextInput>(null);
 
-    const handleFocus = () => {
-        setIsFocused(true);
-    };
-
-    const handleBlur = () => {
-        if (!value) {
-            setIsFocused(false);
-        }
-    };
-
-    const handleClear = () => {
-        onChangeText(""); // Clear the input field when the icon is pressed
-    };
-
+    const handleFocus = () => setIsFocused(true);
+    const handleBlur = () => !value && setIsFocused(false);
+    const handleClear = () => onChangeText("");
     const showClearIcon = allowClear && value.length > 0;
 
     return (
-        <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
             <View style={[styles.container, { marginTop, marginBottom }]}>
                 <TouchableWithoutFeedback onPress={() => inputRef.current?.focus()}>
-                    <View style={[styles.inputContainer, { backgroundColor: "#f0f0f0" }]}>
+                    <View
+                        style={[
+                            styles.inputContainer,
+                            {
+                                backgroundColor,
+                                paddingVertical,
+                                paddingHorizontal,
+                                height,
+                            },
+                            borderColor ? { borderWidth: 1, borderColor } : {},
+                        ]}
+                    >
                         <TextInput
                             ref={inputRef}
                             style={styles.input}
@@ -88,15 +98,11 @@ const PlainTextInput: React.FC<PlainTextInputProps> = ({
 const styles = StyleSheet.create({
     container: {
         width: "100%",
-        marginBottom: 15,
     },
     inputContainer: {
         flexDirection: "row",
         alignItems: "center",
-        backgroundColor: "#fff", // Plain background color
         borderRadius: 15,
-        paddingHorizontal: dimensions.screenWidth * 0.05,
-        height: dimensions.screenHeight * 0.074,
         position: "relative",
     },
     input: {
@@ -105,10 +111,6 @@ const styles = StyleSheet.create({
         fontFamily: "Poppins-Regular",
         color: "#333",
         paddingVertical: 1,
-    },
-    icon: {
-        position: "absolute",
-        left: 10,
     },
     clearIcon: {
         position: "absolute",

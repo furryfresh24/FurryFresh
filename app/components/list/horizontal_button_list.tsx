@@ -16,6 +16,8 @@ type Props = {
   activeColor?: string | null;
   inactiveColor?: string | null;
   paddingHorizontal?: number | null;
+  marginLeft?: number | null,
+  marginTop?: number | null
 };
 
 const HorizontalButtonList = ({
@@ -25,6 +27,8 @@ const HorizontalButtonList = ({
   activeColor,
   inactiveColor,
   paddingHorizontal,
+  marginLeft = dimensions.screenWidth * 0.03,
+  marginTop = 20,
   onServiceClick
 }: Props) => {
   const defaultActiveColor = activeColor ?? '#ED7964';
@@ -42,7 +46,9 @@ const HorizontalButtonList = ({
           styles.button,
           { paddingHorizontal: defaultPaddingHorizontal },
           isActive && { backgroundColor: defaultActiveColor },
-          { marginLeft: index === 0 ? dimensions.screenWidth * 0.03 : 0 },
+          { marginLeft: index === 0 ? marginLeft : 0,
+            marginTop: marginTop
+           },
         ]}
         onPress={() => {
           setActiveService(item.id);
