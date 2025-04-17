@@ -16,6 +16,7 @@ import { useSession } from '../../context/sessions_context';
 import { Ionicons } from '@expo/vector-icons';
 import useCustomFonts from '../../hooks/useFonts';
 
+
 const Explore = () => {
   const { session } = useSession();
   const navigation = useNavigation();

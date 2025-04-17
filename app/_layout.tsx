@@ -239,6 +239,10 @@ const RootLayout = () => {
                 options={{ headerShown: false }}
               />
               <Stack.Screen
+                name="screens/playdate/home"
+                options={{ headerShown: false }}
+              />
+              <Stack.Screen
                 name="screens/orders/confirm_order"
                 options={{ headerShown: false }}
               />

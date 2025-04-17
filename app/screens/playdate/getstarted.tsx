@@ -1,8 +1,11 @@
-import { View, Text, StyleSheet, Image } from 'react-native';
+import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
 import React from 'react';
-import dimensions from '../../utils/sizing'
+import { useRouter } from 'expo-router'; // ✅ Correct import for expo-router
+import dimensions from '../../utils/sizing';
 
 const GetStarted = () => {
+  const router = useRouter(); // ✅ Router instance
+
   return (
     <View style={styles.wrapper}>
       {/* Left Center Paws */}
@@ -81,15 +84,18 @@ const GetStarted = () => {
         Unleash the fun! Dive into Furry Fresh's Playdate feature and connect your pet with new furry friends today!
       </Text>
 
-      {/* Get Started Box */}
-      <View style={styles.getStartedBox}>
+      {/* Get Started Button */}
+      <TouchableOpacity
+        style={styles.getStartedBox}
+        onPress={() => router.push('../playdate/home')} 
+      >
         <Text style={styles.getStartedText}>Get Started</Text>
         <Image
           source={require('../../assets/images/others/arrow.png')}
           style={styles.arrowLogo}
           resizeMode="contain"
         />
-      </View>
+      </TouchableOpacity>
     </View>
   );
 };
@@ -150,7 +156,7 @@ const styles = StyleSheet.create({
   },
   pawBottomRight: {
     position: 'absolute',
-    bottom: 40,
+    bottom: -5,
     right: 0,
     width: 120,
     height: 120,
