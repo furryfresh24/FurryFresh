@@ -93,7 +93,7 @@ const CartItem = ({ item }: { item: any }) => {
                 style={{
                     height: dimensions.screenWidth * 0.21,
                     width: dimensions.screenWidth * 0.21,
-                    backgroundColor: 'red',
+                    backgroundColor: 'transparent',
                     marginRight: dimensions.screenWidth * 0.03,
                     borderRadius: 10,
                     overflow: 'hidden',
@@ -112,7 +112,7 @@ const CartItem = ({ item }: { item: any }) => {
                 <Text numberOfLines={2} style={{ fontFamily: 'Poppins-SemiBold' }}>
                     {prod?.name}
                 </Text>
-                <Text style={{ fontFamily: 'Poppins-Regular', color: '#808080' }}>
+                <Text style={{ fontFamily: 'Poppins-Regular', color: '#808080', fontSize: dimensions.screenWidth * 0.032 }}>
                     ₱{(productPrice * quantity).toFixed(2)}
                 </Text>
 
@@ -123,7 +123,7 @@ const CartItem = ({ item }: { item: any }) => {
                         flexDirection: 'row',
                         alignItems: 'center',
                         width: '100%',
-                        // backgroundColor: 'red'
+                        marginTop: dimensions.screenHeight * 0.015
                     }}
                 >
                     <View
@@ -233,7 +233,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         position: 'relative',
-        elevation: 3,
+        elevation: 0,
         shadowColor: '#000',
         shadowOffset: { width: 2, height: 4 },
         shadowOpacity: 0.3,

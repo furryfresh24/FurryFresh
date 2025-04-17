@@ -1,6 +1,7 @@
-import { StyleSheet, View, Image, ScrollView } from 'react-native';
+import { StyleSheet, View, Image, ScrollView, StyleProp } from 'react-native';
 import dimensions from '../../utils/sizing';
 import React from 'react';
+import { ViewStyle } from 'react-native';
 
 interface MainContPlainProps {
   children: React.ReactNode;
@@ -14,6 +15,8 @@ interface MainContPlainProps {
     left?: number;
     right?: number;
   };
+  scrollEnabled?: boolean; // New prop
+  height?: string | null;
 }
 
 const MainContPlain: React.FC<MainContPlainProps> = ({
@@ -23,7 +26,18 @@ const MainContPlain: React.FC<MainContPlainProps> = ({
   paddingVertical = null,
   floatingComponent,
   floatingPosition = {},
+  scrollEnabled = true,
+  height = null
 }) => {
+  const ContentWrapper = scrollEnabled ? ScrollView : View;
+
+  const contentStyle = {
+    ...(paddingHorizontal !== null && { paddingHorizontal }),
+    ...(paddingVertical !== null && { paddingVertical }),
+    ...(height !== null && { height }),
+  } as ViewStyle;
+  
+
   return (
     <View style={styles.container}>
       {showPetImage && (
@@ -33,16 +47,20 @@ const MainContPlain: React.FC<MainContPlainProps> = ({
         />
       )}
 
-      <ScrollView
-        contentContainerStyle={{ flexGrow: 1 }}
-        showsVerticalScrollIndicator={false}
-        bounces={true}
-        keyboardShouldPersistTaps="handled"
+      <ContentWrapper
+        {...(scrollEnabled && {
+          contentContainerStyle: { flexGrow: 1 },
+          showsVerticalScrollIndicator: false,
+          bounces: true,
+          keyboardShouldPersistTaps: 'handled',
+        })}
       >
-        <View style={{ paddingHorizontal, paddingVertical }}>
+        <View
+          style={contentStyle}
+        >
           {children}
         </View>
-      </ScrollView>
+      </ContentWrapper>
 
       {floatingComponent && (
         <View

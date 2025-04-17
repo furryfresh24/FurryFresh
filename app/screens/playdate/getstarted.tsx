@@ -7,24 +7,50 @@ const GetStarted = () => {
     <View style={styles.wrapper}>
       {/* Left Center Paws */}
       <Image
-        source={require('../../assets/images/others/paws.png')}
-        style={styles.paws}
-        resizeMode="contain"
+        source={require("../../assets/images/general/paw-watermark.png")}
+        style={[styles.paw, styles.leftPaw]}
       />
 
       {/* Bottom Right Paw */}
       <Image
-        source={require('../../assets/images/others/paw.png')}
-        style={styles.pawBottomRight}
-        resizeMode="contain"
+        source={require("../../assets/images/general/paw-watermark.png")}
+        style={[styles.paw, styles.rightPaw]}
       />
 
       {/* Top Right Circle */}
-      <Image
-        source={require('../../assets/images/others/circle.png')}
-        style={styles.circle}
-        resizeMode="contain"
-      />
+      <View style={styles.topRightCircleMain}>
+        <View
+          style={{
+            borderRadius: 100,
+            position: 'absolute',
+            width: dimensions.screenWidth * 0.45,
+            height: dimensions.screenWidth * 0.45,
+            backgroundColor: '#BDCEE4'
+          }}
+        />
+        <View
+          style={{
+            borderRadius: 100,
+            position: 'absolute',
+            width: dimensions.screenWidth * 0.33,
+            height: dimensions.screenWidth * 0.33,
+            top: dimensions.screenHeight * 0.08,
+            right: -dimensions.screenWidth * 0.22,
+            backgroundColor: '#ACBFDB'
+          }}
+        />
+        <View
+          style={{
+            borderRadius: 100,
+            position: 'absolute',
+            width: dimensions.screenWidth * 0.13,
+            height: dimensions.screenWidth * 0.13,
+            top: dimensions.screenHeight * 0.22,
+            right: -dimensions.screenWidth * 0.13,
+            backgroundColor: '#B6C8E2'
+          }}
+        />
+      </View>
 
       {/* Logo */}
       <Image
@@ -35,7 +61,7 @@ const GetStarted = () => {
 
       {/* Dog */}
       <Image
-        source={require('../../assets/images/others/dog.png')}
+        source={require('../../assets/images/others/dog-hd.png')}
         style={styles.image}
         resizeMode="contain"
       />
@@ -62,7 +88,7 @@ const GetStarted = () => {
           source={require('../../assets/images/others/arrow.png')}
           style={styles.arrowLogo}
           resizeMode="contain"
-      />
+        />
       </View>
     </View>
   );
@@ -73,11 +99,36 @@ export default GetStarted;
 const styles = StyleSheet.create({
   wrapper: {
     flex: 1,
+    height: '100%',
+    position: 'relative',
     backgroundColor: '#D0DFF4',
     alignItems: 'center',
     justifyContent: 'flex-start',
     paddingTop: 10,
     paddingHorizontal: 10,
+  },
+  paw: {
+    position: "absolute",
+    width: dimensions.screenWidth * 0.35,
+    height: dimensions.screenWidth * 0.4,
+    tintColor: '#BDCEE4'
+  },
+  topRightCircleMain: {
+    position: "absolute",
+    top: dimensions.screenHeight * 0.1,
+    right: dimensions.screenWidth * 0.26
+  },
+  leftPaw: {
+    top: dimensions.screenHeight * 0.4,
+    left: -dimensions.screenWidth * 0.1,
+    transform: [{ rotate: "40deg" }],
+  },
+  rightPaw: {
+    width: dimensions.screenWidth * 0.3,
+    height: dimensions.screenWidth * 0.35,
+    bottom: -dimensions.screenHeight * 0.05,
+    right: -dimensions.screenWidth * 0.1,
+    transform: [{ rotate: "-40deg" }],
   },
   logo: {
     width: 85,
@@ -86,9 +137,9 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   image: {
-    width: 390,
-    height: 390,
-    marginBottom: -15,
+    width: dimensions.screenWidth * 0.75,
+    height: dimensions.screenWidth * 0.75,
+    marginBottom: dimensions.screenHeight * 0.0,
   },
   paws: {
     position: 'absolute',
@@ -140,9 +191,10 @@ const styles = StyleSheet.create({
   getStartedBox: {
     marginTop: 20,
     backgroundColor: '#466AA2',
-    paddingVertical: 12,
-    paddingHorizontal: 20,
-    borderRadius: 25,
+    paddingVertical: dimensions.screenHeight * 0.018,
+    paddingHorizontal: dimensions.screenWidth * 0.01,
+    paddingLeft: dimensions.screenWidth * 0.08,
+    borderRadius: 50,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
@@ -150,14 +202,12 @@ const styles = StyleSheet.create({
   },
   getStartedText: {
     color: '#FFFFFF',
-    fontSize: 12,
+    fontSize: dimensions.screenWidth * 0.033,
     fontFamily: 'Poppins-Regular',
-    marginLeft: 20,
   },
   arrowLogo: {
-    marginLeft: 20,
-    height: 35,
-    width: 40,
+    height: dimensions.screenWidth * 0.11,
+    width: dimensions.screenWidth * 0.11,
     marginTop: -10,
     marginBottom: -10,
   },

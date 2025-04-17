@@ -303,9 +303,12 @@ const Shop = () => {
                             renderItem={({ item }) => <CartItem item={item} />}
                         />
                         <Button1
-                            title='Checkout'
+                            title='View Full Cart'
                             isPrimary={true}
-                            onPress={closeModal}
+                            onPress={() => {
+                                router.push('../orders/cart');
+                                closeModal();
+                            }}
                             borderRadius={15}
                         />
                     </Animated.View>
