@@ -5,26 +5,30 @@ import AppbarDefault from '../../components/bars/appbar_default';
 import dimensions from '../../utils/sizing';
 import { useSession } from '../../context/sessions_context';
 import HorizontalButtonList from '../../components/list/horizontal_button_list';
+import { useBooking } from '../../context/booking_context';
 
 const Activity = () => {
-  const { session } = useSession();
   const [selectedTab, setSelectedTab] = useState<'ongoing' | 'completed'>('ongoing');
   const [selectedMenu, setSelectedMenu] = useState<number | string>("all");
 
+  const { session } = useSession();
+  const { bookings } = useBooking();
+
   const menus = [
-    {
-      id: 'all',
-      title: 'All'
-    },
-    {
-      id: 'pet-care',
-      title: 'Pet Care'
-    },
-    {
-      id: 'pet-supplies',
-      title: 'Pet Supplies'
-    }
+    { id: 'all', title: 'All' },
+    { id: 'pet-care', title: 'Pet Care' },
+    { id: 'pet-supplies', title: 'Pet Supplies' }
   ];
+
+  const filteredBookings = bookings.filter((booking) => {
+    const isCorrectStatus = selectedTab === "ongoing" ? booking.status !== "completed"  : booking.status === "completed";
+
+    const mockCategory = booking.note?.includes("Supplies") ? "pet-supplies" : "pet-care";
+    const isCorrectCategory =
+      selectedMenu === "all" || mockCategory === selectedMenu;
+
+    return isCorrectStatus && isCorrectCategory;
+  });
 
   return (
     <View style={{ flex: 1, height: '100%', width: '100%', backgroundColor: '#F8F8FF' }}>
@@ -44,7 +48,7 @@ const Activity = () => {
           >
             <Text style={[
               styles.tabText,
-              selectedTab === 'ongoing' && styles.tabTextActive
+              selectedTab === 'ongoing' && styles.tabTextActive 
             ]}>Ongoing</Text>
             {selectedTab === 'ongoing' && <View style={styles.underline} />}
           </TouchableOpacity>
@@ -66,18 +70,24 @@ const Activity = () => {
         <HorizontalButtonList
           services={menus}
           activeService={selectedMenu}
-          setActiveService={(id) => {
-            setSelectedMenu(id);
-          }}
+          setActiveService={(id) => setSelectedMenu(id)}
           paddingHorizontal={dimensions.screenWidth * 0.06}
           marginTop={dimensions.screenHeight * 0.015}
         />
+        <View style={{ paddingHorizontal: 24, paddingTop: 16 }}>
+          {filteredBookings.map((booking) => (
+            <View key={booking.id} style={{ marginBottom: 12 }}>
+              <Text style={{ fontSize: 16, fontWeight: '600' }}>{booking.date} - {booking.status}</Text>
+              <Text style={{ fontSize: 14 }}>{booking.note}</Text>
+            </View>
+          ))}
+        </View>
       </MainContPaw>
     </View>
   )
 }
 
-export default Activity
+export default Activity;
 
 const styles = StyleSheet.create({
   tabContainer: {

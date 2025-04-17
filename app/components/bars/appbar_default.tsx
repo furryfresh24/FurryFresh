@@ -15,13 +15,14 @@ const AppbarDefault = ({
   leadingChildren = null,
   titleSize = dimensions.screenWidth * 0.05,
   subtitleSize = dimensions.screenWidth * 0.035,
+  paddingTop = dimensions.screenHeight * 0.07,
   paddingBottom = dimensions.screenHeight * 0.02,
   subtitleFont,
   containerHeight,
   children
 }: {
   session: Session | null;
-  title: string;
+  title?: string;
   subtitle?: string;
   leadFunction?: () => void;
   showBack?: boolean;
@@ -29,6 +30,7 @@ const AppbarDefault = ({
   leadingChildren: any;
   titleSize: number;
   subtitleSize?: number;
+  paddingTop?: number;
   paddingBottom?: number;
   subtitleFont?: string;
   containerHeight?: number;
@@ -48,8 +50,10 @@ const AppbarDefault = ({
     <View
       style={[
         styles.container,
-        { height: containerHeight ?? undefined,
-          paddingBottom: paddingBottom
+        {
+          height: containerHeight ?? undefined,
+          paddingBottom: paddingBottom,
+          paddingTop: paddingTop
         },
       ]}
     >
@@ -62,22 +66,26 @@ const AppbarDefault = ({
           <View style={{ flex: 1 }} />
         )}
 
-        <View style={styles.titleContainer}>
-          <Text numberOfLines={1} style={[styles.title, { fontSize: titleSize }]}>
-            {title}
-          </Text>
-          {subtitle && (
-            <Text
-              numberOfLines={1}
-              style={[
-                styles.subtitle,
-                { fontSize: subtitleSize, fontFamily: subtitleFont },
-              ]}
-            >
-              {subtitle}
+        {title ? (
+          <View style={styles.titleContainer}>
+            <Text numberOfLines={1} style={[styles.title, { fontSize: titleSize }]}>
+              {title}
             </Text>
-          )}
-        </View>
+            {subtitle && (
+              <Text
+                numberOfLines={1}
+                style={[
+                  styles.subtitle,
+                  { fontSize: subtitleSize, fontFamily: subtitleFont },
+                ]}
+              >
+                {subtitle}
+              </Text>
+            )}
+          </View>
+        ) : (
+          <View style={{ flex: 3 }} />
+        )}
 
         {showLeading ? leadingChildren : <View style={{ flex: 1 }} />}
       </View>

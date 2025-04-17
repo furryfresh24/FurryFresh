@@ -97,7 +97,7 @@ const PlainTextInput: React.FC<PlainTextInputProps> = ({
 
 const styles = StyleSheet.create({
     container: {
-        width: "100%",
+        flex: 1
     },
     inputContainer: {
         flexDirection: "row",

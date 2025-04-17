@@ -150,17 +150,19 @@ const Home = () => {
     <MainContPlain paddingHorizontal={0}>
       {homeOptions.header(session)}
       <View style={{ paddingHorizontal: dimensions.screenWidth * 0.02 }}>
-        <View style={styles.search}>
-          <Ionicons
-            name="search"
-            style={{
-              marginRight: dimensions.screenWidth * 0.04,
-            }}
-            size={dimensions.screenWidth * 0.05}
-            color="#808080"
-          />
-          <Text style={styles.searchText}>Search something here</Text>
-        </View>
+        <TouchableOpacity onPress={() => router.push('../search/search')}>
+          <View style={styles.search}>
+            <Ionicons
+              name="search"
+              style={{
+                marginRight: dimensions.screenWidth * 0.04,
+              }}
+              size={dimensions.screenWidth * 0.05}
+              color="#808080"
+            />
+            <Text style={styles.searchText}>Search something here</Text>
+          </View>
+        </TouchableOpacity>
         <View>
           <HorizontalButtonList
             services={services}

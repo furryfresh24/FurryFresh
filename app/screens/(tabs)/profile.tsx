@@ -15,6 +15,8 @@ import { usePet } from "../../context/pet_context";
 import { useSession } from "../../context/sessions_context";
 import moment from "moment";
 import { Ionicons } from "@expo/vector-icons";
+import Spacer from "../../components/general/spacer";
+import { router } from "expo-router";
 
 const Profile = () => {
   const { session } = useSession();
@@ -28,14 +30,18 @@ const Profile = () => {
           <Text style={styles.titleText}>Profile</Text>
           <View style={styles.iconContainer}>
             <TouchableOpacity>
-              <Icon name="envelope" size={20} color="black" />
-            </TouchableOpacity>
-            <TouchableOpacity>
-              <Icon
-                name="th"
-                size={20}
+              <Ionicons
+                name="chatbubble-ellipses-outline"
+                size={dimensions.screenWidth * 0.06}
                 color="black"
-                style={styles.iconMargin}
+              />
+            </TouchableOpacity>
+            <Spacer width={dimensions.screenWidth * 0.02} />
+            <TouchableOpacity>
+              <Ionicons
+                name="menu"
+                size={dimensions.screenWidth * 0.07}
+                color="black"
               />
             </TouchableOpacity>
           </View>
@@ -57,11 +63,11 @@ const Profile = () => {
           </View>
           <Text style={styles.userName}>{session?.user.user_metadata['first_name'] + ' ' + session?.user.user_metadata['last_name']}</Text>
           <View style={styles.buttonContainer}>
-            <TouchableOpacity style={styles.editButton}>
+            <TouchableOpacity style={styles.editButton} onPress={() => router.push('../profile/edit_profile')}>
               <Text style={styles.editButtonText}>Edit Profile</Text>
               <Icon name="edit" size={20} color="black" />
             </TouchableOpacity>
-            <TouchableOpacity style={styles.viewPetsButton}>
+            <TouchableOpacity style={styles.viewPetsButton} onPress={() => router.push('../pets/pets')}>
               <Text style={styles.buttonText}>View Pets</Text>
               <Icon name="paw" size={20} color="white" />
             </TouchableOpacity>
@@ -88,7 +94,7 @@ const Profile = () => {
       </View>
       <View style={styles.aboutContainer}>
         <View style={styles.aboutHeader}>
-          <Text style={styles.aboutTitle}>About Me</Text>
+          <Text style={[styles.aboutTitle, { fontFamily: 'Poppins-SemiBold' }]}>About Me</Text>
           <Icon
             name="user"
             size={dimensions.screenWidth * 0.04}
@@ -260,8 +266,8 @@ const styles = StyleSheet.create({
     width: dimensions.screenHeight * 0.14,
   },
   aboutTitle: {
-    fontSize: 15,
-    fontWeight: "bold",
+    fontSize: dimensions.screenWidth * 0.035,
+    lineHeight: dimensions.screenWidth * 0.05,
     color: "white",
     marginRight: dimensions.screenHeight * 0.01,
   },
@@ -281,7 +287,7 @@ const styles = StyleSheet.create({
     marginTop: dimensions.screenHeight * 0.01,
   },
   aboutPlaceholder: {
-    fontFamily: "Poppins-light",
+    fontFamily: "Poppins-Regular",
     color: "#808080",
   },
   editIconButton: {
