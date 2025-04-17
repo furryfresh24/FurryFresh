@@ -11,7 +11,9 @@ interface CartContextType {
     error: string | null;
     fetchCarts: () => void;
     addToCartContext: (item: Cart) => void;
+    addToCartProductsContext: (item: Product) => void;
     updateCartContext: (updatedItem: Cart) => void;
+    updateCartProductsContext: (updatedItem: Product) => void;
 }
 
 interface CartProviderProps {
@@ -81,6 +83,11 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
         setCarts((prevCarts) => [...prevCarts, item]);
     };
 
+    const addToCartProductsContext = (item: Product) => {
+        setCartProducts((prevCartProds) => [...prevCartProds, item]);
+    };
+
+
     const updateCartContext = (updatedItem: Cart) => {
         setCarts((prevCarts) =>
             prevCarts.map((item) =>
@@ -90,6 +97,17 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
             )
         );
     };
+
+    const updateCartProductsContext = (updatedProduct: Product) => {
+        setCartProducts((prevProducts) =>
+            prevProducts.map((product) =>
+                product.id === updatedProduct.id
+                    ? { ...product, ...updatedProduct }
+                    : product
+            )
+        );
+    };
+
 
     useEffect(() => {
         if (session?.user?.id) {
@@ -106,7 +124,9 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
                 error,
                 fetchCarts,
                 addToCartContext,
-                updateCartContext
+                addToCartProductsContext,
+                updateCartContext,
+                updateCartProductsContext
             }}
         >
             {children}

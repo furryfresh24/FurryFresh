@@ -37,7 +37,7 @@ const ProductView = () => {
     setCurrentIndex(viewableItems[0]?.index ?? 0);
   }).current;
 
-  const { carts, fetchCarts, addToCartContext, updateCartContext } = useCart();
+  const { carts, fetchCarts, addToCartContext, addToCartProductsContext, updateCartContext, updateCartProductsContext } = useCart();
 
   useEffect(() => {
     if (id) {
@@ -122,6 +122,7 @@ const ProductView = () => {
           console.log('Product added to cart successfully!');
 
           addToCartContext(newCart);
+          addToCartProductsContext(product);
         }
       } else {
         console.log('Product found in cart. Updating quantity...');
@@ -145,6 +146,7 @@ const ProductView = () => {
             user_id: session.user.id,
             created_at: undefined
           });
+          updateCartProductsContext(product);
         }
       }
     } catch (err) {
