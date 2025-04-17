@@ -8,6 +8,7 @@ const useCustomFonts = () => {
     "Poppins-Italic": require("../assets/fonts/Poppins/Poppins-Italic.ttf"),
     "Poppins-Light": require("../assets/fonts/Poppins/Poppins-Light.ttf"),
     "Poppins-SemiBold": require("../assets/fonts/Poppins/Poppins-SemiBold.ttf"),
+    "Baloo-Regular": require("../assets/fonts/Baloo/Baloo-Regular.ttf"),
   });
 
   return fontsLoaded;

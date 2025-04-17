@@ -1,5 +1,6 @@
 import { View, Text, StyleSheet, Image } from 'react-native';
 import React from 'react';
+import dimensions from '../../utils/sizing'
 
 const GetStarted = () => {
   return (
@@ -118,8 +119,8 @@ const styles = StyleSheet.create({
     marginBottom: -15,
   },
   title: {
-    fontSize: 38,
-    fontFamily: 'Poppins-Bold',
+    fontSize: dimensions.screenWidth * 0.11,
+    fontFamily: 'Baloo-Regular',
     textAlign: 'center',
   },
   orange: {
