@@ -47,7 +47,7 @@ const Explore = () => {
           <Text style={styles.text}>Other App Features</Text>
 
           {/* FurryFresh Play Date */}
-          <TouchableOpacity onPress={() => router.push('/playdate/getstarted')}>
+          <TouchableOpacity onPress={() => router.push('../playdate/getstarted')}>
             <View style={styles.innerBox}>
               <View style={styles.indicator}>
                 <View style={styles.indicatorContent}>

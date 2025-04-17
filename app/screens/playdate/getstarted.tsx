@@ -1,13 +1,68 @@
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, Image } from 'react-native';
 import React from 'react';
 
 const GetStarted = () => {
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Welcome to the FurryFresh Play Date!</Text>
+    <View style={styles.wrapper}>
+      {/* Left Center Paws */}
+      <Image
+        source={require('../../assets/images/others/paws.png')}
+        style={styles.paws}
+        resizeMode="contain"
+      />
+
+      {/* Bottom Right Paw */}
+      <Image
+        source={require('../../assets/images/others/paw.png')}
+        style={styles.pawBottomRight}
+        resizeMode="contain"
+      />
+
+      {/* Top Right Circle */}
+      <Image
+        source={require('../../assets/images/others/circle.png')}
+        style={styles.circle}
+        resizeMode="contain"
+      />
+
+      {/* Logo */}
+      <Image
+        source={require('../../assets/images/general/furry-fresh-logo.png')}
+        style={styles.logo}
+        resizeMode="contain"
+      />
+
+      {/* Dog */}
+      <Image
+        source={require('../../assets/images/others/dog.png')}
+        style={styles.image}
+        resizeMode="contain"
+      />
+
+      {/* Colored Title */}
+      <View style={[styles.titleRow, styles.compactTitleRow]}>
+        <Text style={[styles.title, styles.orange]}>FURRY </Text>
+        <Text style={[styles.title, styles.blue]}>FRESH</Text>
+      </View>
+      <View style={styles.titleRow}>
+        <Text style={[styles.title, styles.blue]}>PLAY </Text>
+        <Text style={[styles.title, styles.orange]}>DATE</Text>
+      </View>
+
+      {/* Description */}
       <Text style={styles.description}>
-        Here you can schedule fun activities and meet other furry friends nearby. 🐾
+        Unleash the fun! Dive into Furry Fresh's Playdate feature and connect your pet with new furry friends today!
       </Text>
+
+      {/* Get Started Box */}
+      <View style={styles.getStartedBox}>
+        <Text style={styles.getStartedText}>Get Started</Text>
+        <Image
+          source={require('../../assets/images/others/arrow.png')}
+          style={styles.arrowLogo}
+          resizeMode="contain"
+      />
+      </View>
     </View>
   );
 };
@@ -15,23 +70,94 @@ const GetStarted = () => {
 export default GetStarted;
 
 const styles = StyleSheet.create({
-  container: {
+  wrapper: {
     flex: 1,
-    backgroundColor: '#F8F8FF',
-    justifyContent: 'center',
+    backgroundColor: '#D0DFF4',
     alignItems: 'center',
-    padding: 20,
+    justifyContent: 'flex-start',
+    paddingTop: 10,
+    paddingHorizontal: 10,
+  },
+  logo: {
+    width: 85,
+    height: 85,
+    marginBottom: -5,
+    marginTop: 20,
+  },
+  image: {
+    width: 390,
+    height: 390,
+    marginBottom: -15,
+  },
+  paws: {
+    position: 'absolute',
+    left: 0,
+    top: '30%',
+    width: 100,
+    height: 200,
+  },
+  pawBottomRight: {
+    position: 'absolute',
+    bottom: 40,
+    right: 0,
+    width: 120,
+    height: 120,
+  },
+  circle: {
+    position: 'absolute',
+    bottom: 500,
+    right: -30,
+    width: 250,
+    height: 250,
+  },
+  titleRow: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+  },
+  compactTitleRow: {
+    marginBottom: -15,
   },
   title: {
-    fontSize: 24,
-    color: '#466AA2',
-    fontWeight: 'bold',
-    marginBottom: 10,
+    fontSize: 38,
+    fontFamily: 'Poppins-Bold',
     textAlign: 'center',
   },
+  orange: {
+    color: '#E94C30',
+  },
+  blue: {
+    color: '#121F63',
+  },
   description: {
-    fontSize: 16,
-    color: '#555',
+    fontSize: 13,
+    color: '#466AA2',
     textAlign: 'center',
+    marginTop: 10,
+    fontFamily: 'Poppins-Regular',
+    paddingHorizontal: 20,
+  },
+  getStartedBox: {
+    marginTop: 20,
+    backgroundColor: '#466AA2',
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderRadius: 25,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    width: 180,
+  },
+  getStartedText: {
+    color: '#FFFFFF',
+    fontSize: 12,
+    fontFamily: 'Poppins-Regular',
+    marginLeft: 20,
+  },
+  arrowLogo: {
+    marginLeft: 20,
+    height: 35,
+    width: 40,
+    marginTop: -10,
+    marginBottom: -10,
   },
 });
