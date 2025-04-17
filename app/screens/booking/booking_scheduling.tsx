@@ -265,7 +265,7 @@ const BookingScheduling = () => {
                           }]}>
                             {
                               pet.pet_avatar ?
-                                <Image source={{ uri: pet.pet_avatar }} />
+                                <Image source={{ uri: pet.pet_avatar }} style={{ height: '100%', width: '100%', borderRadius: 100, borderColor: '#808080', borderWidth: 2 }} />
                                 : <SvgValue
                                   svgIcon={pet.pet_type ? 'dog' : 'cat'}
                                   color="#fff"
@@ -643,7 +643,7 @@ const BookingScheduling = () => {
                     <Subtitle1 text='Your chosen pet will be used for this booking only.' fontFamily='Poppins-Regular' />
                     <Spacer height={dimensions.screenHeight * 0.015} />
                     <Button1
-                      title='Select Pet'
+                      title='Done'
                       isPrimary={false}
                       borderRadius={15}
                       onPress={handleSelectPet}

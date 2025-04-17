@@ -8,14 +8,14 @@ type PaymentMethod = {
 
 const paymentMethods: PaymentMethod[] = [
     {
-        id: 'pos',
+        id: 'Pay-on-service',
         icon: 'pay-on-service',
         name: 'Pay on Service',
         isAllowed: true,
         isAvailable: true,
     },
     {
-        id: 'paypal',
+        id: 'PayPal',
         icon: 'paypal',
         name: 'PayPal',
         isAllowed: true,

@@ -7,6 +7,9 @@ type TitleValueProps = {
   value: string;
   isSub: boolean;
   isBold: boolean;
+  paddingVertical?: number;
+  paddingHorizontal?: number;
+  icon?: JSX.Element | null; // Optional icon
 }
 
 const TitleValue = (props: TitleValueProps) => {
@@ -17,22 +20,43 @@ const TitleValue = (props: TitleValueProps) => {
         display: 'flex',
         flexDirection: 'row',
         justifyContent: 'space-between',
+        alignItems: 'center',
+        paddingHorizontal: props.paddingHorizontal,
+        paddingVertical: props.paddingVertical
       }}
     >
       <Text
         style={{
           fontFamily: props.isBold ? 'Poppins-SemiBold' : 'Poppins-Regular',
           fontSize: props.isSub == false ? dimensions.screenWidth * 0.035 : dimensions.screenWidth * 0.033,
-          color: props.isSub == false ? 'black' : '#808080'
+          color: props.isSub == false ? 'black' : '#808080',
+          flex: 2
         }}
-      >{props.title}</Text>
-      <Text
+      >
+        {props.title}
+      </Text>
+
+      <View
         style={{
-          fontFamily: props.isBold ? 'Poppins-SemiBold' : 'Poppins-Regular',
-          fontSize: props.isSub == false ? dimensions.screenWidth * 0.035 : dimensions.screenWidth * 0.033,
-          color: props.isSub == false ? 'black' : '#808080'
+          flex: 1,
+          flexDirection: 'row',
+          alignItems: 'center',
+          justifyContent: 'flex-end',
         }}
-      >{props.value}</Text>
+      >
+        <Text
+          numberOfLines={1}
+          style={{
+            fontFamily: props.isBold ? 'Poppins-SemiBold' : 'Poppins-Regular',
+            fontSize: props.isSub == false ? dimensions.screenWidth * 0.035 : dimensions.screenWidth * 0.033,
+            color: props.isSub == false ? 'black' : '#808080',
+            marginRight: props.icon ? 6 : 0
+          }}
+        >
+          {props.value}
+        </Text>
+        {props.icon && props.icon}
+      </View>
     </View>
   )
 }

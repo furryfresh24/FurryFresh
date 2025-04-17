@@ -1,160 +1,109 @@
-import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import React, { useState } from 'react';
 import MainContPaw from '../../components/general/background_paw';
+import AppbarDefault from '../../components/bars/appbar_default';
+import dimensions from '../../utils/sizing';
+import { useSession } from '../../context/sessions_context';
+import HorizontalButtonList from '../../components/list/horizontal_button_list';
 
 const Activity = () => {
-  const [activeTab, setActiveTab] = useState<'Ongoing' | 'Completed'>('Ongoing');
-  const [activeFilter, setActiveFilter] = useState<'All' | 'Pet Care' | 'Pet Supplies'>('All');
+  const { session } = useSession();
+  const [selectedTab, setSelectedTab] = useState<'ongoing' | 'completed'>('ongoing');
+  const [selectedMenu, setSelectedMenu] = useState<number | string>("all");
+
+  const menus = [
+    {
+      id: 'all',
+      title: 'All'
+    },
+    {
+      id: 'pet-care',
+      title: 'Pet Care'
+    },
+    {
+      id: 'pet-supplies',
+      title: 'Pet Supplies'
+    }
+  ];
 
   return (
-    <MainContPaw showPetImage={true} paddingHorizontal={16} paddingVertical={16}>
-      {/* Header */}
-      <Text style={styles.header}>Activity</Text>
-      
-      {/* Tabs */}
-      <View style={styles.tabContainer}>
-        <TouchableOpacity 
-          style={[styles.tab, activeTab === 'Ongoing' && styles.activeTab]}
-          onPress={() => setActiveTab('Ongoing')}
-        >
-          <Text style={[styles.tabText, activeTab === 'Ongoing' && styles.activeTabText]}>Ongoing</Text>
-        </TouchableOpacity>
-        <TouchableOpacity 
-          style={[styles.tab, activeTab === 'Completed' && styles.activeTab]}
-          onPress={() => setActiveTab('Completed')}
-        >
-          <Text style={[styles.tabText, activeTab === 'Completed' && styles.activeTabText]}>Completed</Text>
-        </TouchableOpacity>
-      </View>
+    <View style={{ flex: 1, height: '100%', width: '100%', backgroundColor: '#F8F8FF' }}>
+      <AppbarDefault
+        title={"Activity"}
+        session={session}
+        showBack={false}
+        showLeading={false}
+        leadingChildren={null}
+        titleSize={dimensions.screenWidth * 0.045}
+        paddingBottom={dimensions.screenHeight * 0.01}
+      >
+        <View style={styles.tabContainer}>
+          <TouchableOpacity
+            style={styles.tab}
+            onPress={() => setSelectedTab('ongoing')}
+          >
+            <Text style={[
+              styles.tabText,
+              selectedTab === 'ongoing' && styles.tabTextActive
+            ]}>Ongoing</Text>
+            {selectedTab === 'ongoing' && <View style={styles.underline} />}
+          </TouchableOpacity>
 
-      {/* Filter butttons */}
-      <View style={styles.filterContainer}>
-        <TouchableOpacity 
-          style={[styles.filterButton, activeFilter === 'All' && styles.activeFilterButton]}
-          onPress={() => setActiveFilter('All')}
-        >
-          <Text style={[styles.filterText, activeFilter === 'All' && styles.activeFilterText]}>All</Text>
-        </TouchableOpacity>
-        <TouchableOpacity 
-          style={[styles.filterButton, activeFilter === 'Pet Care' && styles.activeFilterButton]}
-          onPress={() => setActiveFilter('Pet Care')}
-        >
-          <Text style={[styles.filterText, activeFilter === 'Pet Care' && styles.activeFilterText]}>Pet Care</Text>
-        </TouchableOpacity>
-        <TouchableOpacity 
-          style={[styles.filterButton, activeFilter === 'Pet Supplies' && styles.activeFilterButton]}
-          onPress={() => setActiveFilter('Pet Supplies')}
-        >
-          <Text style={[styles.filterText, activeFilter === 'Pet Supplies' && styles.activeFilterText]}>Pet Supplies</Text>
-        </TouchableOpacity>
-      </View>
-
-      {/* activity Caard */}
-      <View style={styles.card}>
-        <View style={styles.titleRow}>
-          <Text style={[styles.cardTitle, {color: '#4863A0'}]}>Basic Grooming</Text>
-          <View style={styles.priceContainer}>
-            <Text style={styles.cardPrice}>P500.00</Text>
-          </View>
+          <TouchableOpacity
+            style={styles.tab}
+            onPress={() => setSelectedTab('completed')}
+          >
+            <Text style={[
+              styles.tabText,
+              selectedTab === 'completed' && styles.tabTextActive
+            ]}>Completed</Text>
+            {selectedTab === 'completed' && <View style={styles.underline} />}
+          </TouchableOpacity>
         </View>
-        <Text style={styles.cardSubtitle}>for Pet (Poppy)</Text>
-        <Text style={styles.cardDate}>Scheduled for Feb 10, 2025 – 3:30 PM</Text>
-      </View>
-    </MainContPaw>
-  );
-};
+      </AppbarDefault>
+
+      <MainContPaw>
+        <HorizontalButtonList
+          services={menus}
+          activeService={selectedMenu}
+          setActiveService={(id) => {
+            setSelectedMenu(id);
+          }}
+          paddingHorizontal={dimensions.screenWidth * 0.06}
+          marginTop={dimensions.screenHeight * 0.015}
+        />
+      </MainContPaw>
+    </View>
+  )
+}
+
+export default Activity
 
 const styles = StyleSheet.create({
-  header: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 20,
-    textAlign: 'center',
-  },
   tabContainer: {
     flexDirection: 'row',
-    borderBottomWidth: 1,
-    borderBottomColor: '#e0e0e0',
-    marginBottom: 16,
+    justifyContent: 'center',
+    width: '100%',
+    paddingBottom: 0
   },
   tab: {
-    flex: 1,
-    paddingVertical: 12,
     alignItems: 'center',
-  },
-  activeTab: {
-    borderBottomWidth: 2,
-    borderBottomColor: '#4863A0',
+    flex: 1,
   },
   tabText: {
-    fontSize: 16,
-    color: '#888',
+    fontSize: dimensions.screenWidth * 0.035,
+    fontFamily: 'Poppins-Regular',
+    color: '#A0A0A0',
   },
-  activeTabText: {
-    color: '#4863A0',
-    fontWeight: 'bold',
+  tabTextActive: {
+    color: '#466AA2',
+    fontFamily: 'Poppins-SemiBold',
   },
-  filterContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 16,
-  },
-  filterButton: {
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 16,
-    backgroundColor: '#f5f5f5',
-  },
-  activeFilterButton: {
-    backgroundColor: '#F76806',
-  },
-  filterText: {
-    fontSize: 14,
-    color: '#666',
-  },
-  activeFilterText: {
-    color: '#fff',
-  },
-  card: {
-    borderWidth: 1,
-    borderColor: '#e0e0e0',
-    borderRadius: 8,
-    padding: 16,
-    marginTop: 16,
-    backgroundColor: '#fff',
-  },
-  titleRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 4,
-  },
-  priceContainer: {
-    borderWidth: 1,
-    borderColor: '#F76806',
-    borderRadius: 12,
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    backgroundColor: '#F76806',
-  },
-  cardTitle: {
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-  cardSubtitle: {
-    fontSize: 14,
-    color: '#666',
-    marginBottom: 4,
-  },
-  cardDate: {
-    fontSize: 14,
-    color: '#666',
-  },
-  cardPrice: {
-    fontSize: 14,
-    fontWeight: 'bold',
-    color: '#fff',
+  underline: {
+    height: 2,
+    width: '100%',
+    backgroundColor: '#466AA2',
+    marginTop: 4,
+    borderRadius: 1,
   },
 });
-
-export default Activity;

@@ -1,6 +1,6 @@
-import { StyleSheet, Text, View, ScrollView, TouchableOpacity, FlatList } from 'react-native';
+import { StyleSheet, Text, View, ScrollView, TouchableOpacity, FlatList, ActivityIndicator } from 'react-native';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { router, useLocalSearchParams } from 'expo-router';
+import { router, useLocalSearchParams, useNavigation } from 'expo-router';
 import Subcategories from '../../interfaces/subcategories';
 import AppbarDefault from '../../components/bars/appbar_default';
 import dimensions from '../../utils/sizing';
@@ -27,6 +27,7 @@ import CustomCheckbox1 from '../../components/inputs/custom_checkbox1';
 import { CheckBox } from '@rneui/themed';
 import { Voucher } from '../../interfaces/voucher';
 import Paypal from '../../components/payments/paypal';
+import { StackActions } from '@react-navigation/native';
 
 
 type Pet = {
@@ -43,50 +44,102 @@ const ConfirmScheduling = () => {
   const { session } = useSession();
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod | null>(null);
   const hasHandledPayment = useRef(false);
-
+  const navigation = useNavigation();
   const paymentResult = typeof rawResult === 'string' ? JSON.parse(rawResult) : null;
+  const [isProcessing, setIsProcessing] = useState(false);
 
   useEffect(() => {
-    if (hasHandledPayment.current) return;
+    if (hasHandledPayment.current || !paymentResult) return;
 
-    if (paymentResult) {
+    hasHandledPayment.current = true;
+
+    const handlePayment = async () => {
       const status = paymentResult.success;
       const data = paymentResult.data;
-      console.log("✅ Payment Result after coming back: ");
+
+      console.log("✅ Payment Result after coming back:");
       console.log("✅ Status: ", status);
       console.log("✅ Data: ", data);
 
-      if (status == true) {
-        console.log('Payment Successful');
+      setIsProcessing(true);
 
-        const insertData = async () => {
-          const { error, data: insertResult } = await supabase
-            .from('bookings')
-            .insert([
-              {
-                grooming_id: parsedGrooming?.id,
-                user_id: session?.user?.id,
-                pet_ids: parsedPets.map((p) => p.id),
-                date: selectedDate, // format: "YYYY-MM-DD"
-                time_start: selectedTime, // format: "HH:mm" or "10:30 AM"
-                note: '',
-                status: "pending", // or "pending", "paid", etc.
-                created_at: new Date().toISOString(),
-              }
-            ]);
-
-          if (error) {
-            console.log("❌ Booking insert error:", error);
-          } else {
-            console.log("✅ Booking inserted successfully:", insertResult);
-          }
-        };
-
-        insertData(); // 👈 This was missing
-        hasHandledPayment.current = true; // 👈 Set the flag after handling
+      if (!status) {
+        console.log("❌ Payment was not successful.");
+        return;
       }
-    }
+
+      console.log("✅ Payment Successful");
+
+      const { data: bookingResult, error: bookingError } = await supabase
+        .from('bookings')
+        .insert([
+          {
+            grooming_id: parsedGrooming?.id,
+            user_id: session?.user?.id,
+            pet_ids: parsedPets.map((p) => p.id),
+            date: selectedDate,
+            time_start: selectedTime,
+            note: '',
+            status: "pending",
+            created_at: new Date().toISOString(),
+          }
+        ])
+        .select()
+        .single();
+
+      if (bookingError) {
+        console.log("❌ Booking insert error:", bookingError);
+        return;
+      }
+
+      console.log("✅ Booking inserted successfully:", bookingResult);
+
+      let metadata = paymentMethod?.id !== "Pay-on-service" ? data : null;
+
+      const { data: paymentInsertResult, error: paymentError } = await supabase
+        .from('payments')
+        .insert([
+          {
+            user_id: session?.user?.id,
+            booking_id: bookingResult?.id,
+            ref_id: '',
+            payment_method: paymentMethod?.id,
+            amount: finalValue,
+            discount_applied: discount,
+            status: paymentMethod?.id !== "Pay-on-service" ? true : false,
+            currency: 'PHP',
+            metadata,
+            created_at: new Date().toISOString(),
+          }
+        ])
+        .select()
+        .single();
+
+      if (paymentError) {
+        console.log("❌ Payment insert error:", paymentError);
+        return;
+      }
+
+      console.log("✅ Payment inserted successfully:", paymentInsertResult);
+      
+      for (let i = 0; i < 3; i++) {
+        if(router.canGoBack()) {
+          router.back();
+        }
+      }
+
+      router.replace({
+        pathname: './success_booking',
+        params: {
+          booking: JSON.stringify(bookingResult),
+          payment: JSON.stringify(paymentResult),
+        }
+      });
+    };
+
+    handlePayment();
   }, [paymentResult]);
+
 
   const parsedGrooming: Subcategories = JSON.parse(groomingDetails as string);
   const parsedPets: Pet[] = JSON.parse(appointedPets as string);
@@ -103,7 +156,7 @@ const ConfirmScheduling = () => {
   const [voucherResults, setVoucherResults] = useState<any>(null);
   const [voucherError, setVoucherError] = useState<string | null>(null);
   const [isSearchingVouchers, setSearchingVouchers] = useState<boolean>(false);
- 
+
   const totalPrice = parsedPets.reduce(
     (sum, p) => sum + ((p.to_add_price || 0) + (parsedGrooming.price ?? 0)),
     0
@@ -895,6 +948,19 @@ const ConfirmScheduling = () => {
             }
           </BottomSheetView>
         </BottomSheet>
+        {isProcessing && (
+          <View style={{
+            position: 'absolute',
+            top: 0, left: 0, right: 0, bottom: 0,
+            backgroundColor: 'rgba(0,0,0,0.5)',
+            justifyContent: 'center',
+            alignItems: 'center',
+            zIndex: 999,
+          }}>
+            <ActivityIndicator size="large" color="#fff" />
+            <Text style={{ color: 'white', marginTop: 12, fontFamily: 'Poppins-SemiBold' }}>Finalizing your booking...</Text>
+          </View>
+        )}
       </View>
     </PortalProvider>
   );

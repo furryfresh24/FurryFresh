@@ -1,6 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { StyleSheet, View, Animated } from 'react-native';
-import { Tabs } from 'expo-router';
 import { Session } from '@supabase/supabase-js';
 import supabase from '../../utils/supabase';
 import { BlurView } from 'expo-blur';
@@ -73,7 +72,7 @@ export default () => {
               ),
               header: () => homeOptions.header(session),
               headerTransparent: true,
-              headerShown: false, // If you're using a custom header like `homeOptions.header`
+              headerShown: false
             }}
           />
           <Tab.Screen
@@ -108,6 +107,7 @@ export default () => {
                 </View>
               ),
               tabBarBadge: 10,
+              headerShown: false
             }}
           />
           <Tab.Screen

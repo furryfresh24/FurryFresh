@@ -217,6 +217,10 @@ const RootLayout = () => {
                   />
                 }}
               />
+              <Stack.Screen
+                name="screens/booking/success_booking"
+                options={{ headerShown: false }}
+              />
             </Stack>
           </PortalProvider>
         </GestureHandlerRootView>

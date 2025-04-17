@@ -23,11 +23,9 @@ import PetCareIcon from "../../components/svgs/home/PetCareIcon";
 import PetSuppliesIcon from "../../components/svgs/home/PetSuppliesIcon";
 import VoucherTemp1 from "../../components/vouchers/voucher1";
 import Button1 from "../../components/buttons/button1";
-import Category from "../../interfaces/categories";
 import Title1 from "../../components/texts/title1";
 import { Icon, ListItem } from "@rneui/themed";
 import DefaultListIcon from "../../components/svgs/home/services/DefaultListIcon";
-import Subcategories from "../../interfaces/subcategories";
 import Price from "../../components/general/price";
 import SvgValue from "../../hooks/fetchSvg";
 import HorizontalButtonList from "../../components/list/horizontal_button_list";
@@ -39,7 +37,11 @@ import { Portal } from "@gorhom/portal";
 import MainContCircle from "../../components/general/background_circle";
 import { LinearGradient } from "expo-linear-gradient";
 import Subtitle1 from "../../components/texts/subtitle1";
-import { Grooming, Inclusion } from "../../interfaces/grooming";
+import { useCategory } from "../../context/category_context";
+import { useSubcategory } from "../../context/subcategory_context";
+import { useGrooming } from "../../context/grooming_context";
+import Subcategories from "../../interfaces/subcategories";
+import { Grooming } from "../../interfaces/grooming";
 
 type Service = {
   id: number;
@@ -65,7 +67,7 @@ interface Voucher {
   title: string;
   description: string;
   discountValue: number;
-  discountType: 'percentage' | 'fixed';
+  discountType: "percentage" | "fixed";
   icon?: any;
   forFirstTime: boolean;
   code: string;
@@ -111,59 +113,12 @@ const Home = () => {
     []
   );
 
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [grooming, setGroomings] = useState<Grooming[]>([]);
-  const [subcategories, setSubcategories] = useState<Subcategories[]>([]);
   const [activeService, setActiveService] = useState<number | string>(1);
-
   const [session, setSession] = useState<Session | null>(null);
 
-  useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-    });
-    supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
-    });
-  }, []);
-
-  const fetchCategories = async (): Promise<void> => {
-    const { data, error } = await supabase.from("categories").select("*");
-
-    if (error) {
-      console.error("Error fetching categories:", error);
-      return;
-    }
-
-    const parsed = data?.map((item) => ({
-      ...item,
-      created_at: new Date(item.created_at),
-      updated_at: item.updated_at ? new Date(item.updated_at) : undefined,
-    })) as Category[];
-
-    // console.log(parsed.length);
-
-    setCategories(parsed);
-  };
-
-  const fetchSubcategories = async (): Promise<void> => {
-    const { data, error } = await supabase.from("subcategories").select("*");
-
-    if (error) {
-      console.error("Error fetching categories:", error);
-      return;
-    }
-
-    const parsed = data?.map((item) => ({
-      ...item,
-      created_at: new Date(item.created_at),
-      updated_at: item.updated_at ? new Date(item.updated_at) : undefined,
-    })) as Subcategories[];
-
-    // console.log(parsed);
-
-    setSubcategories(parsed);
-  };
+  const { categories, loading: loadingCategories } = useCategory();
+  const { subcategories, loading: loadingSubcategories } = useSubcategory();
+  const { groomings, loading: loadingGroomings } = useGrooming();
 
   const basic = [
     {
@@ -176,25 +131,6 @@ const Home = () => {
     },
   ];
 
-  const fetchGroomings = async (): Promise<void> => {
-    const { data, error } = await supabase.from("groomings").select("*");
-
-    if (error) {
-      console.error("Error fetching groomings: ", error);
-      return;
-    }
-
-    const parsed = data?.map((item) => ({
-      ...item,
-      created_at: new Date(item.created_at),
-      updated_at: item.updated_at ? new Date(item.updated_at) : undefined,
-      inclusions: item.inclusions as Inclusion[],
-    })) as Grooming[];
-
-    console.log(parsed[0].inclusions[0].title);
-    setGroomings(parsed);
-  };
-
   const handleSheetChange = (index: number) => {
     if (index === 0) {
       sheetRef.current?.close();
@@ -202,9 +138,12 @@ const Home = () => {
   };
 
   useEffect(() => {
-    fetchCategories();
-    fetchSubcategories();
-    fetchGroomings();
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+    });
+    supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session);
+    });
   }, []);
 
   return (
@@ -439,7 +378,7 @@ const Home = () => {
                   </Text>
                   <View style={styles.wrapContainer}>
                     {(
-                      grooming.find(
+                      groomings.find(
                         (g) => g.subcategory_id == (selectedGrooming?.id ?? "")
                       )?.inclusions ?? []
                     ).map((item, index) => {
@@ -500,7 +439,7 @@ const Home = () => {
                     }}
                   >
                     {
-                      grooming.find(
+                      groomings.find(
                         (g) => g.subcategory_id == (selectedGrooming?.id ?? "")
                       )?.description
                     }
