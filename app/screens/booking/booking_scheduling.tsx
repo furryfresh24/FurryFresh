@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, TouchableOpacity, FlatList, Image, Button } from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity, FlatList, Image, Button, ActivityIndicator } from 'react-native';
 import React, { useLayoutEffect, useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import MainContPlain from '../../components/general/background_plain';
 import { router, useLocalSearchParams, useNavigation } from 'expo-router';
@@ -36,6 +36,8 @@ const BookingScheduling = () => {
   const sheetRef = useRef<BottomSheet>(null);
   const snapPoints = useMemo(() => ["60%"], []);
   const { pets, fetchPets, addToPetContext, updatePetContext } = usePet();
+  const isReady = selectedDate && selectedTime && petChosen.length > 0;
+  const [isLoading, setLoading] = useState<boolean>(false);
 
   const handleSelectPet = useCallback(() => {
     if (selectedPet && JSON.stringify(selectedPet) !== JSON.stringify(petChosen)) {
@@ -193,6 +195,7 @@ const BookingScheduling = () => {
             session={session}
             showLeading={false}
             leadingChildren
+            zIndex={0}
             titleSize={dimensions.screenWidth * 0.045}
           />
         )}
@@ -654,44 +657,78 @@ const BookingScheduling = () => {
             </BottomSheet>
           </Portal>
         </MainContPlain >
-        {
-          selectedDate && petChosen.length > 0 && selectedTime ? (
-            <TouchableOpacity
-              onPress={() => {
-                console.log(selectedDate);
-                console.log(selectedTime);
-                console.log(grooming);
-                console.log(petChosen);
+        {isReady && (
+          <TouchableOpacity
+            onPress={() => {
+              if (isLoading) return;
 
-                const simplifiedPets = petChosen.map(pet => ({
-                  id: pet.id,
-                  name: pet.name,
-                  weight: pet.weight,
-                  size: getSizeCategory(pet.weight)?.size,
-                  to_add_price: pet.pet_type == 'Dog' ? ((getSizeCategory(pet.weight)?.addonPrice ?? 0.0)) : 50,
-                  pet_type: pet.pet_type
-                }));
+              setLoading(true);
 
-                router.push({
-                  pathname: './confirm_scheduling',
-                  params: {
-                    selectedDate: selectedDate,
-                    selectedTime: selectedTime,
-                    groomingDetails: JSON.stringify(grooming),
-                    appointedPets: JSON.stringify(simplifiedPets)
-                  }
-                });
-              }}
+              console.log('doing');
 
-            >
-              <View style={buttonStyles.bookButtonCont}>
-                <View style={buttonStyles.bookButton}>
-                  <Text style={buttonStyles.title}>Request a book</Text>
-                  <Text style={buttonStyles.subtitle}>{moment(selectedDate).format('MMM D')} - {moment(selectedTime, 'HH:mm').format('h:mm A')}</Text>
-                </View>
+              console.log(selectedDate);
+              console.log(selectedTime);
+              console.log(grooming);
+              console.log(petChosen);
+
+              const simplifiedPets = petChosen.map(pet => ({
+                id: pet.id,
+                name: pet.name,
+                weight: pet.weight,
+                size: getSizeCategory(pet.weight)?.size,
+                to_add_price: pet.pet_type == 'Dog'
+                  ? (getSizeCategory(pet.weight)?.addonPrice ?? 0.0)
+                  : 50,
+                pet_type: pet.pet_type
+              }));
+
+              router.push({
+                pathname: './confirm_scheduling',
+                params: {
+                  selectedDate: selectedDate,
+                  selectedTime: selectedTime,
+                  groomingDetails: JSON.stringify(grooming),
+                  appointedPets: JSON.stringify(simplifiedPets)
+                }
+              });
+
+              setTimeout(function() {
+                setLoading(true);
+              }, 1000);
+              // 🚫 No setLoading(false) here — let navigation take over
+            }}
+          >
+            <View style={buttonStyles.bookButtonCont}>
+              <View style={[
+                buttonStyles.bookButton,
+                {
+                  alignItems: 'center',
+                  justifyContent: isLoading ? 'center' : 'space-between'
+                }
+              ]}>
+                {
+                  isLoading ? (
+                    <ActivityIndicator
+                      color="#fff"
+                      size="small"
+                      style={{
+                        transform: [{ scale: 1.5 }],
+                        paddingVertical: dimensions.screenHeight * 0.0055
+                      }}
+                    />
+                  ) : (
+                    <>
+                      <Text style={buttonStyles.title}>Request a book</Text>
+                      <Text style={buttonStyles.subtitle}>
+                        {moment(selectedDate).format('MMM D')} - {moment(selectedTime, 'HH:mm').format('h:mm A')}
+                      </Text>
+                    </>
+                  )
+                }
               </View>
-            </TouchableOpacity>
-          ) : null
+            </View>
+          </TouchableOpacity>
+        )
         }
       </View>
     </PortalProvider>

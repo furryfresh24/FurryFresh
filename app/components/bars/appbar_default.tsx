@@ -18,6 +18,7 @@ const AppbarDefault = ({
   paddingTop = dimensions.screenHeight * 0.07,
   paddingBottom = dimensions.screenHeight * 0.02,
   subtitleFont,
+  zIndex = 1,
   containerHeight,
   children
 }: {
@@ -34,6 +35,7 @@ const AppbarDefault = ({
   paddingBottom?: number;
   subtitleFont?: string;
   containerHeight?: number;
+  zIndex?: number;
   children?: React.ReactNode;
 }) => {
   const router = useRouter();
@@ -53,7 +55,8 @@ const AppbarDefault = ({
         {
           height: containerHeight ?? undefined,
           paddingBottom: paddingBottom,
-          paddingTop: paddingTop
+          paddingTop: paddingTop,
+          zIndex: zIndex
         },
       ]}
     >

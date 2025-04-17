@@ -186,6 +186,7 @@ const RootLayout = () => {
                         titleSize={dimensions.screenWidth * 0.045}
                       />
                     ),
+                    headerShown: false
                   };
                 }}
               />

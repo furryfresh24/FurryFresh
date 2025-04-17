@@ -1,10 +1,12 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import supabase from '../utils/supabase';
 import Cart from '../interfaces/cart';
+import Product from '../interfaces/product';
 import { useSession } from './sessions_context';
 
 interface CartContextType {
     carts: Cart[];
+    cartProducts: Product[];
     loading: boolean;
     error: string | null;
     fetchCarts: () => void;
@@ -21,6 +23,7 @@ const CartContext = createContext<CartContextType | undefined>(undefined);
 export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
     const { session } = useSession();
     const [carts, setCarts] = useState<Cart[]>([]);
+    const [cartProducts, setCartProducts] = useState<Product[]>([]);
     const [loading, setLoading] = useState<boolean>(false);
     const [error, setError] = useState<string | null>(null);
 
@@ -34,16 +37,40 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
         setError(null);
 
         try {
-            const { data, error } = await supabase
+            // Fetch cart data
+            const { data: cartData, error: cartError } = await supabase
                 .from('carts')
                 .select('*')
                 .eq('user_id', session.user.id);
 
-            if (error) throw error;
+            if (cartError) throw cartError;
 
-            setCarts(data as Cart[]);
+            const carts = cartData as Cart[];
+            setCarts(carts);
+
+            // Extract product_ids from cart
+            const productIds = carts.map((item) => item.product_id);
+
+            if (productIds.length > 0) {
+                const { data: productsData, error: productsError } = await supabase
+                    .from('products')
+                    .select('*')
+                    .in('id', productIds);
+
+                if (productsError) throw productsError;
+
+                const parsed = productsData?.map((item) => ({
+                    ...item,
+                    created_at: new Date(item.created_at),
+                    updated_at: item.updated_at ? new Date(item.updated_at) : undefined,
+                })) as Product[];
+
+                setCartProducts(parsed);
+            } else {
+                setCartProducts([]); // If cart is empty
+            }
         } catch (err) {
-            setError('Failed to fetch cart data.');
+            setError('Failed to fetch cart or product data.');
             console.error(err);
         } finally {
             setLoading(false);
@@ -64,7 +91,6 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
         );
     };
 
-
     useEffect(() => {
         if (session?.user?.id) {
             fetchCarts();
@@ -72,7 +98,17 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
     }, [session]);
 
     return (
-        <CartContext.Provider value={{ carts, loading, error, fetchCarts, addToCartContext, updateCartContext }}>
+        <CartContext.Provider
+            value={{
+                carts,
+                cartProducts,
+                loading,
+                error,
+                fetchCarts,
+                addToCartContext,
+                updateCartContext
+            }}
+        >
             {children}
         </CartContext.Provider>
     );
