@@ -234,6 +234,10 @@ const RootLayout = () => {
                 name="screens/playdate/getstarted"
                 options={{ headerShown: false }}
               />
+              <Stack.Screen
+                name="screens/playdate/home"
+                options={{ headerShown: false }}
+              />
             </Stack>
           </PortalProvider>
         </GestureHandlerRootView>
