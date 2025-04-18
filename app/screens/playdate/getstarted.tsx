@@ -144,8 +144,9 @@ const styles = StyleSheet.create({
   },
   image: {
     width: dimensions.screenWidth * 0.75,
-    height: dimensions.screenWidth * 0.75,
+    height: dimensions.screenWidth * 0.7,
     marginBottom: dimensions.screenHeight * 0.0,
+    marginTop: dimensions.screenHeight * 0.03,
   },
   paws: {
     position: 'absolute',

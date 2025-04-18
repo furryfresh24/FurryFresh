@@ -1,18 +1,63 @@
-import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  Image,
+  TouchableOpacity,
+  Animated,
+  Dimensions,
+  Modal,
+} from 'react-native';
 import dimensions from '../../utils/sizing';
-import React from 'react';
+import React, { useRef, useState } from 'react';
 import { useRouter } from 'expo-router';
+
+const screenWidth = Dimensions.get('window').width;
 
 const Home = () => {
   const router = useRouter();
+  const [showFirstContainer, setShowFirstContainer] = useState(true);
+  const [modalVisible, setModalVisible] = useState(false);
 
-  const handlePress = () => {
-    router.push('../../screens/(tabs)/home');
+  const firstAnim = useRef(new Animated.Value(0)).current;
+  const secondAnim = useRef(new Animated.Value(screenWidth)).current;
+
+  const slideInFromRight = (anim: Animated.Value) =>
+    Animated.timing(anim, {
+      toValue: 0,
+      duration: 300,
+      useNativeDriver: true,
+    });
+
+  const slideOutToLeft = (anim: Animated.Value) =>
+    Animated.timing(anim, {
+      toValue: -screenWidth,
+      duration: 300,
+      useNativeDriver: true,
+    });
+
+  const toggleContainers = () => {
+    if (showFirstContainer) {
+      Animated.sequence([slideOutToLeft(firstAnim), slideInFromRight(secondAnim)]).start(() => {
+        firstAnim.setValue(screenWidth);
+        setShowFirstContainer(false);
+      });
+    } else {
+      Animated.sequence([slideOutToLeft(secondAnim), slideInFromRight(firstAnim)]).start(() => {
+        secondAnim.setValue(screenWidth);
+        setShowFirstContainer(true);
+      });
+    }
   };
+
+  const handlePress = () => router.push('../../screens/(tabs)/home');
+
+  const openModal = () => setModalVisible(true);
+  const closeModal = () => setModalVisible(false);
 
   return (
     <View style={styles.container}>
-      {/* Home */}
+      {/* Home Button */}
       <View style={styles.topLeftWrapper}>
         <TouchableOpacity style={styles.coloredBox} onPress={handlePress}>
           <Image
@@ -27,6 +72,7 @@ const Home = () => {
         </View>
       </View>
 
+      {/* Title */}
       <View style={styles.titleWrapper}>
         <Text style={[styles.title, styles.blueText]}>FIND YOUR PLAY </Text>
         <Text style={[styles.title, styles.orangeText]}>DATE</Text>
@@ -34,7 +80,8 @@ const Home = () => {
 
       <View style={styles.line} />
 
-      <View style={styles.whiteContainer}>
+      {/* Animated White Containers */}
+      <Animated.View style={[styles.whiteContainer, { transform: [{ translateX: firstAnim }] }]}>
         <Image
           source={require('../../assets/images/others/corki.png')}
           style={styles.corkiImage}
@@ -51,8 +98,38 @@ const Home = () => {
             resizeMode="contain"
           />
         </View>
-      </View>
+      </Animated.View>
 
+      <Animated.View
+        style={[
+          styles.whiteContainer,
+          {
+            position: 'absolute',
+            top: 230,
+            alignSelf: 'center',
+            transform: [{ translateX: secondAnim }],
+          },
+        ]}
+      >
+        <Image
+          source={require('../../assets/images/others/putot.png')}
+          style={styles.corkiImage}
+          resizeMode="contain"
+        />
+        <View style={styles.infoRow}>
+          <View>
+            <Text style={styles.containerTitle}>Putot</Text>
+            <Text style={styles.containerSubtitle}>Dog, Golden Retriever</Text>
+          </View>
+          <Image
+            source={require('../../assets/images/others/male.png')}
+            style={styles.genderIcon}
+            resizeMode="contain"
+          />
+        </View>
+      </Animated.View>
+
+      {/* Details Box */}
       <View style={styles.detailsContainer}>
         <View style={styles.detailsContent}>
           <Image
@@ -64,23 +141,25 @@ const Home = () => {
         </View>
       </View>
 
+      {/* Action Buttons */}
       <View style={styles.containerRow}>
-        <View style={styles.skipContainer}>
+        <TouchableOpacity style={styles.skipContainer} onPress={toggleContainers}>
           <Image
             source={require('../../assets/images/others/skip.png')}
             style={styles.skipImage}
             resizeMode="contain"
           />
-        </View>
-        <View style={styles.checkContainer}>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.checkContainer} onPress={openModal}>
           <Image
             source={require('../../assets/images/others/check.png')}
             style={styles.checkImage}
             resizeMode="contain"
           />
-        </View>
+        </TouchableOpacity>
       </View>
 
+      {/* Paw Decorations */}
       <Image
         source={require('../../assets/images/others/paw1.png')}
         style={styles.paw1Image}
@@ -91,6 +170,30 @@ const Home = () => {
         style={styles.paw2Image}
         resizeMode="contain"
       />
+
+      {/* Notification Modal */}
+      <Modal
+        visible={modalVisible}
+        transparent
+        animationType="fade"
+        onRequestClose={closeModal}
+      >
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <Image
+              source={require('../../assets/images/general/furry-fresh-logo.png')}
+              style={styles.modalLogo}
+              resizeMode="contain"
+            />
+            <Text style={styles.modalText}>
+              We will notify you when this playmate is available!
+            </Text>
+            <TouchableOpacity style={styles.modalButton} onPress={closeModal}>
+              <Text style={styles.modalButtonText}>Got It</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 };
@@ -103,7 +206,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#D0DFF4',
     paddingTop: 60,
     paddingHorizontal: 20,
-    position: 'relative', 
+    position: 'relative',
   },
   topLeftWrapper: {
     flexDirection: 'row',
@@ -153,12 +256,8 @@ const styles = StyleSheet.create({
     fontFamily: 'Baloo-Regular',
     textAlign: 'center',
   },
-  blueText: {
-    color: '#121F63',
-  },
-  orangeText: {
-    color: '#E94C30',
-  },
+  blueText: { color: '#121F63' },
+  orangeText: { color: '#E94C30' },
   line: {
     marginTop: 10,
     width: '27%',
@@ -281,5 +380,41 @@ const styles = StyleSheet.create({
     right: -30,
     width: 200,
     height: 200,
+  },
+  modalContainer: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalContent: {
+    backgroundColor: '#FFF',
+    borderRadius: 10,
+    padding: 20,
+    width: '80%',
+    alignItems: 'center',
+  },
+  modalLogo: {
+    width: 80,
+    height: 80,
+    marginBottom: 15,
+  },
+  modalText: {
+    fontSize: 14,
+    fontFamily: 'Poppins-Regular',
+    color: '#121F63',
+    textAlign: 'center',
+    marginBottom: 20,
+  },
+  modalButton: {
+    backgroundColor: '#466AA2',
+    borderRadius: 30,
+    paddingVertical: 5,
+    paddingHorizontal: 25,
+  },
+  modalButtonText: {
+    color: '#FFF',
+    fontFamily: 'Poppins-Regular',
+    fontSize: 13,
   },
 });
