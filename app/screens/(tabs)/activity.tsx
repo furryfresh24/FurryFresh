@@ -7,6 +7,8 @@ import { useSession } from '../../context/sessions_context';
 import HorizontalButtonList from '../../components/list/horizontal_button_list';
 import { useBooking } from '../../context/booking_context';
 import { useOrder } from '../../context/order_context';
+import BookingItem from '../../components/activity/booking_item';
+import OrderItem from '../../components/activity/order_item';
 
 const Activity = () => {
   const [selectedTab, setSelectedTab] = useState<'ongoing' | 'completed'>('ongoing');
@@ -95,16 +97,13 @@ const Activity = () => {
               No activities found.
             </Text>
           ) : (
-            filteredActivities.map((item) => (
-              <View key={item.id} style={styles.activityItem}>
-                <Text style={styles.dateStatus}>
-                  {item.date} - {item.status}
-                </Text>
-                <Text style={styles.noteText}>
-                  {item.type === 'order' ? '🛒 Order' : '🧼 Booking'}: {item.note}
-                </Text>
-              </View>
-            ))
+            filteredActivities.map((item) => {
+              if (item.type === 'booking') {
+                return <BookingItem key={item.id} item={item} />;
+              } else {
+                return <OrderItem key={item.id} item={item} />;
+              }
+            })
           )}
         </View>
       </MainContPaw>
