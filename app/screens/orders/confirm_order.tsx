@@ -1,5 +1,5 @@
-import { StyleSheet, Text, View, TouchableOpacity } from 'react-native'
-import React, { useCallback, useMemo, useRef, useState } from 'react'
+import { StyleSheet, Text, View, TouchableOpacity, TextInput, ActivityIndicator } from 'react-native'
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useSession } from '../../context/sessions_context'
 import dimensions from '../../utils/sizing'
 import AppbarDefault from '../../components/bars/appbar_default'
@@ -17,17 +17,23 @@ import BottomSheet, { BottomSheetBackdrop, BottomSheetView } from '@gorhom/botto
 import { PortalProvider } from '@gorhom/portal'
 import Button1 from '../../components/buttons/button1'
 import PlainTextInput from '../../components/inputs/custom_text_input2'
-import { PaymentMethod, paymentMethods } from '../../hooks/fetchPaymentMethod';
+import { PaymentMethod, paymentMethodsPetSupplies } from '../../hooks/fetchPaymentMethod';
 import SvgValue from '../../hooks/fetchSvg'
 import TitleValue from '../../components/list/title_value'
-import { router } from 'expo-router'
+import { router, useLocalSearchParams } from 'expo-router'
+import supabase from '../../utils/supabase'
+import CustomTextInput from '../../components/inputs/custom_text_input1'
 
 type Props = {}
 
 
 const ConfirmOrder = (props: Props) => {
+    const { paymentResult: rawResult } = useLocalSearchParams();
+    const paymentResult = typeof rawResult === 'string' ? JSON.parse(rawResult) : null;
     const { session } = useSession();
     const { carts, cartProducts } = useCart();
+    const hasHandledPayment = useRef(false);
+    const [isProcessing, setIsProcessing] = useState(false);
 
     const [showFullList, setShowFullList] = useState(false);
     const [isLoading, setLoading] = useState<boolean>(false);
@@ -38,6 +44,10 @@ const ConfirmOrder = (props: Props) => {
     const openSheet = () => sheetRef.current?.expand();
     const sheetRef = useRef<BottomSheet>(null);
     const snapPoints = useMemo(() => ["60%"], []);
+
+    // INPUT FIELD
+    const inputRef = React.useRef<TextInput>(null);
+    const [isFocused, setIsFocused] = React.useState(false);
 
     const backDrop = useCallback(
         (props: any) => (
@@ -58,6 +68,9 @@ const ConfirmOrder = (props: Props) => {
         }
     };
 
+    // USE EFFECTS
+
+
     // VOUCHERS
     const [hasVoucherChanges, setHasVoucherChanges] = useState<boolean>(false);
     const [tempVoucherSelected, setTempVoucherSelected] = useState<Voucher | null>(null);
@@ -67,10 +80,213 @@ const ConfirmOrder = (props: Props) => {
     const [voucherError, setVoucherError] = useState<string | null>(null);
     const [isSearchingVouchers, setSearchingVouchers] = useState<boolean>(false);
 
+    useEffect(() => {
+        const validateAndSearchVoucher = async () => {
+            if (voucherInput.trim().length === 0 || !session?.user?.id) return;
+
+            console.log("🔍 Starting voucher search for:", voucherInput);
+            setSearchingVouchers(true);
+            setVoucherResults(null);
+            setVoucherError(null);
+
+            try {
+                const now = new Date();
+
+                const { data: vouchersData, error: voucherError } = await supabase
+                    .from("vouchers")
+                    .select("*")
+                    .ilike("code", voucherInput);
+
+                if (voucherError) {
+                    setVoucherError("Error searching vouchers");
+                    console.error("❌ Voucher search error:", voucherError);
+                    return;
+                }
+
+                console.log("✅ Vouchers fetched:", vouchersData);
+
+                const { data: usedVouchers, error: usedError } = await supabase
+                    .from("used_vouchers")
+                    .select("*")
+                    .eq("user_id", session.user.id);
+
+                if (usedError) {
+                    setVoucherError("Error checking used vouchers");
+                    console.error("❌ Used vouchers fetch error:", usedError, "Session:", session?.user);
+                    return;
+                }
+
+                console.log("✅ Used vouchers fetched:", usedVouchers);
+
+                const usageCountMap: Record<string, number> = {};
+                const usedCategoryIds: string[] = [];
+
+                usedVouchers.forEach((entry) => {
+                    usageCountMap[entry.voucher_id] = (usageCountMap[entry.voucher_id] || 0) + 1;
+                    if (entry.category_id) {
+                        usedCategoryIds.push(entry.category_id);
+                    }
+                });
+
+                const currentCategoryId = '10f23363-ba26-4567-99dd-fc9501c472ba';
+
+                const validVouchers = vouchersData.filter((voucher) => {
+                    if (!voucher.is_active) return false;
+
+                    const validFrom = new Date(voucher.valid_from);
+                    const validTo = voucher.valid_to ? new Date(voucher.valid_to) : null;
+                    if (now < validFrom || (validTo && now > validTo)) return false;
+
+                    const totalUsed = usageCountMap[voucher.id] || 0;
+                    if (voucher.usage_limit !== null && totalUsed >= voucher.usage_limit) return false;
+
+                    const userUsed = usedVouchers.filter((v) => v.voucher_id === voucher.id).length;
+                    if (voucher.user_limit !== null && userUsed >= voucher.user_limit) return false;
+
+                    const appliesToCategories: string[] = voucher.applies_to_categories || [];
+                    if (appliesToCategories.length > 0 && !appliesToCategories.includes(currentCategoryId)) return false;
+
+                    if (voucher.is_first_time_user_only) {
+                        const hasUsedCategory = appliesToCategories.some((catId: string) => usedCategoryIds.includes(catId));
+                        if (hasUsedCategory) return false;
+                    }
+                    return true;
+                });
+
+                console.log("✅ Valid vouchers after filtering:", validVouchers);
+                setVoucherResults(validVouchers);
+            } catch (err) {
+                console.error("🔥 Unexpected error:", err);
+                setVoucherError("Unexpected error occurred");
+            } finally {
+                setSearchingVouchers(false);
+                console.log("🔚 Voucher search finished");
+            }
+        };
+
+        const debounceTimer = setTimeout(validateAndSearchVoucher, 500);
+        return () => clearTimeout(debounceTimer);
+    }, [voucherInput, session]);
+
     // PAYMENTS
     const [paymentMethod, setPaymentMethod] = useState<PaymentMethod | null>(null);
 
     // SUMMARY
+
+    // use effect upload
+    useEffect(() => {
+        if (hasHandledPayment.current || !paymentResult) return;
+
+        hasHandledPayment.current = true;
+
+        const handlePayment = async () => {
+            setIsProcessing(true);
+
+            try {
+                const status = paymentResult.success;
+                const data = paymentResult.data;
+
+                console.log("✅ Payment Result after coming back:");
+                console.log("✅ Status: ", status);
+                console.log("✅ Data: ", data);
+
+                if (!status) {
+                    console.log("❌ Payment was not successful.");
+                    return;
+                }
+
+                console.log("✅ Payment Successful");
+
+                // Insert Order
+                const { data: orderResult, error: orderInsertError } = await supabase
+                    .from('orders')
+                    .insert([
+                        {
+                            user_id: session?.user?.id,
+                            note: '',
+                            amount: finalValue,
+                            delivery_type: 'Pick-up',
+                            order_status: "Pending",
+                        }
+                    ])
+                    .select()
+                    .single();
+
+                if (orderInsertError) {
+                    console.error("❌ Order insert error:", orderInsertError);
+                    return;
+                }
+
+                console.log("✅ Order inserted successfully:", orderResult);
+
+                // Insert Order Items in batch
+                const orderItemsPayload = carts.map(cart => ({
+                    order_id: orderResult.id,
+                    product_id: cart.product_id,
+                    quantity: cart.quantity,
+                    item_amount: cart.price,
+                    created_at: new Date().toISOString(),
+                }));
+
+                const { error: orderItemsError } = await supabase
+                    .from('order_items')
+                    .insert(orderItemsPayload);
+
+                if (orderItemsError) {
+                    console.error("❌ Order items insert error:", orderItemsError);
+                    return;
+                }
+
+                console.log("✅ Order items inserted successfully");
+
+                // Insert Payment
+                const metadata = paymentMethod?.id !== "Cash-on-delivery" ? data : null;
+
+                const { data: paymentInsertResult, error: paymentInsertError } = await supabase
+                    .from('payments')
+                    .insert([
+                        {
+                            user_id: session?.user?.id,
+                            order_id: orderResult.id,
+                            ref_id: '',
+                            payment_method: paymentMethod?.id,
+                            amount: finalValue,
+                            discount_applied: discount,
+                            status: paymentMethod?.id !== "Cash-on-delivery",
+                            currency: 'PHP',
+                            metadata,
+                            created_at: new Date().toISOString(),
+                        }
+                    ])
+                    .select()
+                    .single();
+
+                if (paymentInsertError) {
+                    console.error("❌ Payment insert error:", paymentInsertError);
+                    return;
+                }
+
+                console.log("✅ Payment inserted successfully:", paymentInsertResult);
+
+                // Navigate to success screen
+                router.replace({
+                    pathname: './success_booking',
+                    params: {
+                        booking: JSON.stringify(orderResult),
+                        payment: JSON.stringify(paymentResult),
+                    }
+                });
+
+            } catch (error) {
+                console.error("❌ Unexpected error during payment processing:", error);
+            } finally {
+                setIsProcessing(false);
+            }
+        };
+
+        handlePayment();
+    }, [paymentResult]);
+
 
     const totalPrice = carts.reduce(
         (sum, p) => sum + (p.price),
@@ -273,7 +489,7 @@ const ConfirmOrder = (props: Props) => {
                             </View>
                             <Spacer height={dimensions.screenHeight * 0.02} />
                             <FlatList
-                                data={paymentMethods}
+                                data={paymentMethodsPetSupplies}
                                 scrollEnabled={false}
                                 style={{
                                     width: '100%',
@@ -441,7 +657,7 @@ const ConfirmOrder = (props: Props) => {
                         loading={isLoading}
                         isPrimary={true}
                         onPress={paymentMethod ? () => {
-                            if(isLoading) return;
+                            if (isLoading) return;
 
                             setLoading(true);
 
@@ -519,15 +735,19 @@ const ConfirmOrder = (props: Props) => {
                         </View>
                         <View style={{}}>
                             <Spacer height={dimensions.screenHeight * 0.02} />
-                            <PlainTextInput
-                                value={voucherInput}
-                                onChangeText={setVoucherInput}
-                                placeholder="Enter promo / voucher code here"
-                                keyboardType="email-address"
-                                marginBottom={dimensions.screenHeight * 0.03}
-                                allowClear={true}
-                                type='search'
-                            />
+                            <View style={{ width: '100%', height: dimensions.screenHeight * 0.07, backgroundColor: "#f0f0f0", borderRadius: 15, paddingHorizontal: dimensions.screenWidth * 0.04, marginBottom: dimensions.screenHeight * 0.015 }}>
+                                <TextInput
+                                    ref={inputRef}
+                                    style={styles.input}
+                                    value={voucherInput}
+                                    onChangeText={setVoucherInput}
+                                    placeholder="Enter promo / voucher code here"
+                                    keyboardType="default"
+                                    placeholderTextColor="#bbb"
+                                    onFocus={() => setIsFocused(true)}
+                                    onBlur={() => !voucherResults && setIsFocused(false)}
+                                />
+                            </View>
                             <FlatList
                                 data={voucherResults}
                                 style={{
@@ -650,6 +870,19 @@ const ConfirmOrder = (props: Props) => {
                         }
                     </BottomSheetView>
                 </BottomSheet>
+                {isProcessing && (
+                    <View style={{
+                        position: 'absolute',
+                        top: 0, left: 0, right: 0, bottom: 0,
+                        backgroundColor: 'rgba(0,0,0,0.5)',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        zIndex: 999,
+                    }}>
+                        <ActivityIndicator size="large" color="#fff" />
+                        <Text style={{ color: 'white', marginTop: 12, fontFamily: 'Poppins-SemiBold' }}>Finalizing your order...</Text>
+                    </View>
+                )}
             </View>
         </PortalProvider>
     );
@@ -744,5 +977,24 @@ const styles = StyleSheet.create({
         fontSize: dimensions.screenWidth * 0.029,
         lineHeight: dimensions.screenWidth * 0.045,
         letterSpacing: 0.4,
+    },
+    container: {
+        flex: 1
+    },
+    inputContainer: {
+        flexDirection: "row",
+        alignItems: "center",
+        borderRadius: 15,
+        position: "relative",
+    },
+    input: {
+        flex: 1,
+        fontSize: dimensions.screenWidth * 0.035,
+        fontFamily: "Poppins-Regular",
+        color: "#333",
+    },
+    clearIcon: {
+        position: "absolute",
+        right: 10,
     },
 });

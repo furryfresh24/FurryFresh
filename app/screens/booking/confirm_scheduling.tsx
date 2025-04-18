@@ -12,7 +12,7 @@ import moment from 'moment';
 import Price from '../../components/general/price';
 import { Ionicons } from '@expo/vector-icons';
 import Spacer from '../../components/general/spacer';
-import { PaymentMethod, paymentMethods } from '../../hooks/fetchPaymentMethod';
+import { PaymentMethod, paymentMethodsPetCare } from '../../hooks/fetchPaymentMethod';
 import TitleValue from '../../components/list/title_value';
 import { Divider } from '@rneui/themed/dist/Divider';
 import Button1 from '../../components/buttons/button1';
@@ -548,7 +548,7 @@ const ConfirmScheduling = () => {
               </View>
               <Spacer height={dimensions.screenHeight * 0.02} />
               <FlatList
-                data={paymentMethods}
+                data={paymentMethodsPetCare}
                 scrollEnabled={false}
                 style={{
                   width: '100%',

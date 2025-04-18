@@ -6,6 +6,7 @@ import { CategoryProvider } from './category_context';
 import { SubcategoryProvider } from './subcategory_context';
 import { GroomingProvider } from './grooming_context';
 import { BookingProvider } from './booking_context';
+import { OrderProvider } from './order_context';
 
 interface ProvidersProps {
   children: React.ReactNode;
@@ -18,11 +19,13 @@ const Providers: React.FC<ProvidersProps> = ({ children }) => {
         <SubcategoryProvider>
           <GroomingProvider>
             <BookingProvider>
-              <CartProvider>
-                <PetProvider>
-                  {children}
-                </PetProvider>
-              </CartProvider>
+              <OrderProvider>
+                <CartProvider>
+                  <PetProvider>
+                    {children}
+                  </PetProvider>
+                </CartProvider>
+              </OrderProvider>
             </BookingProvider>
           </GroomingProvider>
         </SubcategoryProvider>

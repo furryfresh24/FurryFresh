@@ -6,7 +6,7 @@ type PaymentMethod = {
     isAvailable: boolean;
 };
 
-const paymentMethods: PaymentMethod[] = [
+const paymentMethodsPetCare: PaymentMethod[] = [
     {
         id: 'Pay-on-service',
         icon: 'pay-on-service',
@@ -21,12 +21,35 @@ const paymentMethods: PaymentMethod[] = [
         isAllowed: true,
         isAvailable: true,
     },
-    
+
 ];
 
-const getPaymentMethodById = (id: string): PaymentMethod | null => {
-    const found = paymentMethods.find(method => method.id === id);
+const paymentMethodsPetSupplies: PaymentMethod[] = [
+    {
+        id: 'Cash-on-delivery',
+        icon: 'pay-on-service',
+        name: 'Cash on delivery',
+        isAllowed: true,
+        isAvailable: true,
+    },
+    {
+        id: 'PayPal',
+        icon: 'paypal',
+        name: 'PayPal',
+        isAllowed: true,
+        isAvailable: true,
+    },
+
+];
+
+const getPaymentMethodPetCareById = (id: string): PaymentMethod | null => {
+    const found = paymentMethodsPetCare.find(method => method.id === id);
     return found ?? null;
 };
 
-export { PaymentMethod, paymentMethods, getPaymentMethodById };
+const getPaymentMethodPetSuppliesById = (id: string): PaymentMethod | null => {
+    const found = paymentMethodsPetSupplies.find(method => method.id === id);
+    return found ?? null;
+};
+
+export { PaymentMethod as PaymentMethod, paymentMethodsPetCare, paymentMethodsPetSupplies, getPaymentMethodPetCareById, getPaymentMethodPetSuppliesById };
