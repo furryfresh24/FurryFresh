@@ -26,6 +26,9 @@ const Activity = () => {
 
   const bookingAsActivity = bookings.map((booking) => ({
     id: booking.id,
+    pet_ids: booking.pet_ids,
+    sharraine_id: booking.grooming_id,
+    time: booking.time_start,
     date: booking.date,
     note: booking.note || 'No note',
     status: booking.status,
