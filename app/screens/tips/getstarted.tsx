@@ -64,7 +64,7 @@ const GetStarted = () => {
 
       {/* Dog */}
       <Image
-        source={require('../../assets/images/others/dog-hd.png')}
+        source={require('../../assets/images/others/owner.png')}
         style={styles.image}
         resizeMode="contain"
       />
@@ -75,19 +75,19 @@ const GetStarted = () => {
         <Text style={[styles.title, styles.blue]}>FRESH</Text>
       </View>
       <View style={styles.titleRow}>
-        <Text style={[styles.title, styles.blue]}>PLAY </Text>
-        <Text style={[styles.title, styles.orange]}>DATE</Text>
+        <Text style={[styles.title, styles.blue]}>PET CARE </Text>
+        <Text style={[styles.title, styles.orange]}>TIPS</Text>
       </View>
 
       {/* Description */}
       <Text style={styles.description}>
-        Unleash the fun! Dive into Furry Fresh's Playdate feature and connect your pet with new furry friends today!
+      Welcome to our Pet Care Tips! Explore valuable information to help you take the best care of your furry friends.
       </Text>
 
       {/* Get Started Button */}
       <TouchableOpacity
         style={styles.getStartedBox}
-        onPress={() => router.push('../playdate/home')} 
+        onPress={() => router.push('../tips/home')} 
       >
         <Text style={styles.getStartedText}>Get Started</Text>
         <Image
@@ -143,9 +143,10 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   image: {
-    width: dimensions.screenWidth * 0.75,
+    width: dimensions.screenWidth * 0.95,
     height: dimensions.screenWidth * 0.7,
     marginBottom: dimensions.screenHeight * 0.02,
+    marginLeft: dimensions.screenHeight * 0.02,
     marginTop: dimensions.screenHeight * 0.04,
   },
   paws: {

@@ -246,6 +246,14 @@ const RootLayout = () => {
                 name="screens/orders/confirm_order"
                 options={{ headerShown: false }}
               />
+              <Stack.Screen
+                name="screens/tips/getstarted"
+                options={{ headerShown: false }}
+              />
+               <Stack.Screen
+                name="screens/tips/home"
+                options={{ headerShown: false }}
+              />
             </Stack>
           </PortalProvider>
         </GestureHandlerRootView>

@@ -70,8 +70,37 @@ const Explore = () => {
               </View>
 
               <View style={styles.textContainer}>
-                <Text style={styles.innerTextBlack}>FurryFresh Play Date</Text>
+                <Text style={styles.innerTextBlack}>Play Date</Text>
                 <Text style={styles.innerTextGray}>Activities</Text>
+              </View>
+            </View>
+          </TouchableOpacity>
+
+            {/* Pet Care Tips */}
+            <TouchableOpacity onPress={() => router.push('../tips/getstarted')}>
+            <View style={styles.innerBox}>
+              <View style={styles.indicator}>
+                <View style={styles.indicatorContent}>
+                  <Image
+                    source={require('../../assets/images/others/stars.png')}
+                    style={styles.indicatorIcon}
+                    resizeMode="contain"
+                  />
+                  <Text style={styles.indicatorText}>NEW</Text>
+                </View>
+              </View>
+
+              <View style={styles.colorBox}>
+                <Image
+                  source={require('../../assets/images/others/idea.png')}
+                  style={styles.colorBoxImage}
+                  resizeMode="contain"
+                />
+              </View>
+
+              <View style={styles.textContainer}>
+                <Text style={styles.innerTextBlack}>Pet Care Tips</Text>
+                <Text style={styles.innerTextGray}>Education</Text>
               </View>
             </View>
           </TouchableOpacity>
