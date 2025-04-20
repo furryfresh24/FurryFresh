@@ -17,6 +17,7 @@ import moment from "moment";
 import { Ionicons } from "@expo/vector-icons";
 import Spacer from "../../components/general/spacer";
 import { router } from "expo-router";
+import supabase from "../../utils/supabase";
 
 const Profile = () => {
   const { session } = useSession();
@@ -26,7 +27,17 @@ const Profile = () => {
     <MainContPaw>
       <View style={styles.topContainer}>
         <View style={styles.titlePage}>
-          <View style={{ flex: 1 }}></View>
+          <View style={{ flex: 1 }}>
+            <TouchableOpacity onPress={() => router.push('../admin/(tabs)')}>
+              {
+                session?.user?.user_metadata['role'] != 'Admin' && <Ionicons
+                  name="shield-checkmark-outline"
+                  size={dimensions.screenWidth * 0.06}
+                  color="black"
+                />
+              }
+            </TouchableOpacity>
+          </View>
           <Text style={styles.titleText}>Profile</Text>
           <View style={styles.iconContainer}>
             <TouchableOpacity>

@@ -152,6 +152,10 @@ const RootLayout = () => {
                 options={{ headerShown: false }}
               />
               <Stack.Screen
+                name="screens/admin/(tabs)"
+                options={{ headerShown: false }}
+              />
+              <Stack.Screen
                 name="screens/pets/pets"
                 options={{
                   header: () => (
