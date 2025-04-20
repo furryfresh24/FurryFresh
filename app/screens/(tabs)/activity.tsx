@@ -16,7 +16,7 @@ const Activity = () => {
 
   const { session } = useSession();
   const { bookings } = useBooking();
-  const { orders } = useOrder();
+  const { orders, orderItems } = useOrder();
 
   const menus = [
     { id: 'all', title: 'All' },
@@ -43,6 +43,8 @@ const Activity = () => {
     status: order.order_status,
     type: 'order' as const,
     category: 'pet-supplies',
+    ordered_items: orderItems.filter((oi) => oi.order_id == order.id),
+    price: order.amount
   }));
 
   const allActivities = [...bookingAsActivity, ...orderAsActivity];
@@ -94,7 +96,7 @@ const Activity = () => {
           marginTop={dimensions.screenHeight * 0.015}
         />
 
-        <View style={{ paddingHorizontal: 24, paddingTop: 16 }}>
+        <View style={{ paddingHorizontal: 24, paddingTop: 16, paddingBottom: dimensions.screenHeight * 0.13 }}>
           {filteredActivities.length === 0 ? (
             <Text style={{ textAlign: 'center', marginTop: 20, color: '#666' }}>
               No activities found.
