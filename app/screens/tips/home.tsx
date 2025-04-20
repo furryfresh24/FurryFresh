@@ -6,7 +6,6 @@ import {
   TouchableWithoutFeedback,
   Dimensions,
 } from 'react-native';
-import dimensions from '../../utils/sizing';
 import React, { useState } from 'react';
 import { useRouter } from 'expo-router';
 import Animated, {
@@ -22,15 +21,19 @@ const screenWidth = Dimensions.get('window').width;
 const Home = () => {
   const router = useRouter();
 
-  const handlePress = () => router.push('../tips/training');
-
   const hoverStateTraining = useSharedValue(0);
   const hoverStateNutrition = useSharedValue(0);
-  const trainingRotation = useSharedValue(0); 
-  const nutritionRotation = useSharedValue(0); 
+  const trainingRotation = useSharedValue(0);
+  const nutritionRotation = useSharedValue(0);
+  const hoverStateHealth = useSharedValue(0);
+  const hoverStateGrooming = useSharedValue(0);
+  const healthRotation = useSharedValue(0);
+  const groomingRotation = useSharedValue(0);
 
   const [flippedTraining, setFlippedTraining] = useState(false);
   const [flippedNutrition, setFlippedNutrition] = useState(false);
+  const [flippedHealth, setFlippedHealth] = useState(false);
+  const [flippedGrooming, setFlippedGrooming] = useState(false);
 
   const handlePressIn = () => {
     hoverStateTraining.value = withTiming(1, { duration: 150 });
@@ -48,6 +51,19 @@ const Home = () => {
     hoverStateNutrition.value = withTiming(0, { duration: 150 });
   };
 
+  const handlePressInHealth = () => {
+    hoverStateHealth.value = withTiming(1, { duration: 150 });
+  };
+  const handlePressOutHealth = () => {
+    hoverStateHealth.value = withTiming(0, { duration: 150 });
+  };
+  const handlePressInGrooming = () => {
+    hoverStateGrooming.value = withTiming(1, { duration: 150 });
+  };
+  const handlePressOutGrooming = () => {
+    hoverStateGrooming.value = withTiming(0, { duration: 150 });
+  };
+
   const clickBoxStyleTraining = useAnimatedStyle(() => {
     const backgroundColor = interpolateColor(
       hoverStateTraining.value,
@@ -60,6 +76,23 @@ const Home = () => {
   const clickBoxStyleNutrition = useAnimatedStyle(() => {
     const backgroundColor = interpolateColor(
       hoverStateNutrition.value,
+      [0, 1],
+      ['#FFFFFF', '#D0DFF4']
+    );
+    return { backgroundColor };
+  });
+
+  const clickBoxStyleHealth = useAnimatedStyle(() => {
+    const backgroundColor = interpolateColor(
+      hoverStateHealth.value,
+      [0, 1],
+      ['#FFFFFF', '#D0DFF4']
+    );
+    return { backgroundColor };
+  });
+  const clickBoxStyleGrooming = useAnimatedStyle(() => {
+    const backgroundColor = interpolateColor(
+      hoverStateGrooming.value,
       [0, 1],
       ['#FFFFFF', '#D0DFF4']
     );
@@ -104,6 +137,42 @@ const Home = () => {
     left: 0,
   }));
 
+  const frontAnimatedStyleHealth = useAnimatedStyle(() => ({
+    transform: [
+      { perspective: 1000 },
+      { rotateY: `${interpolate(healthRotation.value, [0, 180], [0, 180])}deg` },
+    ],
+    backfaceVisibility: 'hidden',
+  }));
+  const backAnimatedStyleHealth = useAnimatedStyle(() => ({
+    transform: [
+      { perspective: 1000 },
+      { rotateY: `${interpolate(healthRotation.value, [0, 180], [180, 360])}deg` },
+    ],
+    backfaceVisibility: 'hidden',
+    position: 'absolute',
+    top: 0,
+    left: 0,
+  }));
+  
+  const frontAnimatedStyleGrooming = useAnimatedStyle(() => ({
+    transform: [
+      { perspective: 1000 },
+      { rotateY: `${interpolate(groomingRotation.value, [0, 180], [0, 180])}deg` },
+    ],
+    backfaceVisibility: 'hidden',
+  }));
+  const backAnimatedStyleGrooming = useAnimatedStyle(() => ({
+    transform: [
+      { perspective: 1000 },
+      { rotateY: `${interpolate(groomingRotation.value, [0, 180], [180, 360])}deg` },
+    ],
+    backfaceVisibility: 'hidden',
+    position: 'absolute',
+    top: 0,
+    left: 0,
+  }));
+
   const handleTrainingCardFlip = () => {
     const newRotation = flippedTraining ? 0 : 180;
     trainingRotation.value = withTiming(newRotation, { duration: 800 });
@@ -116,14 +185,42 @@ const Home = () => {
     setFlippedNutrition(!flippedNutrition);
   };
 
+  const handleHealthCardFlip = () => {
+    const newRotation = flippedHealth ? 0 : 180;
+    healthRotation.value = withTiming(newRotation, { duration: 800 });
+    setFlippedHealth(!flippedHealth);
+  };
+  
+  const handleGroomingCardFlip = () => {
+    const newRotation = flippedGrooming ? 0 : 180;
+    groomingRotation.value = withTiming(newRotation, { duration: 800 });
+    setFlippedGrooming(!flippedGrooming);
+  };
+
+  const handleTrainingClick = () => {
+    router.push('../tips/training');
+  };
+
   const handleNutritionClick = () => {
-    router.push('../tips/nutrition');  
+    router.push('../tips/nutrition');
+  };
+
+  const handleBackHome = () => {
+    router.push('../../screens/(tabs)/home');
+  };
+
+  const handleHealthClick = () => {
+    router.push('../tips/health');
+  };
+  
+  const handleGroomingClick = () => {
+    router.push('../tips/grooming');
   };
 
   return (
     <View style={styles.container}>
       <View style={styles.topLeftWrapper}>
-        <TouchableWithoutFeedback onPress={handlePress}>
+        <TouchableWithoutFeedback onPress={handleBackHome}>
           <View style={styles.coloredBox}>
             <Image
               source={require('../../assets/images/others/home.png')}
@@ -148,6 +245,7 @@ const Home = () => {
         </Text>
 
         <View style={styles.containerRow}>
+          {/* Training Card */}
           <TouchableWithoutFeedback onPress={handleTrainingCardFlip}>
             <View style={styles.cardContainer}>
               <Animated.View style={[styles.cardSide, styles.frontCard, frontAnimatedStyleTraining]}>
@@ -159,7 +257,7 @@ const Home = () => {
                 <Text style={styles.trainingLabel}>Training</Text>
 
                 <TouchableWithoutFeedback
-                  onPress={handlePress}
+                  onPress={handleTrainingClick}
                   onPressIn={handlePressIn}
                   onPressOut={handlePressOut}
                 >
@@ -178,6 +276,7 @@ const Home = () => {
             </View>
           </TouchableWithoutFeedback>
 
+          {/* Nutrition Card */}
           <TouchableWithoutFeedback onPress={handleNutritionCardFlip}>
             <View style={styles.cardContainer}>
               <Animated.View style={[styles.cardSide, styles.frontCard, frontAnimatedStyleNutrition]}>
@@ -189,7 +288,7 @@ const Home = () => {
                 <Text style={styles.nutritionLabel}>Nutrition</Text>
 
                 <TouchableWithoutFeedback
-                  onPress={handleNutritionClick} 
+                  onPress={handleNutritionClick}
                   onPressIn={handlePressInNutrition}
                   onPressOut={handlePressOutNutrition}
                 >
@@ -208,6 +307,71 @@ const Home = () => {
             </View>
           </TouchableWithoutFeedback>
         </View>
+
+        <View style={styles.containerRow}>
+  {/* Health Card */}
+  <TouchableWithoutFeedback onPress={handleHealthCardFlip}>
+    <View style={styles.cardContainer}>
+      <Animated.View style={[styles.cardSide, styles.frontCard, frontAnimatedStyleHealth]}>
+        <Image
+          source={require('../../assets/images/others/healthPet.png')}
+          style={styles.nutritionImage}
+          resizeMode="contain"
+        />
+        <Text style={styles.trainingLabel}>Health</Text>
+
+        <TouchableWithoutFeedback
+          onPress={handleHealthClick}
+          onPressIn={handlePressInHealth}
+          onPressOut={handlePressOutHealth}
+        >
+          <Animated.View style={[styles.clickBox, clickBoxStyleHealth]}>
+            <Text style={styles.clickText}>Click This</Text>
+          </Animated.View>
+        </TouchableWithoutFeedback>
+      </Animated.View>
+
+      <Animated.View style={[styles.cardSide, styles.backCard, backAnimatedStyleHealth]} pointerEvents="none">
+        <Text style={styles.backTextCardTitle}>Health Tips</Text>
+        <Text style={styles.backTextCard}>
+          Discover ways to keep your pet healthy and happy.
+        </Text>
+      </Animated.View>
+    </View>
+  </TouchableWithoutFeedback>
+
+  {/* Grooming Card */}
+  <TouchableWithoutFeedback onPress={handleGroomingCardFlip}>
+    <View style={styles.cardContainer}>
+      <Animated.View style={[styles.cardSide, styles.frontCard, frontAnimatedStyleGrooming]}>
+        <Image
+          source={require('../../assets/images/others/grooming.png')}
+          style={styles.trainingImage}
+          resizeMode="contain"
+        />
+        <Text style={styles.trainingLabel}>Grooming</Text>
+
+        <TouchableWithoutFeedback
+          onPress={handleGroomingClick}
+          onPressIn={handlePressInGrooming}
+          onPressOut={handlePressOutGrooming}
+        >
+          <Animated.View style={[styles.clickBox, clickBoxStyleGrooming]}>
+            <Text style={styles.clickText}>Click This</Text>
+          </Animated.View>
+        </TouchableWithoutFeedback>
+      </Animated.View>
+
+      <Animated.View style={[styles.cardSide, styles.backCard, backAnimatedStyleGrooming]} pointerEvents="none">
+        <Text style={styles.backTextCardTitle}>Grooming Tips</Text>
+        <Text style={styles.backTextCard}>
+          Learn effective grooming routines for your pets.
+        </Text>
+      </Animated.View>
+    </View>
+  </TouchableWithoutFeedback>
+</View>
+
       </View>
 
       <Image
@@ -225,7 +389,6 @@ const Home = () => {
 };
 
 export default Home;
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -271,7 +434,7 @@ const styles = StyleSheet.create({
     marginTop: -3,
   },
   titleWrapper: {
-    marginTop: 60,
+    marginTop: 30,
     alignItems: 'center',
     paddingHorizontal: 10,
   },
@@ -282,7 +445,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   title: {
-    fontSize: dimensions.screenWidth * 0.07,
+    fontSize: screenWidth * 0.07,
     fontFamily: 'Baloo-Regular',
     textAlign: 'center',
   },
@@ -341,9 +504,10 @@ const styles = StyleSheet.create({
   },
   nutritionImage: {
     width: screenWidth * 0.8,
-    height: screenWidth * 0.38,
-    marginTop: -screenWidth * 0.07,
-    marginBottom: -screenWidth * 0.01,
+    height: screenWidth * 0.34,
+    marginRight: screenWidth * 0.03,
+    marginTop: -screenWidth * 0.04,
+    marginBottom: -screenWidth * 0.0001,
   },
   nutritionLabel: {
     color: '#FFFFFF',
@@ -380,10 +544,10 @@ const styles = StyleSheet.create({
   },
   paw1Image: {
     position: 'absolute',
-    bottom: 10,
+    bottom: -10,
     left: -10,
-    width: 150,
-    height: 150,
+    width: 80,
+    height: 80,
   },
   paw2Image: {
     position: 'absolute',
