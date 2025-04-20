@@ -126,7 +126,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: dimensions.screenWidth * 0.03,
   },
   titlePage: {
-    marginTop: dimensions.screenHeight * 0.0,
+    marginTop: dimensions.screenHeight * 0.04,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
