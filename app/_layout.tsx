@@ -250,8 +250,12 @@ const RootLayout = () => {
                 name="screens/tips/getstarted"
                 options={{ headerShown: false }}
               />
-               <Stack.Screen
+              <Stack.Screen
                 name="screens/tips/home"
+                options={{ headerShown: false }}
+              />
+              <Stack.Screen
+                name="screens/activity/preview_grooming"
                 options={{ headerShown: false }}
               />
             </Stack>

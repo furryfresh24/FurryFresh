@@ -31,13 +31,12 @@ const OrderItem = ({ item }: OrderItemProps) => {
         />
       </View>
       <View style={{ width: '55%' }}>
-        <Text numberOfLines={1} style={styles.titleBooking}>Order {item.id}</Text>
+        <Text numberOfLines={1} style={styles.titleBooking}>Order Placed</Text>
         <Text style={styles.subtitleBooking}>
           Total items: {item.ordered_items.length}
         </Text>
         <Text style={styles.noteText}>
-          {/* Scheduled for {moment(item.date).format("MMM DD, YYYY")} -{" "} */}
-          {/* {moment(item.time, "HH:mm").format("h:mm A")} */}
+          Date Ordered: {moment(item.date).format("MMM DD, YYYY")}
         </Text>
       </View>
       <View style={{
@@ -51,7 +50,11 @@ const OrderItem = ({ item }: OrderItemProps) => {
       }}>
         <Price 
           value={item.price ?? 0} 
-          color="#fff" fontFamily="Poppins-SemiBold" fontSize={dimensions.screenWidth * 0.03} />
+          color="#fff" 
+          fontFamily="Poppins-SemiBold" 
+          fontSize={dimensions.screenWidth * 0.03}
+          lineHeight={dimensions.screenWidth * 0.045} 
+        />
       </View>
     </View>
   );

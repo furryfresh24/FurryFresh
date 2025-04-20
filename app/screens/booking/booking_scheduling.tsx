@@ -682,6 +682,8 @@ const BookingScheduling = () => {
                 pet_type: pet.pet_type
               }));
 
+              setLoading(false);
+
               router.push({
                 pathname: './confirm_scheduling',
                 params: {
@@ -692,9 +694,6 @@ const BookingScheduling = () => {
                 }
               });
 
-              setTimeout(function() {
-                setLoading(true);
-              }, 1000);
               // 🚫 No setLoading(false) here — let navigation take over
             }}
           >
@@ -717,12 +716,12 @@ const BookingScheduling = () => {
                       }}
                     />
                   ) : (
-                    <>
+                    <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
                       <Text style={buttonStyles.title}>Request a book</Text>
                       <Text style={buttonStyles.subtitle}>
                         {moment(selectedDate).format('MMM D')} - {moment(selectedTime, 'HH:mm').format('h:mm A')}
                       </Text>
-                    </>
+                    </View>
                   )
                 }
               </View>

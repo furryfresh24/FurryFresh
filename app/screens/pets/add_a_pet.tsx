@@ -113,7 +113,7 @@ const AddPet = (addPet: AddPetProps) => {
           birthday: petBirthday || null,
           bio: petBio,
           breed: petBreed,
-          weight: petWeight,
+          weight: petWeight.trim().length > 0 ? petWeight : null,
           pet_avatar: null,
         },
       ]).select().single();

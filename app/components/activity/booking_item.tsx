@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import React from "react";
 import { usePet } from "../../context/pet_context";
 import { useGrooming } from "../../context/grooming_context";
@@ -7,6 +7,7 @@ import SvgValue from "../../hooks/fetchSvg";
 import dimensions from "../../utils/sizing";
 import moment from "moment";
 import Price from "../general/price";
+import { router } from "expo-router";
 
 type BookingItemProps = {
   item: {
@@ -17,6 +18,7 @@ type BookingItemProps = {
     time: string;
     status: string;
     note: string;
+    amount: number;
     type: "booking";
     category: string;
   };
@@ -60,9 +62,12 @@ const BookingItem = ({ item }: BookingItemProps) => {
         paddingVertical: dimensions.screenHeight * 0.001,
         borderRadius: 30
       }}>
-        <Price 
-          value={currentGrooming?.price ?? 0} 
-          color="#fff" fontFamily="Poppins-SemiBold" fontSize={dimensions.screenWidth * 0.03} />
+        <Price
+          value={item.amount ?? 0}
+          color="#fff" fontFamily="Poppins-SemiBold"
+          fontSize={dimensions.screenWidth * 0.03}
+          lineHeight={dimensions.screenWidth * 0.045}
+        />
       </View>
     </View>
   );

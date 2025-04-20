@@ -9,6 +9,7 @@ import { useBooking } from '../../context/booking_context';
 import { useOrder } from '../../context/order_context';
 import BookingItem from '../../components/activity/booking_item';
 import OrderItem from '../../components/activity/order_item';
+import { router } from 'expo-router';
 
 const Activity = () => {
   const [selectedTab, setSelectedTab] = useState<'ongoing' | 'completed'>('ongoing');
@@ -32,6 +33,7 @@ const Activity = () => {
     date: booking.date,
     note: booking.note || 'No note',
     status: booking.status,
+    amount: booking.amount ?? 0,
     type: 'booking' as const,
     category: 'pet-care',
   }));
@@ -104,9 +106,21 @@ const Activity = () => {
           ) : (
             filteredActivities.map((item) => {
               if (item.type === 'booking') {
-                return <BookingItem key={item.id} item={item} />;
+                return <TouchableOpacity 
+                    key={item.id} 
+                    onPress={() => router.push({
+                      pathname: '../activity/preview_grooming',
+                      params: {
+                        booking: JSON.stringify(bookings.find((book) => book.id == item.id))
+                      }
+                    })}
+                  >
+                  <BookingItem item={item} />
+                </TouchableOpacity>;
               } else {
-                return <OrderItem key={item.id} item={item} />;
+                return <TouchableOpacity key={item.id} onPress={() => router.push('../activity/preview_grooming')}>
+                  <OrderItem item={item} />
+                </TouchableOpacity>;
               }
             })
           )}

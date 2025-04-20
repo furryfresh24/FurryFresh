@@ -7,6 +7,8 @@ export interface Booking {
     time_start: string; // You could use a specific time format like 'HH:mm'
     note: string;
     status: string;
+    amount?: number;
+    discount_applied?: number;
     created_at: string; // ISO timestamp
     updated_at: string | null; // Nullable timestamp
 }

@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, ScrollView, TouchableOpacity, FlatList, ActivityIndicator } from 'react-native';
+import { StyleSheet, Text, View, ScrollView, TouchableOpacity, FlatList, ActivityIndicator, TextInput } from 'react-native';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { router, useLocalSearchParams, useNavigation } from 'expo-router';
 import Subcategories from '../../interfaces/subcategories';
@@ -28,6 +28,7 @@ import { CheckBox } from '@rneui/themed';
 import { Voucher } from '../../interfaces/voucher';
 import Paypal from '../../components/payments/paypal';
 import { StackActions } from '@react-navigation/native';
+import { useBooking } from '../../context/booking_context';
 
 
 type Pet = {
@@ -42,11 +43,16 @@ type Pet = {
 const ConfirmScheduling = () => {
   const { selectedDate, selectedTime, groomingDetails, appointedPets, paymentResult: rawResult } = useLocalSearchParams();
   const { session } = useSession();
+  const { bookings, addToBookingContext } = useBooking();
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod | null>(null);
   const hasHandledPayment = useRef(false);
   const navigation = useNavigation();
   const paymentResult = typeof rawResult === 'string' ? JSON.parse(rawResult) : null;
   const [isProcessing, setIsProcessing] = useState(false);
+
+
+  const inputRef = React.useRef<TextInput>(null);
+  const [isFocused, setIsFocused] = React.useState(false);
 
   useEffect(() => {
     if (hasHandledPayment.current || !paymentResult) return;
@@ -79,6 +85,8 @@ const ConfirmScheduling = () => {
             pet_ids: parsedPets.map((p) => p.id),
             date: selectedDate,
             time_start: selectedTime,
+            amount: finalValue,
+            discount_applied: discount,
             note: '',
             status: "pending",
             created_at: new Date().toISOString(),
@@ -121,9 +129,33 @@ const ConfirmScheduling = () => {
       }
 
       console.log("✅ Payment inserted successfully:", paymentInsertResult);
-      
+
+      if (discount > 0) {
+        const { data: usedVouchersResult, error: usedVoucherError } = await supabase
+          .from('used_vouchers')
+          .insert([
+            {
+              user_id: session?.user?.id,
+              voucher_id: voucherSelected?.id,
+              booking_id: bookingResult?.id,
+              discount_applied: discount,
+              original_total: parseFloat(getPetTotal('all')),
+              used_at: new Date().toISOString(),
+            }
+          ])
+          .select()
+          .single();
+
+        if (usedVoucherError) {
+          console.log("❌ Used voucher insert error:", paymentError);
+          return;
+        }
+      }
+
+      addToBookingContext(bookingResult);
+
       for (let i = 0; i < 3; i++) {
-        if(router.canGoBack()) {
+        if (router.canGoBack()) {
           router.back();
         }
       }
@@ -311,6 +343,7 @@ const ConfirmScheduling = () => {
         {(
           <AppbarDefault
             title="Confirm Booking"
+            zIndex={0}
             subtitleSize={dimensions.screenWidth * 0.03}
             subtitleFont="Poppins-Regular"
             session={session}
@@ -816,15 +849,19 @@ const ConfirmScheduling = () => {
             </View>
             <View style={{}}>
               <Spacer height={dimensions.screenHeight * 0.02} />
-              <PlainTextInput
-                value={voucherInput}
-                onChangeText={setVoucherInput}
-                placeholder="Enter promo / voucher code here"
-                keyboardType="email-address"
-                marginBottom={dimensions.screenHeight * 0.03}
-                allowClear={true}
-                type='search'
-              />
+              <View style={{ width: '100%', height: dimensions.screenHeight * 0.07, backgroundColor: "#f0f0f0", borderRadius: 15, paddingHorizontal: dimensions.screenWidth * 0.04, marginBottom: dimensions.screenHeight * 0.015 }}>
+                <TextInput
+                  ref={inputRef}
+                  style={styles.input}
+                  value={voucherInput}
+                  onChangeText={setVoucherInput}
+                  placeholder="Enter promo / voucher code here"
+                  keyboardType="default"
+                  placeholderTextColor="#bbb"
+                  onFocus={() => setIsFocused(true)}
+                  onBlur={() => !voucherResults && setIsFocused(false)}
+                />
+              </View>
               <FlatList
                 data={voucherResults}
                 style={{
@@ -977,6 +1014,12 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
     paddingHorizontal: dimensions.screenWidth * 0.05,
     paddingVertical: dimensions.screenHeight * 0.025,
+  },
+  input: {
+    flex: 1,
+    fontSize: dimensions.screenWidth * 0.035,
+    fontFamily: "Poppins-Regular",
+    color: "#333",
   },
   cont2main: {
     display: 'flex',
