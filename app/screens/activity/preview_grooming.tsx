@@ -147,7 +147,7 @@ const PreviewGrooming = () => {
                   borderRadius: 13
                 }}>
                   <TitleValue
-                    title='Price'
+                    title='Subtotal'
                     value={`₱${(parsedBooking?.amount ?? 0).toFixed(2)}`}
                     isBold={false}
                     isSub={false}
