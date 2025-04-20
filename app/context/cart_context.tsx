@@ -14,6 +14,7 @@ interface CartContextType {
     addToCartProductsContext: (item: Product) => void;
     updateCartContext: (updatedItem: Cart) => void;
     updateCartProductsContext: (updatedItem: Product) => void;
+    clearCart: () => void;
 }
 
 interface CartProviderProps {
@@ -39,7 +40,6 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
         setError(null);
 
         try {
-            // Fetch cart data
             const { data: cartData, error: cartError } = await supabase
                 .from('carts')
                 .select('*')
@@ -50,7 +50,6 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
             const carts = cartData as Cart[];
             setCarts(carts);
 
-            // Extract product_ids from cart
             const productIds = carts.map((item) => item.product_id);
 
             if (productIds.length > 0) {
@@ -69,7 +68,7 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
 
                 setCartProducts(parsed);
             } else {
-                setCartProducts([]); // If cart is empty
+                setCartProducts([]);
             }
         } catch (err) {
             setError('Failed to fetch cart or product data.');
@@ -86,7 +85,6 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
     const addToCartProductsContext = (item: Product) => {
         setCartProducts((prevCartProds) => [...prevCartProds, item]);
     };
-
 
     const updateCartContext = (updatedItem: Cart) => {
         setCarts((prevCarts) =>
@@ -108,6 +106,10 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
         );
     };
 
+    const clearCart = () => {
+        setCarts([]);
+        setCartProducts([]);
+    };
 
     useEffect(() => {
         if (session?.user?.id) {
@@ -126,7 +128,8 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
                 addToCartContext,
                 addToCartProductsContext,
                 updateCartContext,
-                updateCartProductsContext
+                updateCartProductsContext,
+                clearCart
             }}
         >
             {children}

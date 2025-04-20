@@ -31,7 +31,7 @@ const ConfirmOrder = (props: Props) => {
     const { paymentResult: rawResult } = useLocalSearchParams();
     const paymentResult = typeof rawResult === 'string' ? JSON.parse(rawResult) : null;
     const { session } = useSession();
-    const { carts, cartProducts } = useCart();
+    const { carts, cartProducts, clearCart } = useCart();
     const hasHandledPayment = useRef(false);
     const [isProcessing, setIsProcessing] = useState(false);
 
@@ -219,6 +219,8 @@ const ConfirmOrder = (props: Props) => {
 
                 console.log("✅ Order inserted successfully:", orderResult);
 
+                clearCart();
+
                 // Insert Order Items in batch
                 const orderItemsPayload = carts.map(cart => ({
                     order_id: orderResult.id,
@@ -268,9 +270,24 @@ const ConfirmOrder = (props: Props) => {
 
                 console.log("✅ Payment inserted successfully:", paymentInsertResult);
 
+                const { data: cartDataDeleted, error: cartDeleteItemsError } = await supabase
+                    .from('carts')
+                    .delete()
+                    .eq('user_id', session?.user.id)
+                    .select();
+
+                if(cartDeleteItemsError) {
+                    console.error("❌ Cart delete error:", cartDeleteItemsError);
+                }
+
+                console.log("✅ Cart items deleted successfully:", cartDataDeleted);
+
+                router.back();
+                router.back();
+                
                 // Navigate to success screen
                 router.replace({
-                    pathname: './success_booking',
+                    pathname: './order_completed',
                     params: {
                         booking: JSON.stringify(orderResult),
                         payment: JSON.stringify(paymentResult),
