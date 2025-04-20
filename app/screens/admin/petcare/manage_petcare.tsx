@@ -8,10 +8,12 @@ import HorizontalButtonList from '../../../components/list/horizontal_button_lis
 import { useBooking } from '../../../context/booking_context';
 import BookingItem from '../../../components/activity/booking_item';
 import { router } from 'expo-router';
+import { Picker } from '@react-native-picker/picker';
 
 const ManagePetCare = () => {
   const [selectedTab, setSelectedTab] = useState<'ongoing' | 'completed'>('ongoing');
   const [selectedMenu, setSelectedMenu] = useState<'all' | 'pet-care'>('all');
+  const [selectedFilter, setSelectedFilter] = useState<'overall' | '24h' | '7d' | '30d'>('overall');
 
   const { session } = useSession();
   const { bookings } = useBooking();
@@ -34,14 +36,28 @@ const ManagePetCare = () => {
     category: 'pet-care',
   }));
 
+  const now = new Date();
+  const filterByTime = (activityDate: string) => {
+    const date = new Date(activityDate);
+    switch (selectedFilter) {
+      case '24h':
+        return now.getTime() - date.getTime() <= 24 * 60 * 60 * 1000;
+      case '7d':
+        return now.getTime() - date.getTime() <= 7 * 24 * 60 * 60 * 1000;
+      case '30d':
+        return now.getTime() - date.getTime() <= 30 * 24 * 60 * 60 * 1000;
+      default:
+        return true;
+    }
+  };
+
   const filteredActivities = bookingAsActivity.filter((activity) => {
     const isCorrectStatus =
       selectedTab === 'ongoing' ? activity.status !== 'completed' : activity.status === 'completed';
-
     const isCorrectCategory =
       selectedMenu === 'all' || activity.category === selectedMenu;
-
-    return isCorrectStatus && isCorrectCategory;
+    const isCorrectTime = filterByTime(activity.date);
+    return isCorrectStatus && isCorrectCategory && isCorrectTime;
   });
 
   return (
@@ -73,18 +89,35 @@ const ManagePetCare = () => {
       </AppbarDefault>
 
       <MainContPaw>
-        <View style={{ display: 'flex', flexDirection: 'row' }}>
+        <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', paddingHorizontal: 24 }}>
           <View style={{ flex: 1 }}>
             <HorizontalButtonList
               services={menus}
               activeService={selectedMenu}
               setActiveService={(id) => setSelectedMenu(id as any)}
-              paddingHorizontal={dimensions.screenWidth * 0.06}
+              paddingHorizontal={0}
               marginTop={dimensions.screenHeight * 0.015}
             />
           </View>
-          <View style={{ backgroundColor: 'red' }}>
-            <Text>Test</Text>
+          <View style={{ width: 160, marginLeft: 12 }}>
+            <Picker
+              selectedValue={selectedFilter}
+              onValueChange={(itemValue) => setSelectedFilter(itemValue)}
+              mode="dropdown"
+              style={{
+                height: 40,
+                backgroundColor: '#FFF',
+                borderRadius: 8,
+                borderColor: '#CCC',
+                borderWidth: 1,
+              }}
+              dropdownIconColor="#466AA2"
+            >
+              <Picker.Item label="Overall" value="overall" />
+              <Picker.Item label="Last 24 Hours" value="24h" />
+              <Picker.Item label="Last 7 Days" value="7d" />
+              <Picker.Item label="Last 30 Days" value="30d" />
+            </Picker>
           </View>
         </View>
 
