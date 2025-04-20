@@ -152,10 +152,6 @@ const RootLayout = () => {
                 options={{ headerShown: false }}
               />
               <Stack.Screen
-                name="screens/admin/(tabs)"
-                options={{ headerShown: false }}
-              />
-              <Stack.Screen
                 name="screens/pets/pets"
                 options={{
                   header: () => (
@@ -260,6 +256,16 @@ const RootLayout = () => {
               />
               <Stack.Screen
                 name="screens/activity/preview_grooming"
+                options={{ headerShown: false }}
+              />
+
+              {/* ADMIN TABS */}
+              <Stack.Screen
+                name="screens/admin/(tabs)"
+                options={{ headerShown: false }}
+              />
+              <Stack.Screen
+                name="screens/admin/petcare/manage_petcare"
                 options={{ headerShown: false }}
               />
             </Stack>

@@ -17,6 +17,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { PortalProvider } from '@gorhom/portal';
 import Dashboard from './dashboard';
 import Menu from './menu';
+import MenuHorizIcon from '../../../components/svgs/hub/MenuHorizIcon';
 
 const Tab = createBottomTabNavigator();
 
@@ -85,7 +86,7 @@ export default () => {
                   <NavbarItem
                     color={color}
                     title="Menu"
-                    icon={<HomeIcon color={color} width={dimensions.screenWidth * 0.07} height={dimensions.screenWidth * 0.07} props={undefined} />}
+                    icon={<MenuHorizIcon color={color} width={dimensions.screenWidth * 0.07} height={dimensions.screenWidth * 0.07} props={undefined} />}
                   />
                 </View>
               ),

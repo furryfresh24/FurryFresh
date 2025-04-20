@@ -4,11 +4,21 @@ import dimensions from '../../../utils/sizing'
 import Spacer from '../../../components/general/spacer'
 import Booking from '../../../interfaces/booking'
 import supabase from '../../../utils/supabase'
+import HorizontalButtonList from '../../../components/list/horizontal_button_list'
+import Button1 from '../../../components/buttons/button1'
+import { router } from 'expo-router'
 
-type Props = {}
+const timeFilters = [
+  { id: 'all', title: 'Overall' },
+  { id: '24h', title: 'Last 24 Hours' },
+  { id: '7d', title: 'Last 7 Days' },
+  { id: '30d', title: 'Last 30 Days' }
+];
 
-const MainPetCare = (props: Props) => {
+const MainPetCare = (props: {}) => {
     const [bookings, setBookings] = useState<Booking[]>([]);
+    const [activeFilter, setActiveFilter] = useState<string | number>('all');
+    const [filteredBookings, setFilteredBookings] = useState<Booking[]>(bookings);
 
     useEffect(() => {
         const fetchBookings = async () => {
@@ -18,28 +28,78 @@ const MainPetCare = (props: Props) => {
 
             if (error) {
                 console.error('Error encountered while fetching bookings:', error.message);
-                return; 
+                return;
             }
 
             setBookings(data as Booking[]);
+            setFilteredBookings(data as Booking[]);
             console.log('Fetch all completed!');
         };
 
         fetchBookings();
     }, []);
 
-    const totalSales = bookings.reduce((sum, booking) => sum + (booking.amount || 0), 0);
-    const totalOrders = bookings.length;
-    const totalCompleted = bookings.filter(b => b.status === 'completed').length;
-    const totalPending = bookings.filter(b => b.status === 'pending').length;
+    const applyTimeFilter = (filter: string) => {
+        setActiveFilter(filter);
+
+        let filtered: Booking[];
+        const now = new Date();
+
+        switch (filter) {
+            case '24h':
+                filtered = bookings.filter(booking => {
+                    const bookingDate = new Date(booking.created_at);
+                    return (now.getTime() - bookingDate.getTime()) <= 24 * 60 * 60 * 1000; // 24 hours
+                });
+                break;
+            case '7d':
+                filtered = bookings.filter(booking => {
+                    const bookingDate = new Date(booking.created_at);
+                    return (now.getTime() - bookingDate.getTime()) <= 7 * 24 * 60 * 60 * 1000; // 7 days
+                });
+                break;
+            case '30d':
+                filtered = bookings.filter(booking => {
+                    const bookingDate = new Date(booking.created_at);
+                    return (now.getTime() - bookingDate.getTime()) <= 30 * 24 * 60 * 60 * 1000; // 30 days
+                });
+                break;
+            default:
+                filtered = bookings;
+                break;
+        }
+
+        setFilteredBookings(filtered);
+    };
+
+    const totalSales = filteredBookings.reduce((sum, booking) => sum + (booking.amount || 0), 0);
+    const totalOrders = filteredBookings.length;
+    const totalCompleted = filteredBookings.filter(b => b.status === 'completed').length;
+    const totalPending = filteredBookings.filter(b => b.status === 'pending').length;
 
     return (
         <View>
+            <HorizontalButtonList
+                services={timeFilters}
+                activeService={activeFilter}
+                setActiveService={setActiveFilter}
+                onServiceClick={(item) => applyTimeFilter(item.id as string)} 
+            />
+            <Spacer height={dimensions.screenHeight * 0.02} />
             <View style={[styles.container, { alignItems: 'flex-start' }]}>
                 <View style={styles.activityCard}>
                     <Text style={styles.cardLabel}>Booking Sales</Text>
-                    <Text style={styles.salesAmount}>${totalSales.toFixed(2)}</Text>
+                    <Text style={styles.salesAmount}>₱{totalSales.toFixed(2)}</Text>
                     <Text style={styles.growthText}>+34%</Text>
+                </View>
+
+                <View style={{ width: '100%', marginTop: dimensions.screenHeight * 0.02 }}>
+                    <Button1 
+                        title='Manage Orders'
+                        isPrimary={false}
+                        borderRadius={15}
+                        onPress={() => router.push('../petcare/manage_petcare')}
+                    />
                 </View>
 
                 <View style={styles.summaryContainer}>
@@ -76,11 +136,10 @@ const MainPetCare = (props: Props) => {
             </View>
             <Spacer height={dimensions.screenHeight * 0.1} />
         </View>
-    )
+    );
 }
 
-export default MainPetCare
-
+export default MainPetCare;
 
 
 const styles = StyleSheet.create({
