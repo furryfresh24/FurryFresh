@@ -16,6 +16,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 // import ExploreIcon from '../../components/svgs/hub/ExploreIcon';
 import { PortalProvider } from '@gorhom/portal';
 import Dashboard from './dashboard';
+import Menu from './menu';
 
 const Tab = createBottomTabNavigator();
 
@@ -65,7 +66,25 @@ export default () => {
                 <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
                   <NavbarItem
                     color={color}
-                    title="Home"
+                    title="Dashboard"
+                    icon={<HomeIcon color={color} width={dimensions.screenWidth * 0.07} height={dimensions.screenWidth * 0.07} props={undefined} />}
+                  />
+                </View>
+              ),
+              // header: () => homeOptions.header(session),
+              headerTransparent: true,
+              headerShown: false
+            }}
+          />
+          <Tab.Screen
+            name="menu"
+            component={MenuWithAnimation}
+            options={{
+              tabBarIcon: ({ color }: { color: string }) => (
+                <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+                  <NavbarItem
+                    color={color}
+                    title="Menu"
                     icon={<HomeIcon color={color} width={dimensions.screenWidth * 0.07} height={dimensions.screenWidth * 0.07} props={undefined} />}
                   />
                 </View>
@@ -129,13 +148,12 @@ const DashboardWithAnimation = () => {
 
   return (
     <Animated.View style={{ flex: 1, transform: [{ translateX: slideAnim }] }}>
-      {/* <Home /> */}
       <Dashboard />
     </Animated.View>
   );
 };
 
-const ExploreWithAnimation = () => {
+const MenuWithAnimation = () => {
   const slideAnim = useRef(new Animated.Value(300)).current;
 
   useFocusEffect(
@@ -158,7 +176,7 @@ const ExploreWithAnimation = () => {
 
   return (
     <Animated.View style={{ flex: 1, transform: [{ translateX: slideAnim }] }}>
-      {/* <Explore /> */}
+      <Menu />
     </Animated.View>
   );
 };
