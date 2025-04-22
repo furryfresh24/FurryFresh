@@ -3,187 +3,116 @@ import {
   Text,
   View,
   Image,
+  TextInput,
   TouchableOpacity,
-  FlatList,
 } from "react-native";
-import React, { useState } from "react";
+import React from "react";
 import MainContPaw from "../../components/general/background_paw";
 import dimensions from "../../utils/sizing";
 import Icon from "react-native-vector-icons/FontAwesome";
+import Subtitle1 from "../../components/texts/subtitle1";
 import { usePet } from "../../context/pet_context";
 import { useSession } from "../../context/sessions_context";
 import moment from "moment";
 import { Ionicons } from "@expo/vector-icons";
 import Spacer from "../../components/general/spacer";
-import { router, useFocusEffect } from "expo-router";
+import { router } from "expo-router";
 
 const Profile = () => {
   const { session } = useSession();
-  const { pets } = usePet();
-  const [menuVisible, setMenuVisible] = useState(false);
-
-  const toggleMenu = () => {
-    setMenuVisible((prev) => !prev);
-  };
-
-  const menuItems = [
-    {
-      id: '1',
-      title: 'Settings and privacy',
-      onPress: () => router.push('../profile/settings'),
-    },
-    { id: '2', title: 'Kakabit dito' },
-    { id: '3', title: 'Boss Popoy' },
-    { id: '4', title: '....' },
-  ];
-
-  useFocusEffect(
-    React.useCallback(() => {
-      setMenuVisible(false);
-    }, [])
-  );
-
-  const renderProfileHeader = () => (
-    <View style={styles.titlePage}>
-      <View style={{ flex: 1 }}></View>
-      <Text style={styles.titleText}>Profile</Text>
-      <View style={styles.iconContainer}>
-        <TouchableOpacity>
-          <Ionicons
-            name="chatbubble-ellipses-outline"
-            size={dimensions.screenWidth * 0.06}
-            color="black"
-          />
-        </TouchableOpacity>
-        <Spacer width={dimensions.screenWidth * 0.02} />
-        <TouchableOpacity onPress={toggleMenu}>
-          <Ionicons
-            name="menu"
-            size={dimensions.screenWidth * 0.07}
-            color="black"
-          />
-        </TouchableOpacity>
-      </View>
-    </View>
-  );
-
-  const renderProfileInfo = () => (
-    <View style={styles.profileContainer}>
-      <View style={styles.profilePicContainer}>
-        <View style={styles.profilePic}>
-          {session?.user.user_metadata['avatar_url'] ? (
-            <Image
-              source={require("../../assets/images/general/pet-enjoy.png")}
-              style={styles.profilePic}
-            />
-          ) : (
-            <Ionicons
-              name="person"
-              style={{ alignSelf: 'center', color: 'white' }}
-              size={dimensions.screenWidth * 0.12}
-            />
-          )}
-        </View>
-        <TouchableOpacity style={styles.cameraButton}>
-          <Icon name="camera" size={20} color="black" />
-        </TouchableOpacity>
-      </View>
-      <Text style={styles.userName}>
-        {session?.user.user_metadata['first_name'] + ' ' + session?.user.user_metadata['last_name']}
-      </Text>
-      <View style={styles.buttonContainer}>
-        <TouchableOpacity
-          style={styles.editButton}
-          onPress={() => router.push('../profile/edit_profile')}
-        >
-          <Text style={styles.editButtonText}>Edit Profile</Text>
-          <Icon name="edit" size={20} color="black" />
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.viewPetsButton}
-          onPress={() => router.push('../pets/pets')}
-        >
-          <Text style={styles.buttonText}>View Pets</Text>
-          <Icon name="paw" size={20} color="white" />
-        </TouchableOpacity>
-      </View>
-      <View style={[styles.statsContainer, { paddingTop: dimensions.screenWidth * 0.025 }]}>
-        <View style={[styles.statItem, { flex: 1, alignItems: 'flex-start' }]}>
-          <View style={{ alignItems: "center" }}>
-            <Text style={styles.statNumber}>{pets.length}</Text>
-            <Text style={styles.statLabel}>Pets</Text>
-          </View>
-        </View>
-        <View style={[styles.statItem, { flex: 2 }]}>
-          <Text style={styles.statNumber}>{moment(session?.user.created_at).format('MMM DD, YYYY')}</Text>
-          <Text style={styles.statLabel}>Joined On</Text>
-        </View>
-        <View style={[styles.statItem, { flex: 1, alignItems: 'flex-end' }]}>
-          <View style={{ alignItems: 'center' }}>
-            <Text style={styles.statNumber}>10</Text>
-            <Text style={styles.statLabel}>Playdates</Text>
-          </View>
-        </View>
-      </View>
-    </View>
-  );
-
-  const renderAboutSection = () => (
-    <View style={styles.aboutContainer}>
-      <View style={styles.aboutHeader}>
-        <Text style={[styles.aboutTitle, { fontFamily: 'Poppins-SemiBold' }]}>About Me</Text>
-        <Icon name="user" size={dimensions.screenWidth * 0.04} color="white" />
-      </View>
-      <View style={styles.inputContainer}>
-        <View style={styles.aboutInput}>
-          <Text style={styles.aboutPlaceholder}>
-            Say something about you as a pet owner...
-          </Text>
-        </View>
-        <TouchableOpacity style={styles.editIconButton}>
-          <Icon name="edit" size={20} color="white" />
-        </TouchableOpacity>
-      </View>
-    </View>
-  );
+  const { pets, fetchPets, addToPetContext, updatePetContext } = usePet();
 
   return (
-    <View style={{ flex: 1 }}>
-      <FlatList
-        data={[{ key: 'header' }, { key: 'profile' }, { key: 'about' }]}
-        renderItem={({ item }) => {
-          switch (item.key) {
-            case 'header':
-              return renderProfileHeader();
-            case 'profile':
-              return renderProfileInfo();
-            case 'about':
-              return renderAboutSection();
-            default:
-              return null;
-          }
-        }}
-        keyExtractor={(item) => item.key}
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingBottom: dimensions.screenHeight * 0.15 }}
-      />
-      {menuVisible && (
-        <View style={styles.menuOverlay}>
-          <TouchableOpacity style={styles.overlayBackground} onPress={toggleMenu} />
-          <View style={styles.menuContainer}>
-            {menuItems.map((item) => (
-              <TouchableOpacity 
-                key={item.id} 
-                style={styles.menuItem} 
-                onPress={item.onPress}
-              >
-                <Text style={styles.menuItemText}>{item.title}</Text>
-              </TouchableOpacity>
-            ))}
+    <MainContPaw>
+      <View style={styles.topContainer}>
+        <View style={styles.titlePage}>
+          <View style={{ flex: 1 }}></View>
+          <Text style={styles.titleText}>Profile</Text>
+          <View style={styles.iconContainer}>
+            <TouchableOpacity>
+              <Ionicons
+                name="chatbubble-ellipses-outline"
+                size={dimensions.screenWidth * 0.06}
+                color="black"
+              />
+            </TouchableOpacity>
+            <Spacer width={dimensions.screenWidth * 0.02} />
+            <TouchableOpacity>
+              <Ionicons
+                name="menu"
+                size={dimensions.screenWidth * 0.07}
+                color="black"
+              />
+            </TouchableOpacity>
           </View>
         </View>
-      )}
-    </View>
+        <View style={styles.profileContainer}>
+          <View style={styles.profilePicContainer}>
+            <View style={styles.profilePic}>
+              {
+                session?.user.user_metadata['avatar_url'] ? (
+                  <Image source={require("../../assets/images/general/pet-enjoy.png")} style={styles.profilePic} />
+                ) : (
+                  <Ionicons name="person" style={{ alignSelf: 'center', alignContent: 'center', color: 'white' }} size={dimensions.screenWidth * 0.12} />
+                )
+              }
+            </View>
+            <TouchableOpacity style={styles.cameraButton}>
+              <Icon name="camera" size={20} color="black" />
+            </TouchableOpacity>
+          </View>
+          <Text style={styles.userName}>{session?.user.user_metadata['first_name'] + ' ' + session?.user.user_metadata['last_name']}</Text>
+          <View style={styles.buttonContainer}>
+            <TouchableOpacity style={styles.editButton} onPress={() => router.push('../profile/edit_profile')}>
+              <Text style={styles.editButtonText}>Edit Profile</Text>
+              <Icon name="edit" size={20} color="black" />
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.viewPetsButton} onPress={() => router.push('../pets/pets')}>
+              <Text style={styles.buttonText}>View Pets</Text>
+              <Icon name="paw" size={20} color="white" />
+            </TouchableOpacity>
+          </View>
+          <View style={[styles.statsContainer, { paddingTop: dimensions.screenWidth * 0.025 }]}>
+            <View style={[styles.statItem, { flex: 1, alignItems: 'flex-start' }]}>
+              <View style={{ alignItems: "center" }}>
+                <Text style={styles.statNumber}>{pets.length}</Text>
+                <Text style={styles.statLabel}>Pets</Text>
+              </View>
+            </View>
+            <View style={[styles.statItem, { flex: 2 }]}>
+              <Text style={styles.statNumber}>{moment(session?.user.created_at).format('MMM DD, YYYY')}</Text>
+              <Text style={styles.statLabel}>Joined On</Text>
+            </View>
+            <View style={[styles.statItem, { flex: 1, alignItems: 'flex-end' }]}>
+              <View style={{ alignItems: 'center' }}>
+                <Text style={styles.statNumber}>10</Text>
+                <Text style={styles.statLabel}>Playdates</Text>
+              </View>
+            </View>
+          </View>
+        </View>
+      </View>
+      <View style={styles.aboutContainer}>
+        <View style={styles.aboutHeader}>
+          <Text style={[styles.aboutTitle, { fontFamily: 'Poppins-SemiBold' }]}>About Me</Text>
+          <Icon
+            name="user"
+            size={dimensions.screenWidth * 0.04}
+            color="white"
+          />
+        </View>
+        <View style={styles.inputContainer}>
+          <View style={styles.aboutInput}>
+            <Text style={styles.aboutPlaceholder}>
+              Say something about you as a pet owner...
+            </Text>
+          </View>
+          <TouchableOpacity style={styles.editIconButton}>
+            <Icon name="edit" size={20} color="white" />
+          </TouchableOpacity>
+        </View>
+      </View>
+    </MainContPaw>
   );
 };
 
@@ -213,7 +142,10 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: 'flex-end',
-    flex: 1,
+    flex: 1
+  },
+  iconMargin: {
+    marginLeft: dimensions.screenHeight * 0.015,
   },
   profileContainer: {
     alignItems: "center",
@@ -270,7 +202,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     width: dimensions.screenHeight * 0.18,
     flex: 1,
-    marginLeft: dimensions.screenWidth * 0.03,
     backgroundColor: "white",
   },
   editButtonText: {
@@ -287,7 +218,6 @@ const styles = StyleSheet.create({
     paddingVertical: dimensions.screenHeight * 0.008,
     alignItems: "center",
     justifyContent: "center",
-    marginRight: dimensions.screenWidth * 0.03,
   },
   buttonText: {
     color: "white",
@@ -303,8 +233,6 @@ const styles = StyleSheet.create({
     borderRadius: 15,
     paddingHorizontal: dimensions.screenWidth * 0.05,
     marginTop: dimensions.screenHeight * 0.02,
-    marginLeft: dimensions.screenWidth * 0.03,
-    marginRight: dimensions.screenWidth * 0.03,
   },
   statItem: {
     alignItems: "center",
@@ -373,37 +301,5 @@ const styles = StyleSheet.create({
     position: "absolute",
     right: dimensions.screenWidth * 0.04,
     bottom: dimensions.screenHeight * 0.02,
-  },
-  menuOverlay: {
-    position: "absolute",
-    bottom: 0,
-    left: 0,
-    right: 0,
-    top: 0,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    zIndex: 999,
-  },
-  overlayBackground: {
-    flex: 1,
-  },
-  menuContainer: {
-    backgroundColor: "white",
-    borderRadius: 10,
-    elevation: 10,
-    position: "absolute",
-    bottom: 0,
-    left: 0,
-    right: 0,
-    padding: dimensions.screenHeight * 0.01,
-    zIndex: 1000,
-  },
-  menuItem: {
-    paddingVertical: dimensions.screenHeight * 0.02,
-    borderBottomColor: "#E0E0E0",
-    borderBottomWidth: dimensions.screenWidth * 0.002,
-  },
-  menuItemText: {
-    fontSize: dimensions.screenWidth * 0.04,
-    textAlign: "center",
   },
 });
