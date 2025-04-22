@@ -279,6 +279,22 @@ const RootLayout = () => {
                   ),
                 }}
               />
+              <Stack.Screen
+                name="screens/tips/training"
+                options={{ headerShown: false }}
+              />
+              <Stack.Screen
+                name="screens/tips/nutrition"
+                options={{ headerShown: false }}
+              />
+              <Stack.Screen
+                name="screens/tips/health"
+                options={{ headerShown: false }}
+              />
+              <Stack.Screen
+                name="screens/tips/grooming"
+                options={{ headerShown: false }}
+              />
             </Stack>
           </PortalProvider>
         </GestureHandlerRootView>
