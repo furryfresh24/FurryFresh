@@ -6,7 +6,6 @@ import {
   TouchableWithoutFeedback,
   Dimensions,
 } from 'react-native';
-import dimensions from '../../utils/sizing';
 import React, { useState } from 'react';
 import { useRouter } from 'expo-router';
 import Animated, {
@@ -251,11 +250,11 @@ const Home = () => {
             <View style={styles.cardContainer}>
               <Animated.View style={[styles.cardSide, styles.frontCard, frontAnimatedStyleTraining]}>
                 <Image
-                  source={require('../../assets/images/others/training.png')}
+                  source={require('../../assets/images/others/grooming.png')}
                   style={styles.trainingImage}
                   resizeMode="contain"
                 />
-                <Text style={styles.trainingLabel}>Training</Text>
+                <Text style={styles.trainingLabel}>Grooming</Text>
 
                 <TouchableWithoutFeedback
                   onPress={handleTrainingClick}
@@ -269,9 +268,9 @@ const Home = () => {
               </Animated.View>
 
               <Animated.View style={[styles.cardSide, styles.backCard, backAnimatedStyleTraining]} pointerEvents="none">
-                <Text style={styles.backTextCardTitle}>Training Tips</Text>
+                <Text style={styles.backTextCardTitle}>Grooming Tips</Text>
                 <Text style={styles.backTextCard}>
-                  Helpful training strategies for your furry friends.
+                  Learn effective grooming routines for your pets.
                 </Text>
               </Animated.View>
             </View>
@@ -346,11 +345,11 @@ const Home = () => {
     <View style={styles.cardContainer}>
       <Animated.View style={[styles.cardSide, styles.frontCard, frontAnimatedStyleGrooming]}>
         <Image
-          source={require('../../assets/images/others/grooming.png')}
+          source={require('../../assets/images/others/training.png')}
           style={styles.trainingImage}
           resizeMode="contain"
         />
-        <Text style={styles.trainingLabel}>Grooming</Text>
+        <Text style={styles.trainingLabel}>Training</Text>
 
         <TouchableWithoutFeedback
           onPress={handleGroomingClick}
@@ -364,9 +363,9 @@ const Home = () => {
       </Animated.View>
 
       <Animated.View style={[styles.cardSide, styles.backCard, backAnimatedStyleGrooming]} pointerEvents="none">
-        <Text style={styles.backTextCardTitle}>Grooming Tips</Text>
+        <Text style={styles.backTextCardTitle}>Training Tips</Text>
         <Text style={styles.backTextCard}>
-          Learn effective grooming routines for your pets.
+        Helpful training strategies for your furry friends.
         </Text>
       </Animated.View>
     </View>

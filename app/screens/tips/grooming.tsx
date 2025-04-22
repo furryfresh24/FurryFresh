@@ -3,7 +3,7 @@ import { View, StyleSheet, Image, TouchableOpacity } from "react-native";
 import { useRouter } from "expo-router";
 import dimensions from "../../utils/sizing";
 
-const GroomingTipsScreen = () => {
+const TrainingTipsScreen = () => {
   const router = useRouter();
 
   const handleBackPress = () => {
@@ -23,7 +23,7 @@ const GroomingTipsScreen = () => {
   );
 };
 
-export default GroomingTipsScreen;
+export default TrainingTipsScreen;
 
 const styles = StyleSheet.create({
   container: {
