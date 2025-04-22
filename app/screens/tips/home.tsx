@@ -6,6 +6,7 @@ import {
   TouchableWithoutFeedback,
   Dimensions,
 } from 'react-native';
+import dimensions from '../../utils/sizing';
 import React, { useState } from 'react';
 import { useRouter } from 'expo-router';
 import Animated, {
