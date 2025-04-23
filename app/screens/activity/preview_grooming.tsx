@@ -27,7 +27,6 @@ const PreviewGrooming = () => {
     <View style={{ flex: 1, height: '100%', position: 'relative', width: '100%' }}>
       <MainContPlain scrollEnabled={true}>
         <View style={general.header}>
-
         </View>
         {/* <Text style={{  backgroundColor: 'green' }}>PreviewGrooming</Text> */}
         <View style={body.main}>
@@ -203,7 +202,7 @@ const general = StyleSheet.create({
     left: 0,
     right: 0,
     alignItems: 'center',
-    top: dimensions.screenHeight * 0.035,
+    top: dimensions.screenHeight * 0.07,
     // backgroundColor: 'red',
     paddingHorizontal: dimensions.screenWidth * 0.05
   },
