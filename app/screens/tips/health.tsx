@@ -21,38 +21,38 @@ import Animated, {
 const tips = [
   {
     id: 1,
-    title: "Positive Reinforcement",
+    title: "Regular Vet Check-ups",
     text:
-      "Reward good behavior with treats, praise, or playtime to encourage repetition of those behaviors.",
-    image: require("../../assets/images/others/trainingTips1.png"),
+      "Schedule annual veterinary visits to monitor your pet’s health and catch any issues early.",
+    image: require("../../assets/images/others/healthTips1.png"),
   },
   {
     id: 2,
-    title: "Consistency is Key",
+    title: "Vaccinations",
     text:
-      "Use the same commands and cues consistently to avoid confusing your pet.",
-    image: require("../../assets/images/others/trainingTips2.png"),
+      "Keep your pet’s vaccinations up to date to protect against common diseases.",
+    image: require("../../assets/images/others/healthTips2.png"),
   },
   {
     id: 3,
-    title: "Short Training Sessions",
+    title: "Parasite Prevention",
     text:
-      "Keep training sessions short (5-10 minutes) to maintain your pet's focus and enthusiasm.",
-    image: require("../../assets/images/others/trainingTips3.png"),
+      "Use preventive treatments for fleas, ticks, and worms to keep your pet safe and healthy.",
+    image: require("../../assets/images/others/healthTips3.png"),
   },
   {
     id: 4,
-    title: "Socialization",
+    title: "Healthy Weight Management",
     text:
       "Expose your pet to different environments, people, and other animals to promote good behavior and reduce anxiety.",
-    image: require("../../assets/images/others/trainingTips4.png"),
+    image: require("../../assets/images/others/healthTips4.png"),
   },
   {
     id: 5,
-    title: "Patience and Persistence",
+    title: "Observe Behavior Changes",
     text:
-      "Be patient and persistent; training takes time, and setbacks are normal. Celebrate small victories along the way!",
-    image: require("../../assets/images/others/trainingTips5.png"),
+      "Be attentive to any changes in your pet’s behavior, appetite, or energy levels, and consult your vet if you notice anything unusual.",
+    image: require("../../assets/images/others/healthTips5.png"),
   },
 ];
 
@@ -159,7 +159,7 @@ const HealthTipsScreen = () => {
         {item.id === 3 && (
           <Image
             source={item.image}
-            style={[styles.bathingImage, { width: dimensions.screenWidth * 0.9 }]} 
+            style={[styles.bathingImage, { width: dimensions.screenWidth * 0.7 }]} 
             resizeMode="contain"
           />
         )}
@@ -177,7 +177,7 @@ const HealthTipsScreen = () => {
          {item.id === 5 && (
           <Image
             source={item.image}
-            style={[styles.bathingImage, { width: dimensions.screenWidth * 0.6 }]} 
+            style={[styles.bathingImage, { width: dimensions.screenWidth * 0.5 }]} 
             resizeMode="contain"
           />
             )}
@@ -252,8 +252,8 @@ const styles = StyleSheet.create({
     color: "#466AA2",
   },
   bathingImage: {
-    width: dimensions.screenWidth * 0.6,
-    height: dimensions.screenWidth * 0.6,
+    width: dimensions.screenWidth * 0.7,
+    height: dimensions.screenWidth * 0.7,
     alignSelf: "center",
     marginTop: dimensions.screenWidth * 0.1,
     marginBottom: dimensions.screenWidth * 0.070,
