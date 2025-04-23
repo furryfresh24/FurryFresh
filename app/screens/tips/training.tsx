@@ -56,7 +56,7 @@ const tips = [
   },
 ];
 
-const TrainingTipsScreen = () => {
+const GroomingTipsScreen = () => {
   const router = useRouter();
   const [modalVisible, setModalVisible] = useState(true);
   const [currentTipIndex, setCurrentTipIndex] = useState(0);
@@ -98,7 +98,7 @@ const TrainingTipsScreen = () => {
 
   return (
     <View style={styles.container}>
-      {/* Modal should not interfere with gestures */}
+
       <Modal visible={modalVisible} transparent animationType="fade">
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
@@ -112,7 +112,7 @@ const TrainingTipsScreen = () => {
             </Text>
             <Pressable
               style={styles.modalButton}
-              onPress={() => setModalVisible(false)} // Close modal when the button is pressed
+              onPress={() => setModalVisible(false)} 
             >
               <Text style={styles.modalButtonText}>Noted!</Text>
             </Pressable>
@@ -120,7 +120,7 @@ const TrainingTipsScreen = () => {
         </View>
       </Modal>
 
-      {/* Back button */}
+
       <TouchableOpacity style={styles.circle} onPress={handleBackPress}>
         <Image
           source={require("../../assets/images/others/arrowBack.png")}
@@ -129,7 +129,7 @@ const TrainingTipsScreen = () => {
         />
       </TouchableOpacity>
 
-      {/* Tip content wrapped in swipeable gesture */}
+
       <GestureHandlerRootView>
         <GestureDetector gesture={swipeGesture}>
         <Animated.View style={animatedStyle}>
@@ -142,11 +142,10 @@ const TrainingTipsScreen = () => {
           <Text style={styles.centerText}>Tip #{item.id}</Text>
         </View>
 
-        {/* Customize per tip if needed */}
         {item.id === 1 && (
           <Image
             source={item.image}
-            style={[styles.bathingImage, { borderRadius: 20 }]} // custom style
+            style={[styles.bathingImage, { borderRadius: 20 }]} 
             resizeMode="contain"
           />
         )}
@@ -197,7 +196,6 @@ const TrainingTipsScreen = () => {
         </GestureDetector>
       </GestureHandlerRootView>
 
-      {/* Paw images */}
       <Image
         source={require("../../assets/images/others/paw1.png")}
         style={styles.paw1Image}
@@ -212,7 +210,7 @@ const TrainingTipsScreen = () => {
   );
 };
 
-export default TrainingTipsScreen;
+export default GroomingTipsScreen;
 
 const styles = StyleSheet.create({
   container: {

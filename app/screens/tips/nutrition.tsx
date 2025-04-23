@@ -98,7 +98,6 @@ const NutritionTipsScreen = () => {
 
   return (
     <View style={styles.container}>
-      {/* Modal should not interfere with gestures */}
       <Modal visible={modalVisible} transparent animationType="fade">
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
@@ -112,7 +111,7 @@ const NutritionTipsScreen = () => {
             </Text>
             <Pressable
               style={styles.modalButton}
-              onPress={() => setModalVisible(false)} // Close modal when the button is pressed
+              onPress={() => setModalVisible(false)} 
             >
               <Text style={styles.modalButtonText}>Noted!</Text>
             </Pressable>
@@ -120,7 +119,6 @@ const NutritionTipsScreen = () => {
         </View>
       </Modal>
 
-      {/* Back button */}
       <TouchableOpacity style={styles.circle} onPress={handleBackPress}>
         <Image
           source={require("../../assets/images/others/arrowBack.png")}
@@ -129,7 +127,6 @@ const NutritionTipsScreen = () => {
         />
       </TouchableOpacity>
 
-      {/* Tip content wrapped in swipeable gesture */}
       <GestureHandlerRootView>
         <GestureDetector gesture={swipeGesture}>
         <Animated.View style={animatedStyle}>
@@ -142,11 +139,10 @@ const NutritionTipsScreen = () => {
           <Text style={styles.centerText}>Tip #{item.id}</Text>
         </View>
 
-        {/* Customize per tip if needed */}
         {item.id === 1 && (
           <Image
             source={item.image}
-            style={[styles.bathingImage, { borderRadius: 20 }]} // custom style
+            style={[styles.bathingImage, { borderRadius: 20 }]} 
             resizeMode="contain"
           />
         )}
@@ -197,7 +193,6 @@ const NutritionTipsScreen = () => {
         </GestureDetector>
       </GestureHandlerRootView>
 
-      {/* Paw images */}
       <Image
         source={require("../../assets/images/others/paw1.png")}
         style={styles.paw1Image}
