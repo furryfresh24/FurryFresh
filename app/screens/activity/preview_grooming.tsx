@@ -203,7 +203,6 @@ const general = StyleSheet.create({
     right: 0,
     alignItems: 'center',
     top: dimensions.screenHeight * 0.07,
-    // backgroundColor: 'red',
     paddingHorizontal: dimensions.screenWidth * 0.05
   },
   header: {
