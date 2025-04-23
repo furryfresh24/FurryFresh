@@ -113,6 +113,12 @@ const Home = () => {
     []
   );
 
+  const handleSheetChange = (index: number) => {
+    if (index === 0) {
+      sheetRef.current?.close();
+    }
+  };
+
   const [activeService, setActiveService] = useState<number | string>(1);
   const [session, setSession] = useState<Session | null>(null);
 
@@ -131,11 +137,7 @@ const Home = () => {
     },
   ];
 
-  const handleSheetChange = (index: number) => {
-    if (index === 0) {
-      sheetRef.current?.close();
-    }
-  };
+
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {

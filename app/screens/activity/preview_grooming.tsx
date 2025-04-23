@@ -124,6 +124,7 @@ const PreviewGrooming = () => {
                   <Spacer width={dimensions.screenWidth * 0.02} />
                   <Text style={body.otherDetailsTitle}>Booking note</Text>
                 </View>
+                <Spacer height={dimensions.screenHeight * 0.015} />
                 <View style={{
                   backgroundColor: '#e6e6e6',
                   paddingHorizontal: dimensions.screenWidth * 0.04,
@@ -169,7 +170,7 @@ const PreviewGrooming = () => {
         <View style={floating.main}>
           <View style={[floating.cont, {}]}>
             <Text style={floating.title}>Basic Grooming</Text>
-            <Text style={floating.status}>
+            <Text style={[floating.status, { backgroundColor: parsedBooking?.status === 'completed' ? 'green' : '#ED7964' }]}>
               {parsedBooking?.status.substring(0, 1).toLocaleUpperCase()}{parsedBooking?.status.substring(1, parsedBooking?.status.length)}
             </Text>
           </View>

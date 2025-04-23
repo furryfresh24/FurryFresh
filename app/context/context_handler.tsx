@@ -7,6 +7,7 @@ import { SubcategoryProvider } from './subcategory_context';
 import { GroomingProvider } from './grooming_context';
 import { BookingProvider } from './booking_context';
 import { OrderProvider } from './order_context';
+import { GlobalBookingProvider } from './global_booking_context';
 
 interface ProvidersProps {
   children: React.ReactNode;
@@ -18,15 +19,17 @@ const Providers: React.FC<ProvidersProps> = ({ children }) => {
       <CategoryProvider>
         <SubcategoryProvider>
           <GroomingProvider>
-            <BookingProvider>
-              <OrderProvider>
-                <CartProvider>
-                  <PetProvider>
-                    {children}
-                  </PetProvider>
-                </CartProvider>
-              </OrderProvider>
-            </BookingProvider>
+            <GlobalBookingProvider>
+              <BookingProvider>
+                <OrderProvider>
+                  <CartProvider>
+                    <PetProvider>
+                      {children}
+                    </PetProvider>
+                  </CartProvider>
+                </OrderProvider>
+              </BookingProvider>
+            </GlobalBookingProvider>
           </GroomingProvider>
         </SubcategoryProvider>
       </CategoryProvider>

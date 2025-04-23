@@ -8,6 +8,7 @@ interface MainContPawProps {
   paddingHorizontal?: number | null;
   paddingVertical?: number | null;
   allowScroll?: boolean;
+  zIndex?: number | undefined
 }
 
 const MainContPaw: React.FC<MainContPawProps> = ({
@@ -15,10 +16,11 @@ const MainContPaw: React.FC<MainContPawProps> = ({
   showPetImage = false,
   paddingHorizontal = null,
   paddingVertical = null,
-  allowScroll = true
+  allowScroll = true,
+  zIndex = undefined
 }) => {
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { zIndex }]}>
       <Image
         source={require("../../assets/images/general/paw-watermark.png")}
         style={[styles.paw, styles.topLeftCircle]}
