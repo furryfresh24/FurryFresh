@@ -6,7 +6,7 @@ import {
   TextInput,
   TouchableOpacity,
 } from "react-native";
-import React from "react";
+import React, { useCallback, useMemo, useRef } from "react";
 import MainContPaw from "../../components/general/background_paw";
 import dimensions from "../../utils/sizing";
 import Icon from "react-native-vector-icons/FontAwesome";
@@ -19,9 +19,55 @@ import Spacer from "../../components/general/spacer";
 import { router } from "expo-router";
 import supabase from "../../utils/supabase";
 
+import BottomSheet, {
+  BottomSheetBackdrop,
+  BottomSheetView,
+} from "@gorhom/bottom-sheet";
+import { Portal } from "@gorhom/portal";
+
 const Profile = () => {
   const { session } = useSession();
   const { pets, fetchPets, addToPetContext, updatePetContext } = usePet();
+
+  const sheetRef = useRef<BottomSheet>(null);
+  const snapPoints = useMemo(() => ["33%"], []);
+  const openSheet = () => sheetRef.current?.expand();
+
+  const backDrop = useCallback(
+    (props: any) => (
+      <BottomSheetBackdrop
+        {...props}
+        appearsOnIndex={0}
+        disappearsOnIndex={-1}
+      />
+    ),
+    []
+  );
+
+  const handleSheetChange = (index: number) => {
+    if (index === 0) {
+      sheetRef.current?.close();
+    }
+  };
+
+  type SheetItemProps = {
+    title: string;
+    icon: keyof typeof Ionicons.glyphMap;
+    onPress?: () => void;
+    toRoute?: string;
+  };
+
+  const SheetItem = ({ title, icon, onPress, toRoute }: SheetItemProps) => {
+    return (
+      <TouchableOpacity onPress={onPress != null ? onPress : () => {sheetRef.current?.close(); router.push(toRoute ?? ''); } }>
+        <View style={bs.itemCont}>
+          <Ionicons name={icon} size={dimensions.screenWidth * 0.055} />
+          <Spacer width={dimensions.screenWidth * 0.025} />
+          <Text style={bs.itemTitle}>{title}</Text>
+        </View>
+      </TouchableOpacity>
+    );
+  };
 
   return (
     <MainContPaw>
@@ -48,7 +94,7 @@ const Profile = () => {
               />
             </TouchableOpacity>
             <Spacer width={dimensions.screenWidth * 0.02} />
-            <TouchableOpacity>
+            <TouchableOpacity onPress={openSheet}>
               <Ionicons
                 name="menu"
                 size={dimensions.screenWidth * 0.07}
@@ -123,6 +169,26 @@ const Profile = () => {
           </TouchableOpacity>
         </View>
       </View>
+      <Portal>
+        <BottomSheet
+          ref={sheetRef}
+          snapPoints={snapPoints}
+          index={-1}
+          enablePanDownToClose={true}
+          handleComponent={null}
+          backgroundStyle={{ backgroundColor: "transparent" }}
+          backdropComponent={backDrop}
+          onChange={handleSheetChange}
+        >
+          <BottomSheetView style={bs.mainCont}>
+            <SheetItem 
+              icon="settings-outline" 
+              title="Settings and Privacy" 
+              toRoute="../profile/settings"
+            />
+          </BottomSheetView>
+        </BottomSheet>
+      </Portal>
     </MainContPaw>
   );
 };
@@ -313,4 +379,26 @@ const styles = StyleSheet.create({
     right: dimensions.screenWidth * 0.04,
     bottom: dimensions.screenHeight * 0.02,
   },
+});
+
+const bs = StyleSheet.create({
+  mainCont: {
+    backgroundColor: 'white',
+    flex: 1,
+    borderTopLeftRadius: 15,
+    borderTopRightRadius: 15
+  },
+  itemCont: {
+    // backgroundColor: 'red',
+    paddingVertical: dimensions.screenHeight * 0.025,
+    borderBottomColor: '#bbb',
+    borderBottomWidth: .2,
+    marginHorizontal: dimensions.screenWidth * 0.05,
+    paddingHorizontal: dimensions.screenWidth * 0.01,
+    flexDirection: 'row'
+  },
+  itemTitle: {
+    fontSize: dimensions.screenWidth * 0.042,
+    fontFamily: 'Poppins-Medium'
+  }
 });

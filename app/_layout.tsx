@@ -15,6 +15,8 @@ import { CartProvider } from "./context/cart_context";
 import Providers from "./context/context_handler";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { PortalProvider } from "@gorhom/portal";
+import { TouchableOpacity, View } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
 
 const RootLayout = () => {
   const fontsLoaded = useCustomFonts();
@@ -266,6 +268,41 @@ const RootLayout = () => {
               />
               <Stack.Screen
                 name="screens/admin/petcare/manage_petcare"
+                options={{ headerShown: false }}
+              />
+              <Stack.Screen
+                name="screens/profile/settings"
+                options={{
+                  headerBackButtonDisplayMode: "minimal",
+                  headerBackVisible: false,
+                  headerLeft: () => (
+                    <TouchableOpacity onPress={() => router.back()}>
+                      <Ionicons
+                        name="arrow-back"
+                        size={dimensions.screenWidth * 0.06}
+                        color="#000"
+                        style={{
+                          marginLeft: dimensions.screenWidth * 0.0
+                        }}
+                      />
+                    </TouchableOpacity>
+                  ),
+                }}
+              />
+              <Stack.Screen
+                name="screens/tips/training"
+                options={{ headerShown: false }}
+              />
+              <Stack.Screen
+                name="screens/tips/nutrition"
+                options={{ headerShown: false }}
+              />
+              <Stack.Screen
+                name="screens/tips/health"
+                options={{ headerShown: false }}
+              />
+              <Stack.Screen
+                name="screens/tips/grooming"
                 options={{ headerShown: false }}
               />
             </Stack>

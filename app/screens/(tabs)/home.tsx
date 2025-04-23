@@ -293,15 +293,6 @@ const Home = () => {
               )}
             />
           </View>
-
-          <Button1
-            title="Force Logout"
-            isPrimary={true}
-            onPress={async () => {
-              await supabase.auth.signOut();
-              router.replace("../auth/sign_in");
-            }}
-          />
         </View>
       </View>
       <Portal>

@@ -12,12 +12,14 @@ import { usePet } from '../../context/pet_context'
 import { useGrooming } from '../../context/grooming_context'
 import SvgValue from '../../hooks/fetchSvg'
 import TitleValue from '../../components/list/title_value'
+import { useReviewRatings } from '../../context/review_ratings_context'
 
 
 const PreviewGrooming = () => {
   const { booking } = useLocalSearchParams();
   const { pets } = usePet();
   const { groomings } = useGrooming();
+  const { ratings } = useReviewRatings();
 
   const parsedBooking = booking ? JSON.parse(booking as string) as Booking : null;
 
@@ -27,7 +29,6 @@ const PreviewGrooming = () => {
     <View style={{ flex: 1, height: '100%', position: 'relative', width: '100%' }}>
       <MainContPlain scrollEnabled={true}>
         <View style={general.header}>
-
         </View>
         {/* <Text style={{  backgroundColor: 'green' }}>PreviewGrooming</Text> */}
         <View style={body.main}>
@@ -188,6 +189,11 @@ const PreviewGrooming = () => {
         </TouchableOpacity>
         <Ionicons name='ellipsis-horizontal' size={dimensions.screenWidth * 0.05} color="#fff" />
       </View>
+      <View style={general.buttonMainCont}>
+        <TouchableOpacity onPress={() => { }} style={general.buttonReview}>
+          <Text style={general.buttonText1}>Add a Review  ⭐</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   )
 }
@@ -204,8 +210,7 @@ const general = StyleSheet.create({
     left: 0,
     right: 0,
     alignItems: 'center',
-    top: dimensions.screenHeight * 0.035,
-    // backgroundColor: 'red',
+    top: dimensions.screenHeight * 0.07,
     paddingHorizontal: dimensions.screenWidth * 0.05
   },
   header: {
@@ -213,6 +218,29 @@ const general = StyleSheet.create({
     width: '100%',
     height: dimensions.screenHeight * 0.32
   },
+
+  // BOTTOM BUTTON
+  buttonMainCont: {
+    position: 'absolute',
+    bottom: dimensions.screenHeight * 0.05,
+    left: 0,
+    right: 0,
+    // backgroundColor: 'red',
+    alignItems: 'center',
+    width: dimensions.screenWidth
+  },
+  buttonReview: {
+    backgroundColor: '#466AA2',
+    paddingVertical: dimensions.screenHeight * 0.015,
+    width: dimensions.screenWidth * 0.88,
+    alignItems: 'center',
+    borderRadius: 15
+  },
+  buttonText1: {
+    color: 'white',
+    fontFamily: 'Poppins-SemiBold',
+    fontSize: dimensions.screenWidth * 0.044
+  }
 });
 
 const body = StyleSheet.create({
@@ -315,5 +343,5 @@ const floating = StyleSheet.create({
     fontSize: dimensions.screenWidth * 0.033,
     color: 'white',
     lineHeight: dimensions.screenWidth * 0.05
-  }
+  },
 });

@@ -8,6 +8,7 @@ import { GroomingProvider } from './grooming_context';
 import { BookingProvider } from './booking_context';
 import { OrderProvider } from './order_context';
 import { GlobalBookingProvider } from './global_booking_context';
+import { ReviewRatingsProvider } from './review_ratings_context';
 
 interface ProvidersProps {
   children: React.ReactNode;
@@ -22,11 +23,13 @@ const Providers: React.FC<ProvidersProps> = ({ children }) => {
             <GlobalBookingProvider>
               <BookingProvider>
                 <OrderProvider>
-                  <CartProvider>
-                    <PetProvider>
-                      {children}
-                    </PetProvider>
-                  </CartProvider>
+                  <ReviewRatingsProvider>
+                    <CartProvider>
+                      <PetProvider>
+                        {children}
+                      </PetProvider>
+                    </CartProvider>
+                  </ReviewRatingsProvider>
                 </OrderProvider>
               </BookingProvider>
             </GlobalBookingProvider>
