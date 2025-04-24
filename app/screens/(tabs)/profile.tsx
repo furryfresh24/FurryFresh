@@ -5,12 +5,12 @@ import {
   Image,
   TextInput,
   TouchableOpacity,
+  ScrollView,
 } from "react-native";
 import React, { useCallback, useMemo, useRef, useState } from "react";
 import MainContPaw from "../../components/general/background_paw";
 import dimensions from "../../utils/sizing";
 import Icon from "react-native-vector-icons/FontAwesome";
-import Subtitle1 from "../../components/texts/subtitle1";
 import { usePet } from "../../context/pet_context";
 import { useSession } from "../../context/sessions_context";
 import moment from "moment";
@@ -21,18 +21,25 @@ import * as ImagePicker from 'expo-image-picker';
 import * as FileSystem from 'expo-file-system';
 import { Buffer } from 'buffer';
 import supabase from "../../utils/supabase";
-
 import BottomSheet, {
   BottomSheetBackdrop,
   BottomSheetView,
 } from "@gorhom/bottom-sheet";
 import { Portal } from "@gorhom/portal";
 
+// Define a type for Comment
+type Comment = {
+  text: string;
+  date: string;
+};
+
 const Profile = () => {
   const { session } = useSession();
-  const { pets, fetchPets, addToPetContext, updatePetContext } = usePet();
+  const { pets } = usePet();
   const [image, setImage] = useState<string | null>(null);
   const [isLoading, setLoading] = useState(false);
+  const [comments, setComments] = useState<Comment[]>([]);
+  const [currentComment, setCurrentComment] = useState("");
 
   const sheetRef = useRef<BottomSheet>(null);
   const snapPoints = useMemo(() => ["33%"], []);
@@ -46,8 +53,6 @@ const Profile = () => {
       quality: 1,
     });
 
-    console.log(result);
-
     if (!result.canceled) {
       setImage(result.assets[0].uri);
       await uploadImage(result.assets[0].uri);
@@ -57,36 +62,34 @@ const Profile = () => {
   const uploadImage = async (uri: string) => {
     try {
       setLoading(true);
-      
       if (!session?.user?.id) throw new Error("No user ID");
-      
+
       const response = await FileSystem.readAsStringAsync(uri, {
         encoding: FileSystem.EncodingType.Base64,
       });
       const fileBuffer = Buffer.from(response, 'base64');
-  
       const fileExt = uri.split('.').pop();
       const fileName = `user_${session.user.id}.${fileExt}`;
-      const filePath = `${session.user.id}/avatar/${fileName}`; // Path tied to the user ID
-  
+      const filePath = `${session.user.id}/avatar/${fileName}`;
+
       const { error: uploadError } = await supabase.storage
         .from('usersavatar')
         .upload(filePath, fileBuffer, {
           contentType: `image/${fileExt}`,
           upsert: true,
         });
-  
+
       if (uploadError) throw uploadError;
-  
+
       const { data } = supabase.storage.from('usersavatar').getPublicUrl(filePath);
       const photoUrl = data.publicUrl;
-  
+
       const { error: updateError } = await supabase.auth.updateUser({
-        data: { user_avatar: photoUrl } // Update the user's profile with the avatar URL
+        data: { user_avatar: photoUrl }
       });
-  
+
       if (updateError) throw updateError;
-  
+
       alert("Profile picture updated successfully!");
     } catch (error) {
       console.error("Error uploading image:", error);
@@ -113,6 +116,17 @@ const Profile = () => {
     }
   };
 
+  const addComment = () => {
+    if (currentComment.trim()) {
+      const newComment: Comment = {
+        text: currentComment,
+        date: moment().format('MMM DD, YYYY HH:mm'),
+      };
+      setComments([...comments, newComment]);
+      setCurrentComment("");
+    }
+  };
+
   type SheetItemProps = {
     title: string;
     icon: keyof typeof Ionicons.glyphMap;
@@ -122,7 +136,7 @@ const Profile = () => {
 
   const SheetItem = ({ title, icon, onPress, toRoute }: SheetItemProps) => {
     return (
-      <TouchableOpacity onPress={onPress != null ? onPress : () => {sheetRef.current?.close(); router.push(toRoute ?? ''); } }>
+      <TouchableOpacity onPress={onPress != null ? onPress : () => {sheetRef.current?.close(); router.push(toRoute ?? '');}}>
         <View style={bs.itemCont}>
           <Ionicons name={icon} size={dimensions.screenWidth * 0.055} />
           <Spacer width={dimensions.screenWidth * 0.025} />
@@ -170,9 +184,8 @@ const Profile = () => {
                   style={styles.profilePic} 
                 />
               ) : (
-                <Ionicons 
+                <Ionicons style={styles.profileIcon}
                   name="person" 
-                  style={{ alignSelf: 'center', alignContent: 'center', color: 'white' }} 
                   size={dimensions.screenWidth * 0.12} 
                 />
               )}
@@ -226,15 +239,26 @@ const Profile = () => {
           />
         </View>
         <View style={styles.inputContainer}>
-          <View style={styles.aboutInput}>
-            <Text style={styles.aboutPlaceholder}>
-              Say something about you as a pet owner...
-            </Text>
-          </View>
-          <TouchableOpacity style={styles.editIconButton}>
+          <TextInput
+            style={styles.aboutInput}
+            placeholder="Say something about you as a pet owner..."
+            value={currentComment}
+            onChangeText={setCurrentComment}
+            onSubmitEditing={addComment}
+            returnKeyType="done"
+          />
+          <TouchableOpacity style={styles.editIconButton} onPress={addComment}>
             <Icon name="edit" size={20} color="white" />
           </TouchableOpacity>
         </View>
+        <ScrollView style={styles.commentsContainer}>
+          {comments.map((comment, index) => (
+            <View key={index} style={styles.comment}>
+              <Text style={styles.commentText}>{comment.text}</Text>
+              <Text style={styles.commentDate}>{comment.date}</Text>
+            </View>
+          ))}
+        </ScrollView>
       </View>
       <Portal>
         <BottomSheet
@@ -259,8 +283,6 @@ const Profile = () => {
     </MainContPaw>
   );
 };
-
-export default Profile;
 
 const styles = StyleSheet.create({
   topContainer: {
@@ -288,9 +310,6 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
     flex: 1
   },
-  iconMargin: {
-    marginLeft: dimensions.screenHeight * 0.015,
-  },
   profileContainer: {
     alignItems: "center",
     marginBottom: dimensions.screenHeight * 0.014,
@@ -304,11 +323,16 @@ const styles = StyleSheet.create({
     width: dimensions.screenHeight * 0.18,
     height: dimensions.screenHeight * 0.18,
     alignItems: 'center',
-    display: 'flex',
-    justifyContent: 'center',
     backgroundColor: "#b1bfda",
     borderRadius: 100,
     overflow: 'hidden',
+  },
+  profileIcon: {
+    color: "white",
+    alignItems: "center",
+    flex: 1,
+    position: "absolute",
+    bottom: dimensions.screenHeight * 0.065,
   },
   cameraButton: {
     position: "absolute",
@@ -401,7 +425,6 @@ const styles = StyleSheet.create({
   },
   aboutHeader: {
     flexDirection: "row",
-    display: "flex",
     justifyContent: "center",
     alignItems: "center",
     backgroundColor: "#466AA2",
@@ -431,9 +454,22 @@ const styles = StyleSheet.create({
     paddingRight: dimensions.screenHeight * 0.05,
     marginTop: dimensions.screenHeight * 0.01,
   },
-  aboutPlaceholder: {
-    fontFamily: "Poppins-Regular",
-    color: "#808080",
+  commentsContainer: {
+    marginTop: dimensions.screenHeight * 0.01,
+    maxHeight: dimensions.screenHeight * 0.3,
+  },
+  comment: {
+    padding: 10,
+    borderBottomColor: "#ccc",
+    borderBottomWidth: 1,
+  },
+  commentText: {
+    fontSize: dimensions.screenWidth * 0.035,
+    color: "#333",
+  },
+  commentDate: {
+    fontSize: dimensions.screenWidth * 0.03,
+    color: "#888",
   },
   editIconButton: {
     backgroundColor: "#FF6F61",
@@ -454,18 +490,20 @@ const bs = StyleSheet.create({
     backgroundColor: 'white',
     flex: 1,
     borderTopLeftRadius: 15,
-    borderTopRightRadius: 15
+    borderTopRightRadius: 15,
   },
   itemCont: {
     paddingVertical: dimensions.screenHeight * 0.025,
     borderBottomColor: '#bbb',
-    borderBottomWidth: .2,
+    borderBottomWidth: 0.2,
     marginHorizontal: dimensions.screenWidth * 0.05,
     paddingHorizontal: dimensions.screenWidth * 0.01,
-    flexDirection: 'row'
+    flexDirection: 'row',
   },
   itemTitle: {
     fontSize: dimensions.screenWidth * 0.042,
-    fontFamily: 'Poppins-Medium'
-  }
+    fontFamily: 'Poppins-Medium',
+  },
 });
+
+export default Profile;
