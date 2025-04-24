@@ -250,7 +250,7 @@ const Home = () => {
             <View style={styles.cardContainer}>
               <Animated.View style={[styles.cardSide, styles.frontCard, frontAnimatedStyleTraining]}>
                 <Image
-                  source={require('../../assets/images/others/grooming.png')}
+                  source={require('../../assets/images/others/groomingTips.png')}
                   style={styles.trainingImage}
                   resizeMode="contain"
                 />
@@ -281,7 +281,7 @@ const Home = () => {
             <View style={styles.cardContainer}>
               <Animated.View style={[styles.cardSide, styles.frontCard, frontAnimatedStyleNutrition]}>
                 <Image
-                  source={require('../../assets/images/others/nutrition.png')}
+                  source={require('../../assets/images/others/nutritionTips.png')}
                   style={styles.nutritionImage}
                   resizeMode="contain"
                 />
@@ -314,7 +314,7 @@ const Home = () => {
     <View style={styles.cardContainer}>
       <Animated.View style={[styles.cardSide, styles.frontCard, frontAnimatedStyleHealth]}>
         <Image
-          source={require('../../assets/images/others/healthPet.png')}
+          source={require('../../assets/images/others/healthTips.png')}
           style={styles.nutritionImage}
           resizeMode="contain"
         />
@@ -345,7 +345,7 @@ const Home = () => {
     <View style={styles.cardContainer}>
       <Animated.View style={[styles.cardSide, styles.frontCard, frontAnimatedStyleGrooming]}>
         <Image
-          source={require('../../assets/images/others/training.png')}
+          source={require('../../assets/images/others/trainingTips.png')}
           style={styles.trainingImage}
           resizeMode="contain"
         />

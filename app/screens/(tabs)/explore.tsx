@@ -63,7 +63,7 @@ const Explore = () => {
 
               <View style={styles.colorBox}>
                 <Image
-                  source={require('../../assets/images/others/ball.png')}
+                  source={require('../../assets/images/others/features1.png')}
                   style={styles.colorBoxImage}
                   resizeMode="contain"
                 />
@@ -92,7 +92,7 @@ const Explore = () => {
 
               <View style={styles.colorBox}>
                 <Image
-                  source={require('../../assets/images/others/idea.png')}
+                  source={require('../../assets/images/others/features2.png')}
                   style={styles.colorBoxImage}
                   resizeMode="contain"
                 />
@@ -113,7 +113,7 @@ const Explore = () => {
               </View>
               <View style={styles.colorBox}>
                 <Image
-                  source={require('../../assets/images/others/show.png')}
+                  source={require('../../assets/images/others/features3.png')}
                   style={styles.colorBoxImage}
                   resizeMode="contain"
                 />
@@ -133,7 +133,7 @@ const Explore = () => {
               </View>
               <View style={styles.colorBox}>
                 <Image
-                  source={require('../../assets/images/others/health.png')}
+                  source={require('../../assets/images/others/features4.png')}
                   style={styles.colorBoxImage}
                   resizeMode="contain"
                 />

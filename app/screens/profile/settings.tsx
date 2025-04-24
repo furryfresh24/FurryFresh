@@ -4,7 +4,7 @@ import { router, useNavigation } from 'expo-router';
 import dimensions from "../../utils/sizing";
 import MainContPlain from '../../components/general/background_plain';
 import Spacer from '../../components/general/spacer';
-import { ChevronRight } from "lucide-react-native";
+// import { ChevronRight } from "lucide-react-native";
 import { Ionicons, Feather, MaterialIcons, FontAwesome5 } from "@expo/vector-icons";
 import supabase from '../../utils/supabase';
 import BottomSheet, { BottomSheetBackdrop, BottomSheetView } from "@gorhom/bottom-sheet";
@@ -102,7 +102,7 @@ const Settings: React.FC = () => {
         )}
         <Text style={styles.itemText}>{item.title}</Text>
       </View>
-      <ChevronRight size={dimensions.screenWidth * 0.05} color="#000" style={styles.chevronIcon} />
+      {/* <ChevronRight size={dimensions.screenWidth * 0.05} color="#000" style={styles.chevronIcon} /> */}
     </TouchableOpacity>
   );
 

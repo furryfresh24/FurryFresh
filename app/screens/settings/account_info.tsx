@@ -9,7 +9,7 @@ import {
 import { useNavigation } from "expo-router";
 import MainContPlain from "../../components/general/background_plain";
 import dimensions from "../../utils/sizing";
-import { ChevronRight } from "lucide-react-native";
+// import { ChevronRight } from "lucide-react-native";
 import { Ionicons } from "@expo/vector-icons";
 import supabase from "../../utils/supabase"; // Import supabase to access the user
 
@@ -67,11 +67,11 @@ const AccountInformationScreen = () => {
         <Text style={styles.itemValue}>{item.value}</Text>
         {item.note && <Text style={styles.itemNote}>{item.note}</Text>}
       </View>
-      <ChevronRight
+      {/* <ChevronRight
         size={dimensions.screenWidth * 0.05}
         color="#000"
         style={styles.chevronIcon}
-      />
+      /> */}
     </TouchableOpacity>
   );
 
