@@ -6,7 +6,7 @@ import {
   TextInput,
   TouchableOpacity,
 } from "react-native";
-import React, { useCallback, useMemo, useRef } from "react";
+import React, { useCallback, useMemo, useRef, useState } from "react";
 import MainContPaw from "../../components/general/background_paw";
 import dimensions from "../../utils/sizing";
 import Icon from "react-native-vector-icons/FontAwesome";
@@ -17,6 +17,10 @@ import moment from "moment";
 import { Ionicons } from "@expo/vector-icons";
 import Spacer from "../../components/general/spacer";
 import { router } from "expo-router";
+import * as ImagePicker from 'expo-image-picker';
+import * as FileSystem from 'expo-file-system';
+import { Buffer } from 'buffer';
+import supabase from "../../utils/supabase";
 
 import BottomSheet, {
   BottomSheetBackdrop,
@@ -27,10 +31,70 @@ import { Portal } from "@gorhom/portal";
 const Profile = () => {
   const { session } = useSession();
   const { pets, fetchPets, addToPetContext, updatePetContext } = usePet();
+  const [image, setImage] = useState<string | null>(null);
+  const [isLoading, setLoading] = useState(false);
 
   const sheetRef = useRef<BottomSheet>(null);
   const snapPoints = useMemo(() => ["33%"], []);
   const openSheet = () => sheetRef.current?.expand();
+
+  const pickImage = async () => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ['images'],
+      allowsEditing: true,
+      aspect: [4, 4],
+      quality: 1,
+    });
+
+    console.log(result);
+
+    if (!result.canceled) {
+      setImage(result.assets[0].uri);
+      await uploadImage(result.assets[0].uri);
+    }
+  };
+
+  const uploadImage = async (uri: string) => {
+    try {
+      setLoading(true);
+      
+      if (!session?.user?.id) throw new Error("No user ID");
+      
+      const response = await FileSystem.readAsStringAsync(uri, {
+        encoding: FileSystem.EncodingType.Base64,
+      });
+      const fileBuffer = Buffer.from(response, 'base64');
+  
+      const fileExt = uri.split('.').pop();
+      const fileName = `user_${session.user.id}.${fileExt}`;
+      const filePath = `${session.user.id}/avatar/${fileName}`; // Path tied to the user ID
+  
+      const { error: uploadError } = await supabase.storage
+        .from('usersavatar')
+        .upload(filePath, fileBuffer, {
+          contentType: `image/${fileExt}`,
+          upsert: true,
+        });
+  
+      if (uploadError) throw uploadError;
+  
+      const { data } = supabase.storage.from('usersavatar').getPublicUrl(filePath);
+      const photoUrl = data.publicUrl;
+  
+      const { error: updateError } = await supabase.auth.updateUser({
+        data: { user_avatar: photoUrl } // Update the user's profile with the avatar URL
+      });
+  
+      if (updateError) throw updateError;
+  
+      alert("Profile picture updated successfully!");
+    } catch (error) {
+      console.error("Error uploading image:", error);
+      alert("There was an error updating your profile picture.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const backDrop = useCallback(
     (props: any) => (
@@ -95,15 +159,29 @@ const Profile = () => {
         <View style={styles.profileContainer}>
           <View style={styles.profilePicContainer}>
             <View style={styles.profilePic}>
-              {
-                session?.user.user_metadata['avatar_url'] ? (
-                  <Image source={require("../../assets/images/general/pet-enjoy.png")} style={styles.profilePic} />
-                ) : (
-                  <Ionicons name="person" style={{ alignSelf: 'center', alignContent: 'center', color: 'white' }} size={dimensions.screenWidth * 0.12} />
-                )
-              }
+              {image ? (
+                <Image 
+                  source={{ uri: image }} 
+                  style={styles.profilePic} 
+                />
+              ) : session?.user.user_metadata['avatar_url'] ? (
+                <Image 
+                  source={{ uri: session.user.user_metadata.avatar_url }} 
+                  style={styles.profilePic} 
+                />
+              ) : (
+                <Ionicons 
+                  name="person" 
+                  style={{ alignSelf: 'center', alignContent: 'center', color: 'white' }} 
+                  size={dimensions.screenWidth * 0.12} 
+                />
+              )}
             </View>
-            <TouchableOpacity style={styles.cameraButton}>
+            <TouchableOpacity 
+              style={styles.cameraButton} 
+              onPress={pickImage}
+              disabled={isLoading}
+            >
               <Icon name="camera" size={20} color="black" />
             </TouchableOpacity>
           </View>
@@ -230,6 +308,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     backgroundColor: "#b1bfda",
     borderRadius: 100,
+    overflow: 'hidden',
   },
   cameraButton: {
     position: "absolute",
@@ -378,7 +457,6 @@ const bs = StyleSheet.create({
     borderTopRightRadius: 15
   },
   itemCont: {
-    // backgroundColor: 'red',
     paddingVertical: dimensions.screenHeight * 0.025,
     borderBottomColor: '#bbb',
     borderBottomWidth: .2,

@@ -1,0 +1,139 @@
+import React, { useLayoutEffect, useState, useEffect } from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  FlatList,
+  TouchableOpacity,
+} from "react-native";
+import { useNavigation } from "expo-router";
+import MainContPlain from "../../components/general/background_plain";
+import dimensions from "../../utils/sizing";
+import { ChevronRight } from "lucide-react-native";
+import { Ionicons } from "@expo/vector-icons";
+import supabase from "../../utils/supabase"; // Import supabase to access the user
+
+type UserInfoItem = {
+  id: string;
+  title: string;
+  value: string;
+  note?: string;
+  onPress?: () => void;
+};
+
+const AccountInformationScreen = () => {
+  const navigation = useNavigation();
+  const [userEmail, setUserEmail] = useState<string>("");
+
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      title: "Account Information", // Keep the title
+      headerBackTitleVisible: false, // This removes the back title text
+      headerTintColor: "black", // Back icon color
+      headerLeft: () => (
+        <TouchableOpacity onPress={() => navigation.goBack()}>
+          <Ionicons name="arrow-back" size={24} color="black" style={{ marginLeft: 0 }} />
+        </TouchableOpacity>
+      ),
+    });
+  }, [navigation]);
+
+  // Fetch the user's email from Supabase when the component mounts
+  useEffect(() => {
+    const fetchUserEmail = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        setUserEmail(user.email || "Not set"); // Set email or fallback to "Not set"
+      }
+    };
+
+    fetchUserEmail();
+  }, []);
+
+  const userInfo: UserInfoItem[] = [
+    { id: "1", title: "Phone number", value: "Not set" },
+    { id: "2", title: "Email", value: userEmail }, // Display the fetched email
+    { id: "3", title: "Date of birth", value: "Not set" },
+  ];
+
+  const renderItem = ({ item }: { item: UserInfoItem }) => (
+    <TouchableOpacity
+      style={styles.item}
+      onPress={item.onPress}
+      activeOpacity={item.onPress ? 0.6 : 1}
+    >
+      <View style={{ flex: 1 }}>
+        <Text style={styles.itemTitle}>{item.title}</Text>
+        <Text style={styles.itemValue}>{item.value}</Text>
+        {item.note && <Text style={styles.itemNote}>{item.note}</Text>}
+      </View>
+      <ChevronRight
+        size={dimensions.screenWidth * 0.05}
+        color="#000"
+        style={styles.chevronIcon}
+      />
+    </TouchableOpacity>
+  );
+
+  return (
+    <MainContPlain>
+      <View style={styles.container}>
+        <Text style={styles.sectionHeader}>Account</Text>
+        <View style={styles.card}>
+          <FlatList
+            data={userInfo}
+            renderItem={renderItem}
+            keyExtractor={(item) => item.id}
+            scrollEnabled={false}
+          />
+        </View>
+      </View>
+    </MainContPlain>
+  );
+};
+
+export default AccountInformationScreen;
+
+const styles = StyleSheet.create({
+  container: {
+    padding: dimensions.screenWidth * 0.04,
+    marginTop: 8,
+  },
+  sectionHeader: {
+    fontSize: dimensions.screenWidth * 0.038,
+    fontFamily: "Poppins-SemiBold",
+    color: "#a2a2a2",
+    paddingLeft: dimensions.screenHeight * 0.015,
+    marginBottom: dimensions.screenHeight * 0.01,
+  },
+  card: {
+    backgroundColor: "white",
+    borderRadius: 6,
+  },
+  item: {
+    padding: dimensions.screenHeight * 0.025,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  chevronIcon: {
+    marginLeft: 10,
+  },
+  itemTitle: {
+    fontSize: 14,
+    fontFamily: "Poppins-Regular",
+    color: "#666",
+  },
+  itemValue: {
+    fontSize: 16,
+    fontFamily: "Poppins-SemiBold",
+    marginTop: 2,
+  },
+  itemNote: {
+    fontSize: 12,
+    fontFamily: "Poppins-Regular",
+    color: "#999",
+    marginTop: 4,
+    maxWidth: "90%",
+  },
+});

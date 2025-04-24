@@ -1,16 +1,13 @@
-import React, { useCallback, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useLayoutEffect, useMemo, useRef } from 'react';
 import { StyleSheet, Text, View, FlatList, TouchableOpacity } from 'react-native';
 import { router, useNavigation } from 'expo-router';
 import dimensions from "../../utils/sizing";
 import MainContPlain from '../../components/general/background_plain';
 import Spacer from '../../components/general/spacer';
-// import { ChevronRight } from "lucide-react-native";
+import { ChevronRight } from "lucide-react-native";
 import { Ionicons, Feather, MaterialIcons, FontAwesome5 } from "@expo/vector-icons";
 import supabase from '../../utils/supabase';
-import BottomSheet, {
-  BottomSheetBackdrop,
-  BottomSheetView,
-} from "@gorhom/bottom-sheet";
+import BottomSheet, { BottomSheetBackdrop, BottomSheetView } from "@gorhom/bottom-sheet";
 import { Portal } from "@gorhom/portal";
 
 interface SettingOption {
@@ -50,7 +47,9 @@ const Settings: React.FC = () => {
       id: '1',
       title: 'Account',
       icon: <Feather name="user" size={20} color="#a2a2a2" />,
-      onPress: () => { },
+      onPress: () => {
+        router.push('../settings/account_info');
+      },
     },
     {
       id: '2',
@@ -103,7 +102,7 @@ const Settings: React.FC = () => {
         )}
         <Text style={styles.itemText}>{item.title}</Text>
       </View>
-      {/* <ChevronRight size={dimensions.screenWidth * 0.05} color="#000" style={styles.chevronIcon} /> */}
+      <ChevronRight size={dimensions.screenWidth * 0.05} color="#000" style={styles.chevronIcon} />
     </TouchableOpacity>
   );
 
@@ -172,7 +171,6 @@ const Settings: React.FC = () => {
             </TouchableOpacity>
           </BottomSheetView>
         </BottomSheet>
-
       </Portal>
     </MainContPlain>
   );
@@ -225,13 +223,13 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
     borderTopLeftRadius: 16,
     borderTopRightRadius: 16,
-    width: '100%', // Ensure the container takes full width
+    width: '100%',
   },
   sheetBtn: {
-    width: '100%', // Make sure the button spans the full width of the container
+    width: '100%',
     paddingVertical: 14,
-    borderTopWidth: 2, // Border is applied to the top edge of each button
-    borderTopColor: '#eee', // Light color for the top border
+    borderTopWidth: 2,
+    borderTopColor: '#eee',
     alignItems: 'center',
   },
   logoutText: {
@@ -245,4 +243,4 @@ const styles = StyleSheet.create({
     color: 'black',
   },
 });
-  
+
