@@ -24,35 +24,35 @@ const tips = [
     title: "Balanced Diet",
     text:
       "Provide a balanced diet that includes proteins, fats, carbohydrates, vitamins, and minerals tailored to your pet’s age and breed.",
-    image: require("../../assets/images/others/diet.png"),
+    image: require("../../assets/images/others/nutritionTips1.png"),
   },
   {
     id: 2,
     title: "Portion Control",
     text:
       "Follow feeding guidelines on pet food packaging to avoid overfeeding and maintain a healthy weight.",
-    image: require("../../assets/images/others/portion.png"),
+    image: require("../../assets/images/others/nutritionTips2.png"),
   },
   {
     id: 3,
     title: "Fresh Water",
     text:
       "Ensure your pet has access to fresh, clean water at all times to stay hydrated.",
-    image: require("../../assets/images/others/water.png"),
+    image: require("../../assets/images/others/nutritionTips3.png"),
   },
   {
     id: 4,
     title: "Limit Treats",
     text:
       "Use treats sparingly and opt for healthy options to avoid excessive calorie intake.",
-    image: require("../../assets/images/others/treats.png"),
+    image: require("../../assets/images/others/nutritionTips4.png"),
   },
   {
     id: 5,
     title: "Consult Your Vet",
     text:
       "Regularly discuss your pet’s diet with your veterinarian, especially when making changes or if your pet has specific health needs.",
-    image: require("../../assets/images/others/vet.png"),
+    image: require("../../assets/images/others/nutritionTips5.png"),
   },
 ];
 

@@ -24,35 +24,35 @@ const tips = [
     title: "Bathing Frequency",
     text:
       "Bathe your pet as needed, typically every 4-6 weeks, to maintain a clean coat without stripping natural oils.",
-    image: require("../../assets/images/others/bathing.png"),
+    image: require("../../assets/images/others/groomingTips1.png"),
   },
   {
     id: 2,
     title: "Nail Trimming",
     text:
       "Trim your pet’s nails every 3-4 weeks to prevent discomfort and injury. Use proper tools and be cautious of the quick.",
-    image: require("../../assets/images/others/trimming.png"),
+    image: require("../../assets/images/others/groomingTips2.png"),
   },
   {
     id: 3,
     title: "Regular Brushing",
     text:
       "Brush your pet’s coat at least once a week to prevent mats and tangles, especially for long-haired breeds.",
-    image: require("../../assets/images/others/brushingHair.png"),
+    image: require("../../assets/images/others/groomingTips3.png"),
   },
   {
     id: 4,
     title: "Ear Cleaning",
     text:
       "Check and clean your pet’s ears weekly to prevent infections. Use a vet-recommended ear cleaner and cotton balls..",
-    image: require("../../assets/images/others/ear.png"),
+    image: require("../../assets/images/others/groomingTips4.png"),
   },
   {
     id: 5,
     title: "Dental Care",
     text:
       "Brush your pet’s teeth regularly, ideally daily, to prevent dental diseases. Consider dental chews for additional care.",
-    image: require("../../assets/images/others/dental.png"),
+    image: require("../../assets/images/others/groomingTips5.png"),
   },
 ];
 
