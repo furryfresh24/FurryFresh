@@ -295,6 +295,10 @@ const RootLayout = () => {
                 name="screens/tips/grooming"
                 options={{ headerShown: false }}
               />
+              <Stack.Screen
+                name="screens/minigame/minigame"
+                options={{ headerShown: false }}
+              />
             </Stack>
           </PortalProvider>
         </GestureHandlerRootView>

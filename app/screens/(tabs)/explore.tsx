@@ -106,7 +106,7 @@ const Explore = () => {
           </TouchableOpacity>
 
           {/* Pet Show Contest */}
-          <TouchableOpacity onPress={() => showComingSoon('Pet Show Contest')}>
+          <TouchableOpacity onPress={() => router.push('../minigame/minigame')}>
             <View style={styles.innerBox}>
               <View style={styles.indicator}>
                 <Text style={styles.indicatorText}>COMING SOON!</Text>
