@@ -56,6 +56,8 @@ const Explore = () => {
 
             if (showGetStarted) {
               router.push('../playdate/getstarted');
+            } else {
+              router.push('../playdate/home');
             }
 
           }}>
