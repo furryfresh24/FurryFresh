@@ -47,9 +47,57 @@ const Home = () => {
     [fetchedPets]
   );
 
-  const swiped = (direction: string, idToDelete: string) => {
-    console.log('removing: ' + idToDelete + ' to the ' + direction)
+  const swiped = async (direction: string, idToDelete: string) => {
+    const storeRemovedForAWhile = fetchedPets.find((pet) => pet.id == idToDelete);
+    console.log('removing: ' + idToDelete + ' to the ' + direction);
+    alreadyRemoved.current.push(idToDelete);
+  
+    if (direction === 'right') {
+      const { data: insertedMatch, error } = await supabase
+        .from('playdate_matches')
+        .insert({
+          user_id: session?.user.id,
+          used_pet_id: selectedPet?.id,
+          to_match_pet_id: idToDelete,
+          created_at: new Date()
+        })
+        .select();
+  
+      if (error) {
+        console.error('Error inserting match:', error);
+        return;
+      }
+  
+      const { data: mutualMatch, error: mutualError } = await supabase
+        .from('playdate_matches')
+        .select()
+        .eq('used_pet_id', idToDelete)   
+        .eq('to_match_pet_id', selectedPet?.id)
+        .single(); 
+  
+      if (mutualError && mutualError.code !== 'PGRST116') { 
+        console.error('Error checking for mutual match:', mutualError);
+        return;
+      }
+  
+      if (mutualMatch) {
+        console.log('Mutual match found! 🎉', mutualMatch);
+        router.push({
+          pathname: './matched',
+          params: {
+            mutualMath: JSON.stringify(mutualMatch),
+            insertedMatch: JSON.stringify(insertedMatch),
+            usedPet: JSON.stringify(selectedPet),
+            matchedPet: JSON.stringify(storeRemovedForAWhile)
+          }
+        });
+      } else {
+        console.log('No match found!');
+
+      } 
+    }
   };
+  
 
   const swipe = async (dir: 'left' | 'right') => {
     const cardsLeft = fetchedPets.filter((pet) => !alreadyRemoved.current.includes(pet.id));
@@ -86,35 +134,57 @@ const Home = () => {
   };
 
   const handlePress = () => router.push('../../screens/(tabs)/home');
-  const closeModal = () => setModalVisible(false);
 
+  const fetchPets = useCallback(async () => {
+    // First: Get all pet IDs that the selectedPet has already swiped right on
+    const { data: matchesMade, error: matchesError } = await supabase
+      .from('playdate_matches')
+      .select('to_match_pet_id')
+      .eq('used_pet_id', selectedPet?.id);
+  
+    if (matchesError) {
+      console.error('Error fetching matches:', matchesError);
+      return;
+    }
+  
+    const alreadyMatchedIds = matchesMade?.map(match => match.to_match_pet_id) || [];
+  
+    // Then: Fetch pets excluding pets already matched
+    const { data, error } = await supabase
+      .from('pets')
+      .select()
+      .eq('is_playdate_allowed', true)
+      .neq('user_id', session?.user.id)
+      .not('id', 'in', `(${alreadyMatchedIds.join(',')})`); // Exclude already matched
+  
+    if (error) {
+      console.error('Error fetching pets:', error);
+      return;
+    }
+  
+    if (data) {
+      setFetchedPets(data as Pets[]);
+      alreadyRemoved.current = [];
+    }
+  }, [selectedPet, session?.user.id]);
+  
+
+  // on startup
   useEffect(() => {
     if (!isStartUp) {
-      setStartUp(true);
-      const fetchPets = async () => {
-        const { data, error } = await supabase
-          .from('pets')
-          .select()
-          .eq('is_playdate_allowed', true)
-          .neq('user_id', session?.user.id);
-        if (data) {
-          setFetchedPets(data as Pets[]);
-        }
-        if (error) {
-          console.error(error);
-        }
-      };
+    }
+  }, [fetchPets]);
+
+  // when selectedPet changes
+  useEffect(() => {
+    if (selectedPet) {
+      alreadyRemoved.current = [];
+      setFetchedPets([]); // Clear old pets first
       fetchPets();
     }
-  }, []);
-
-  useEffect(() => {
-    // Remove the selected pet from the list
-    setFetchedPets((prevPets) => prevPets.filter((p) => p.id !== selectedPet?.id));
-
-    // Clear swiped pets
-    alreadyRemoved.current.length = 0;
   }, [selectedPet]);
+
+  
 
   useEffect(() => {
     if (selectedPet === null) {
@@ -217,7 +287,9 @@ const Home = () => {
               resizeMode="contain"
             />
           </TouchableOpacity>
-          <TouchableOpacity style={styles.checkContainer} onPress={() => swipe('right')}>
+          <TouchableOpacity style={styles.checkContainer} onPress={() => {
+            swipe('right');
+          }}>
             <Image
               source={require('../../assets/images/others/check.png')}
               style={styles.checkImage}

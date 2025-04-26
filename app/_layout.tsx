@@ -303,6 +303,13 @@ const RootLayout = () => {
                 name="screens/playdate/playdate-setup/select_pets"
                 options={{ headerShown: false }}
               />
+              <Stack.Screen
+                name="screens/playdate/matched"
+                options={{ 
+                  headerShown: false,
+                  animation: 'fade'
+                }}
+              />
             </Stack>
           </PortalProvider>
         </GestureHandlerRootView>
