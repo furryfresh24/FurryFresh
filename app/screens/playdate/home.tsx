@@ -28,7 +28,8 @@ const screenWidth = dimensions.screenWidth;
 const screenHeight = dimensions.screenHeight;
 
 const Home = () => {
-  const alreadyRemoved: string[] = [];
+  const alreadyRemoved = useRef<string[]>([]);
+
   const router = useRouter();
   const { session } = useSession();
   const { pets } = usePet();
@@ -37,7 +38,6 @@ const Home = () => {
   const [fetchedPets, setFetchedPets] = useState<Pets[]>([]);
   const [selectedPet, setSelectedPet] = useState<Pets | null>(null);
   const sheetRef = useRef<BottomSheet>(null);
-  const [isOpen, setIsOpen] = useState(true);
   const snapPoints = useMemo(() => ["50%"], []);
   const childRefs = useMemo(
     () =>
@@ -52,11 +52,11 @@ const Home = () => {
   };
 
   const swipe = async (dir: 'left' | 'right') => {
-    const cardsLeft = fetchedPets.filter((pet) => !alreadyRemoved.includes(pet.id));
+    const cardsLeft = fetchedPets.filter((pet) => !alreadyRemoved.current.includes(pet.id));
     if (cardsLeft.length) {
       const toBeRemoved = cardsLeft[cardsLeft.length - 1].id;
       const index = fetchedPets.map(pet => pet.id).indexOf(toBeRemoved);
-      alreadyRemoved.push(toBeRemoved);
+      alreadyRemoved.current.push(toBeRemoved);
       await childRefs[index]?.current?.swipe(dir);
     }
   };
@@ -109,6 +109,14 @@ const Home = () => {
   }, []);
 
   useEffect(() => {
+    // Remove the selected pet from the list
+    setFetchedPets((prevPets) => prevPets.filter((p) => p.id !== selectedPet?.id));
+
+    // Clear swiped pets
+    alreadyRemoved.current.length = 0;
+  }, [selectedPet]);
+
+  useEffect(() => {
     if (selectedPet === null) {
       setTimeout(function () {
         openSheet();
@@ -134,16 +142,19 @@ const Home = () => {
             </View>
           </View>
           <View>
-            <Image 
-              source={{ uri: selectedPet?.pet_avatar }}
-              style={{ 
-                width: dimensions.screenWidth * 0.14, 
-                height: dimensions.screenWidth * 0.14, 
-                borderRadius: 100,
-                borderColor: 'white',
-                borderWidth: 2
-              }}
-            />
+            <TouchableOpacity onPress={() => openSheet()}>
+              <Image
+                source={{ uri: selectedPet?.pet_avatar ?? '' }}
+                style={{
+                  width: dimensions.screenWidth * 0.14,
+                  height: dimensions.screenWidth * 0.14,
+                  borderRadius: 100,
+                  borderColor: 'white',
+                  borderWidth: 2,
+                  backgroundColor: '#d1d1d1'
+                }}
+              />
+            </TouchableOpacity>
           </View>
         </View>
 
