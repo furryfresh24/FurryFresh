@@ -42,6 +42,7 @@ import { useSubcategory } from "../../context/subcategory_context";
 import { useGrooming } from "../../context/grooming_context";
 import Subcategories from "../../interfaces/subcategories";
 import { Grooming } from "../../interfaces/grooming";
+import { useSession } from "../../context/sessions_context";
 
 type Service = {
   id: number;
@@ -96,6 +97,8 @@ const vouchers: Voucher[] = [
 ];
 
 const Home = () => {
+  const { session } = useSession();
+
   const sheetRef = useRef<BottomSheet>(null);
   const [isOpen, setIsOpen] = useState(true);
   const [selectedGrooming, setSelectedGrooming] = useState<Subcategories>();
@@ -114,7 +117,6 @@ const Home = () => {
   );
 
   const [activeService, setActiveService] = useState<number | string>(1);
-  const [session, setSession] = useState<Session | null>(null);
 
   const { categories, loading: loadingCategories } = useCategory();
   const { subcategories, loading: loadingSubcategories } = useSubcategory();
@@ -136,15 +138,6 @@ const Home = () => {
       sheetRef.current?.close();
     }
   };
-
-  useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-    });
-    supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
-    });
-  }, []);
 
   return (
     <MainContPlain paddingHorizontal={0}>
@@ -823,12 +816,12 @@ export const homeOptions = {
   header: (session: Session | null) => (
     <View style={styles.header}>
       <View style={styles.headerLeft}>
-        <View style={styles.profileImage}>
+        <View style={[styles.profileImage]}>
           {
             session?.user.user_metadata['avatar_url'] ? (
               <Image
-                source={require("../../assets/images/general/pet-enjoy.png")}
-                style={styles.profileImage}
+                source={{ uri: session?.user.user_metadata['avatar_url'] }}
+                style={[styles.profileImage, { marginRight: 0 }]}
               />
             ) : (
               <Ionicons name="person" style={{ alignSelf: 'center', alignContent: 'center', color: 'white' }} size={dimensions.screenWidth * 0.05} />

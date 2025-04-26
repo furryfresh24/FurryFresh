@@ -55,20 +55,39 @@ const Home = () => {
   const openModal = () => setModalVisible(true);
   const closeModal = () => setModalVisible(false);
 
+  const pets = [
+    {
+      name: 'Corki',
+      breed: 'Dog, Corgi',
+      image: require('../../assets/images/others/corki.png'),
+      genderIcon: require('../../assets/images/others/male.png'),
+    },
+    {
+      name: 'Putot',
+      breed: 'Dog, Golden Retriever',
+      image: require('../../assets/images/others/putot.png'),
+      genderIcon: require('../../assets/images/others/male.png'),
+    },
+    // Add more pets here easily!
+  ];
+
+
   return (
     <View style={styles.container}>
       {/* Home Button */}
       <View style={styles.topLeftWrapper}>
-        <TouchableOpacity style={styles.coloredBox} onPress={handlePress}>
-          <Image
-            source={require('../../assets/images/others/home.png')}
-            style={styles.homeIcon}
-            resizeMode="contain"
-          />
-        </TouchableOpacity>
-        <View style={styles.textContainer}>
-          <Text style={styles.backText}>Back to Home</Text>
-          <Text style={styles.pageText}>Page</Text>
+        <View style={{ flexDirection: 'row' }}>
+          <TouchableOpacity style={styles.coloredBox} onPress={handlePress}>
+            <Image
+              source={require('../../assets/images/others/home.png')}
+              style={styles.homeIcon}
+              resizeMode="contain"
+            />
+          </TouchableOpacity>
+          <View style={styles.textContainer}>
+            <Text style={styles.backText}>Back to Home</Text>
+            <Text style={styles.pageText}>Page</Text>
+          </View>
         </View>
       </View>
 
@@ -81,53 +100,38 @@ const Home = () => {
       <View style={styles.line} />
 
       {/* Animated White Containers */}
-      <Animated.View style={[styles.whiteContainer, { transform: [{ translateX: firstAnim }] }]}>
-        <Image
-          source={require('../../assets/images/others/corki.png')}
-          style={styles.corkiImage}
-          resizeMode="contain"
-        />
-        <View style={styles.infoRow}>
-          <View>
-            <Text style={styles.containerTitle}>Corki</Text>
-            <Text style={styles.containerSubtitle}>Dog, Corgi</Text>
-          </View>
+      {pets.map((pet, index) => (
+        <Animated.View
+          key={index}
+          style={[
+            styles.whiteContainer,
+            {
+              position: index === 0 ? 'relative' : 'absolute',
+              top: index === 0 ? undefined : 230,
+              alignSelf: 'center',
+              transform: [{ translateX: index === 0 ? firstAnim : secondAnim }],
+            },
+          ]}
+        >
           <Image
-            source={require('../../assets/images/others/male.png')}
-            style={styles.genderIcon}
+            source={pet.image}
+            style={styles.corkiImage}
             resizeMode="contain"
           />
-        </View>
-      </Animated.View>
+          <View style={styles.infoRow}>
+            <View>
+              <Text style={styles.containerTitle}>{pet.name}</Text>
+              <Text style={styles.containerSubtitle}>{pet.breed}</Text>
+            </View>
+            <Image
+              source={pet.genderIcon}
+              style={styles.genderIcon}
+              resizeMode="contain"
+            />
+          </View>
+        </Animated.View>
+      ))}
 
-      <Animated.View
-        style={[
-          styles.whiteContainer,
-          {
-            position: 'absolute',
-            top: 230,
-            alignSelf: 'center',
-            transform: [{ translateX: secondAnim }],
-          },
-        ]}
-      >
-        <Image
-          source={require('../../assets/images/others/putot.png')}
-          style={styles.corkiImage}
-          resizeMode="contain"
-        />
-        <View style={styles.infoRow}>
-          <View>
-            <Text style={styles.containerTitle}>Putot</Text>
-            <Text style={styles.containerSubtitle}>Dog, Golden Retriever</Text>
-          </View>
-          <Image
-            source={require('../../assets/images/others/male.png')}
-            style={styles.genderIcon}
-            resizeMode="contain"
-          />
-        </View>
-      </Animated.View>
 
       {/* Details Box */}
       <View style={styles.detailsContainer}>
@@ -211,6 +215,7 @@ const styles = StyleSheet.create({
   topLeftWrapper: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'space-between'
   },
   coloredBox: {
     width: 55,

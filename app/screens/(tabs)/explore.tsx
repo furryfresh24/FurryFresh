@@ -15,9 +15,11 @@ import dimensions from '../../utils/sizing';
 import { useSession } from '../../context/sessions_context';
 import { Ionicons } from '@expo/vector-icons';
 import useCustomFonts from '../../hooks/useFonts';
+import { usePet } from '../../context/pet_context';
 
 
 const Explore = () => {
+  const { pets } = usePet();
   const { session } = useSession();
   const navigation = useNavigation();
   const router = useRouter();
@@ -48,7 +50,15 @@ const Explore = () => {
           <Text style={styles.text}>Other App Features</Text>
 
           {/* FurryFresh Play Date */}
-          <TouchableOpacity onPress={() => router.push('../playdate/getstarted')}>
+          <TouchableOpacity onPress={() => {
+
+            const showGetStarted = (pets.filter((pet) => pet.is_playdate_allowed).length == 0);
+
+            if (showGetStarted) {
+              router.push('../playdate/getstarted');
+            }
+
+          }}>
             <View style={styles.innerBox}>
               <View style={styles.indicator}>
                 <View style={styles.indicatorContent}>
@@ -76,8 +86,8 @@ const Explore = () => {
             </View>
           </TouchableOpacity>
 
-            {/* Pet Care Tips */}
-            <TouchableOpacity onPress={() => router.push('../tips/getstarted')}>
+          {/* Pet Care Tips */}
+          <TouchableOpacity onPress={() => router.push('../tips/getstarted')}>
             <View style={styles.innerBox}>
               <View style={styles.indicator}>
                 <View style={styles.indicatorContent}>

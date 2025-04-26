@@ -299,6 +299,10 @@ const RootLayout = () => {
                 name="screens/minigame/minigame"
                 options={{ headerShown: false }}
               />
+              <Stack.Screen
+                name="screens/playdate/playdate-setup/select_pets"
+                options={{ headerShown: false }}
+              />
             </Stack>
           </PortalProvider>
         </GestureHandlerRootView>

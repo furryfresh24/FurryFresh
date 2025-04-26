@@ -7,6 +7,7 @@ interface Pets {
     pet_type: string;
     gender: string;
     weight?: number;
+    is_playdate_allowed: boolean;
     breed: string;
     birthday: Date;
     size?: string;

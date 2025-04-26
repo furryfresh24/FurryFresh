@@ -85,7 +85,9 @@ const Profile = () => {
       const photoUrl = data.publicUrl;
 
       const { error: updateError } = await supabase.auth.updateUser({
-        data: { user_avatar: photoUrl }
+        data: { 
+          'avatar_url': photoUrl 
+        }
       });
 
       if (updateError) throw updateError;

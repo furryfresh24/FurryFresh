@@ -87,7 +87,12 @@ const GetStarted = () => {
       {/* Get Started Button */}
       <TouchableOpacity
         style={styles.getStartedBox}
-        onPress={() => router.push('../playdate/home')} 
+        onPress={() => {
+
+          router.push('./playdate-setup/select_pets')
+          
+          // router.push('../playdate/home')
+        }} 
       >
         <Text style={styles.getStartedText}>Get Started</Text>
         <Image
