@@ -9,6 +9,7 @@ import { BookingProvider } from './booking_context';
 import { OrderProvider } from './order_context';
 import { ConversationsProvider } from '../realtime/conversations';
 import { MessagesProvider } from '../realtime/messages';
+import { TypingProvider } from '../realtime/typing-status';
 
 interface ProvidersProps {
   children: React.ReactNode;
@@ -26,7 +27,9 @@ const Providers: React.FC<ProvidersProps> = ({ children }) => {
                   <PetProvider>
                     <ConversationsProvider>
                       <MessagesProvider>
-                        {children}
+                        <TypingProvider>
+                          {children}
+                        </TypingProvider>
                       </MessagesProvider>
                     </ConversationsProvider>
                   </PetProvider>
