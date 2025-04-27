@@ -42,7 +42,7 @@ const Home = () => {
   const [allSwiped, setAllSwiped] = useState(false);
   const [selectedPet, setSelectedPet] = useState<Pets | null>(null);
   const selectPetRef = useRef<BottomSheet>(null);
-  const selectPetSnapPoints = useMemo(() => ["60%"], []);
+  const selectPetSnapPoints = useMemo(() => ["50%"], []);
 
   const petDetailsRef = useRef<BottomSheet>(null);
   const petDetailsSnapPoints = useMemo(() => ["80%"], []);
@@ -331,7 +331,7 @@ const Home = () => {
                 resizeMode="contain"
               />
               <View style={styles.infoRow}>
-                <View>
+                <View style={{flex: 1 }}>
                   <Text numberOfLines={2} style={styles.containerTitle}>
                     {pet.name.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')}
                   </Text>
@@ -443,6 +443,7 @@ const Home = () => {
             </View>
             <FlatList
               data={filterMyPetsData()}
+              style={{ flex: 1 ,  }}
               renderItem={({ item, index }) => (
                 <TouchableOpacity
                   style={styles.petItemCont}
@@ -752,7 +753,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     width: '100%',
-    alignItems: 'flex-end',
+    alignItems: 'center',
   },
   containerTitle: {
     fontSize: 20,
