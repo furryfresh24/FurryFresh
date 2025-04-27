@@ -13,7 +13,7 @@ const MessageScreen = () => {
     const { pets } = usePet();
     const { session } = useSession();
     const { newMessages, sendMessage, markMessagesAsRead } = useMessages();
-    const { conversationId } = useLocalSearchParams<{ conversationId: string }>();
+    const { conversationId, otherPetAvatar } = useLocalSearchParams<{ conversationId: string, otherPetAvatar: string }>();
 
     const [messageInput, setMessageInput] = useState('');
     const [pendingMessages, setPendingMessages] = useState<any[]>([]);
@@ -107,7 +107,7 @@ const MessageScreen = () => {
                 {!isMine && isLastOfBlock && (
                     <View style={styles.avatarContainer}>
                         <Image
-                            source={{ uri: item.sender_pet_profile.pet_avatar }}
+                            source={{ uri: otherPetAvatar }}
                             style={styles.avatar}
                         />
                     </View>

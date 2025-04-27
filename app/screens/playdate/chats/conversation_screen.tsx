@@ -69,7 +69,7 @@ const ConversationScreen = () => {
                             const isUnread = latestMessage && latestMessage.read_at === null;
 
                             return (
-                                <TouchableOpacity onPress={() => router.push(`./message_screen?conversationId=${item.id}`)}>
+                                <TouchableOpacity onPress={() => router.push(`./message_screen?conversationId=${item.id}&otherPetAvatar=${otherPetProfile.pet_avatar}`)}>
                                     <View style={styles.convoBoxItem}>
                                         <View style={noConvoStyles.petImagesCont}>
                                             <Image source={{ uri: myPetProfile.pet_avatar }} style={noConvoStyles.pet1image} />
