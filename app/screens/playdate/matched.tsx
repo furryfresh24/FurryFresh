@@ -91,7 +91,7 @@ const MatchedScreen = (props: Props) => {
             </Animated.View>
 
             <Animated.View style={[styles.buttonCont, { opacity: buttonOpacity }]}>
-                <TouchableOpacity style={styles.button} onPress={handleContinue}>
+                <TouchableOpacity style={styles.button} onPress={() => router.push('./chats/conversation_screen')}>
                     <Text style={styles.buttonText}>Message</Text>
                 </TouchableOpacity>
                 <TouchableOpacity onPress={handleContinue}>
