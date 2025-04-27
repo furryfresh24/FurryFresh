@@ -19,7 +19,7 @@
     "@react-spring/native": "^9.5.5",
     "@reduxjs/toolkit": "^2.6.1",
     "@rneui/themed": "^4.0.0-rc.8",
-    "@shopify/react-native-skia": "^1.12.4",
+    "@shopify/react-native-skia": "^1.5.0",
     "@supabase/supabase-js": "^2.49.4",
     "axios": "^1.8.4",
     "base64-arraybuffer": "^1.0.2",
