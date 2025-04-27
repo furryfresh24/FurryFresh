@@ -15,25 +15,102 @@ export const ConversationsProvider: React.FC<{ children: React.ReactNode }> = ({
   const [newConversations, setNewConversations] = useState<Conversation[]>([]);
 
   useEffect(() => {
+    if (pets.length === 0) return;
+
     const myPetIds = pets.map((pet) => pet.id);
 
-    if (myPetIds.length === 0) return;
+    const fetchExistingConversations = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('playdate_conversations')
+          .select(`
+            *,
+            pet_1_profile:pet_1_id (*, profiles: user_id (*)),
+            pet_2_profile:pet_2_id (*, profiles: user_id (*))
+          `)
+          .or(
+            myPetIds
+              .map(id => `pet_1_id.eq.${id}`)
+              .concat(myPetIds.map(id => `pet_2_id.eq.${id}`))
+              .join(',')
+          );
 
-    const channel = supabase
-      .channel('global_conversations')
+        if (error) throw error;
+
+        setNewConversations(data as Conversation[]);
+      } catch (err) {
+        console.error('Failed to fetch existing conversations:', err);
+      }
+    };
+
+    const fetchSingleConversation = async (conversationId: string) => {
+      try {
+        const { data, error } = await supabase
+          .from('playdate_conversations')
+          .select(`
+            *,
+            pet_1_profile:pet_1_id (*, profiles: user_id (*)),
+            pet_2_profile:pet_2_id (*, profiles: user_id (*))
+          `)
+          .eq('id', conversationId)
+          .single();
+
+        if (error) throw error;
+
+        return data as Conversation;
+      } catch (err) {
+        console.error('Failed to fetch conversation:', err);
+        return null;
+      }
+    };
+
+    fetchExistingConversations();
+
+    const channel = supabase.channel('global_conversations');
+
+    channel
       .on(
         'postgres_changes',
-        {
-          event: 'INSERT',
-          schema: 'public',
-          table: 'playdate_conversations',
-        },
-        (payload) => {
-          const conversation = payload.new as Conversation;
+        { event: 'INSERT', schema: 'public', table: 'playdate_conversations' },
+        async (payload) => {
+          const newConversation = payload.new as Conversation;
+          const involved = myPetIds.includes(newConversation.pet_1_id) || myPetIds.includes(newConversation.pet_2_id);
+          if (!involved) return;
 
-          if (myPetIds.includes(conversation.pet_1_id) || myPetIds.includes(conversation.pet_2_id)) {
-            setNewConversations((prev) => [...prev, conversation]);
+          const fullConversation = await fetchSingleConversation(newConversation.id);
+          if (fullConversation) {
+            setNewConversations((prev) => [...prev, fullConversation]);
           }
+        }
+      )
+      .on(
+        'postgres_changes',
+        { event: 'UPDATE', schema: 'public', table: 'playdate_conversations' },
+        async (payload) => {
+          const updatedConversation = payload.new as Conversation;
+          const involved = myPetIds.includes(updatedConversation.pet_1_id) || myPetIds.includes(updatedConversation.pet_2_id);
+
+          console.log('New Data');
+
+          if (!involved) return;
+
+          const fullConversation = await fetchSingleConversation(updatedConversation.id);
+          if (fullConversation) {
+            setNewConversations((prev) =>
+              prev.map((conv) => (conv.id === fullConversation.id ? fullConversation : conv))
+            );
+          }
+        }
+      )
+      .on(
+        'postgres_changes',
+        { event: 'DELETE', schema: 'public', table: 'playdate_conversations' },
+        async (payload) => {
+          const deletedConversation = payload.old as Conversation;
+          const involved = myPetIds.includes(deletedConversation.pet_1_id) || myPetIds.includes(deletedConversation.pet_2_id);
+          if (!involved) return;
+
+          setNewConversations((prev) => prev.filter((conv) => conv.id !== deletedConversation.id));
         }
       )
       .subscribe();

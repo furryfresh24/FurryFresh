@@ -87,6 +87,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#F8F8FF',
+    paddingTop: dimensions.screenHeight * 0.01,
     position: 'relative',
   },
   petenjoy: {

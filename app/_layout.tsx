@@ -312,6 +312,14 @@ const RootLayout = () => {
                   animation: 'fade'
                 }}
               />
+              <Stack.Screen
+                name="screens/playdate/chats/conversation_screen"
+                options={{ headerShown: false }}
+              />
+              <Stack.Screen
+                name="screens/playdate/chats/message_screen"
+                options={{ headerShown: false }}
+              />
             </Stack>
           </PortalProvider>
         </GestureHandlerRootView>

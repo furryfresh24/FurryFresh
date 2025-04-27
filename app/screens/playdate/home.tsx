@@ -463,9 +463,9 @@ const Home = () => {
           </View>
         }
 
-        <View style={styles.matchesButton}>
+        <TouchableOpacity style={styles.matchesButton} onPress={() => router.push('./chats/conversation_screen')}>
           <MessageCircleMore size={dimensions.screenWidth * 0.07} color="white" />
-        </View>
+        </TouchableOpacity>
       </View>
       <Portal>
         <BottomSheet

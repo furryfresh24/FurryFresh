@@ -105,15 +105,9 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     paddingTop: dimensions.screenHeight * 0.07,
     paddingBottom: dimensions.screenHeight * 0.02,
-    marginBottom: dimensions.screenHeight * 0.01,
     paddingHorizontal: 16,
-    borderBottomLeftRadius: 15,
-    borderBottomRightRadius: 15,
-    elevation: 4,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
+    borderBottomLeftRadius: 0,
+    borderBottomRightRadius: 0,
     zIndex: 1
   },
   topRow: {
