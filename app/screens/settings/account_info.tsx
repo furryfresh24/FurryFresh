@@ -11,7 +11,7 @@ import MainContPlain from "../../components/general/background_plain";
 import dimensions from "../../utils/sizing";
 import { ChevronRight } from "lucide-react-native";
 import { Ionicons } from "@expo/vector-icons";
-import supabase from "../../utils/supabase"; // Import supabase to access the user
+import supabase from "../../utils/supabase";
 
 type UserInfoItem = {
   id: string;
@@ -24,12 +24,13 @@ type UserInfoItem = {
 const AccountInformationScreen = () => {
   const navigation = useNavigation();
   const [userEmail, setUserEmail] = useState<string>("");
+  const [userNumber, setUserNumber] = useState<string>("");
 
   useLayoutEffect(() => {
     navigation.setOptions({
-      title: "Account Information", // Keep the title
-      headerBackTitleVisible: false, // This removes the back title text
-      headerTintColor: "black", // Back icon color
+      title: "Account Information",
+      headerBackTitleVisible: false,
+      headerTintColor: "black",
       headerLeft: () => (
         <TouchableOpacity onPress={() => navigation.goBack()}>
           <Ionicons name="arrow-back" size={24} color="black" style={{ marginLeft: 0 }} />
@@ -38,21 +39,24 @@ const AccountInformationScreen = () => {
     });
   }, [navigation]);
 
-  // Fetch the user's email from Supabase when the component mounts
   useEffect(() => {
-    const fetchUserEmail = async () => {
+    const fetchUserInfo = async () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (user) {
-        setUserEmail(user.email || "Not set"); // Set email or fallback to "Not set"
+        setUserEmail(user.email || "Not set");
+
+        // Fetch phone number from user_metadata
+        const phoneNumber = user.user_metadata?.contact_number || "Not set";
+        setUserNumber(phoneNumber);
       }
     };
 
-    fetchUserEmail();
+    fetchUserInfo();
   }, []);
 
   const userInfo: UserInfoItem[] = [
-    { id: "1", title: "Phone number", value: "Not set" },
-    { id: "2", title: "Email", value: userEmail }, // Display the fetched email
+    { id: "1", title: "Phone number", value: userNumber },
+    { id: "2", title: "Email", value: userEmail },
     { id: "3", title: "Date of birth", value: "Not set" },
   ];
 
@@ -67,11 +71,11 @@ const AccountInformationScreen = () => {
         <Text style={styles.itemValue}>{item.value}</Text>
         {item.note && <Text style={styles.itemNote}>{item.note}</Text>}
       </View>
-      <ChevronRight
+      {/* <ChevronRight
         size={dimensions.screenWidth * 0.05}
         color="#000"
         style={styles.chevronIcon}
-      />
+      /> */}
     </TouchableOpacity>
   );
 
