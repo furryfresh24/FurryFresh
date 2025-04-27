@@ -25,6 +25,7 @@ import TinderCard from 'react-tinder-card';
 import { GestureHandlerRootView, GestureDetector, Gesture, PanGestureHandler } from 'react-native-gesture-handler';
 import moment from 'moment';
 import Spacer from '../../components/general/spacer';
+import { Heart, HeartHandshake, PawPrint, MessageCircle, MessageCircleMore } from "lucide-react-native";
 
 const screenWidth = dimensions.screenWidth;
 const screenHeight = dimensions.screenHeight;
@@ -124,7 +125,6 @@ const Home = () => {
       }
     }
   };
-
 
   const swipe = async (dir: 'left' | 'right') => {
     const cardsLeft = fetchedPets.filter((pet) => !alreadyRemoved.current.includes(pet.id));
@@ -425,6 +425,10 @@ const Home = () => {
             </TouchableOpacity>
           </View>
         }
+
+        <View style={styles.matchesButton}>
+          <MessageCircleMore size={dimensions.screenWidth * 0.07} color="white"/>
+        </View>
       </View>
       <Portal>
         <BottomSheet
@@ -432,7 +436,7 @@ const Home = () => {
           snapPoints={selectPetSnapPoints}
           index={-1}
           enablePanDownToClose={true}
-          handleComponent={null}
+          handleComponent={null} 
           backgroundStyle={{ backgroundColor: "transparent" }}
           backdropComponent={selectPetBackDrop}
           onChange={selectPetHandleSheetChange}
@@ -639,6 +643,14 @@ const Home = () => {
 export default Home;
 
 const styles = StyleSheet.create({
+  matchesButton: {
+    position: 'absolute',
+    bottom: dimensions.screenHeight * 0.05,
+    right: dimensions.screenWidth * 0.06,
+    backgroundColor: '#466AA2',
+    padding: dimensions.screenWidth * 0.045,
+    borderRadius: 100
+  },
   container: {
     flex: 1,
     backgroundColor: '#D0DFF4',
