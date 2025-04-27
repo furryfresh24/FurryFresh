@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, TextInput, TouchableOpacity, KeyboardAvoidingView, Platform, Keyboard, FlatList, Image } from 'react-native';
+import { StyleSheet, Text, View, TextInput, TouchableOpacity, KeyboardAvoidingView, Platform, Keyboard, FlatList, Image, Animated } from 'react-native';
 import React, { useState, useMemo, useRef, useEffect } from 'react';
 import { useLocalSearchParams } from 'expo-router';
 import { usePet } from '../../../context/pet_context';
@@ -14,6 +14,7 @@ const MessageScreen = () => {
     const { newMessages, sendMessage, markMessagesAsRead } = useMessages();
     const { typingStatuses, setTypingStatus } = useTyping();
     const { conversationId, otherPetAvatar } = useLocalSearchParams<{ conversationId: string, otherPetAvatar: string }>();
+    const [keyboardVisible, setKeyboardVisible] = useState(false);
 
     const [messageInput, setMessageInput] = useState('');
     const [pendingMessages, setPendingMessages] = useState<any[]>([]);
@@ -21,15 +22,7 @@ const MessageScreen = () => {
     const flatListRef = useRef<FlatList>(null);
     const myPetIds = pets.map((pet) => pet.id);
 
-    const conversationMessages = useMemo(() => {
-        if (!conversationId) return [];
-        return [
-            ...newMessages
-                .filter((msg) => msg.conversation_id === conversationId)
-                .sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime()),
-            ...pendingMessages
-        ];
-    }, [newMessages, pendingMessages, conversationId]);
+    const inputPaddingBottom = useRef(new Animated.Value(dimensions.screenHeight * 0.05)).current;
 
     const isSomeoneTyping = typingStatuses.some(
         (status) =>
@@ -37,6 +30,29 @@ const MessageScreen = () => {
             status.is_typing &&
             !myPetIds.includes(status.sender_pet_id)
     );
+
+    const conversationMessages = useMemo(() => {
+        if (!conversationId) return [];
+        const sortedMessages = [
+            ...newMessages
+                .filter((msg) => msg.conversation_id === conversationId)
+                .sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime()),
+            ...pendingMessages
+        ];
+
+        if (isSomeoneTyping) {
+            sortedMessages.push({
+                id: 'typing-indicator',
+                conversation_id: conversationId,
+                sender_pet_id: 'other',
+                content: 'typing...',
+                created_at: new Date().toISOString(),
+                isTyping: true
+            });
+        }
+
+        return sortedMessages;
+    }, [newMessages, pendingMessages, conversationId, isSomeoneTyping]);
 
     useEffect(() => {
         if (!conversationId) return;
@@ -70,16 +86,31 @@ const MessageScreen = () => {
     };
 
     useEffect(() => {
-        const keyboardListener = Keyboard.addListener('keyboardDidShow', () => {
-            setTimeout(() => {
-                flatListRef.current?.scrollToEnd({ animated: true });
-            }, 10);
+        const keyboardShowListener = Keyboard.addListener('keyboardDidShow', () => {
+            setKeyboardVisible(true);
+            Animated.timing(inputPaddingBottom, {
+                toValue: dimensions.screenHeight * 0.02,
+                duration: 100,
+                useNativeDriver: false,
+            }).start();
         });
-
+    
+        const keyboardHideListener = Keyboard.addListener('keyboardDidHide', () => {
+            setKeyboardVisible(false);
+            Animated.timing(inputPaddingBottom, {
+                toValue: dimensions.screenHeight * 0.05,
+                duration: 100,
+                useNativeDriver: false,
+            }).start();
+        });
+    
         return () => {
-            keyboardListener.remove();
+            keyboardShowListener.remove();
+            keyboardHideListener.remove();
         };
     }, []);
+    
+    
 
     useEffect(() => {
         flatListRef.current?.scrollToEnd({ animated: true });
@@ -95,12 +126,30 @@ const MessageScreen = () => {
     }, [newMessages]);
 
     const renderItem = ({ item, index }: { item: any, index: number }) => {
+        if (item.isTyping) {
+            return (
+                <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 10 }}>
+                    <View style={styles.avatarContainer}>
+                        <Image
+                            source={{ uri: otherPetAvatar }}
+                            style={styles.avatar}
+                        />
+                    </View>
+                    <View style={[styles.senderMessageBubble, styles.theirBubble]}>
+                        <Text style={[styles.messageText, styles.theirBubbleText]}>
+                            Typing...
+                        </Text>
+                    </View>
+                </View>
+            );
+        }
+    
         const isMine = myPetIds.includes(item.sender_pet_id);
         const nextItem = conversationMessages[index + 1];
         const prevItem = conversationMessages[index - 1];
         const isLastOfBlock = !nextItem || nextItem.sender_pet_id !== item.sender_pet_id;
         const isStartOfBlock = !prevItem || prevItem.sender_pet_id !== item.sender_pet_id;
-
+    
         return (
             <View style={{ flexDirection: 'row', alignItems: 'flex-end', marginBottom: isLastOfBlock ? 10 : 2 }}>
                 {!isMine && !isLastOfBlock && <View style={{ width: dimensions.screenWidth * 0.12 }} />}
@@ -130,7 +179,7 @@ const MessageScreen = () => {
             </View>
         );
     };
-
+    
     return (
         <View style={styles.container}>
             <AppbarDefault session={session} titleSize={0} leadingChildren={null} showLeading={true} />
@@ -149,14 +198,7 @@ const MessageScreen = () => {
                         flatListRef.current?.scrollToOffset({ offset: 999999, animated: true });
                     }}
                 />
-                {isSomeoneTyping && (
-                    <View style={{ padding: 10 }}>
-                        <Text style={{ fontFamily: 'Poppins-Regular', color: '#888' }}>
-                            Typing...
-                        </Text>
-                    </View>
-                )}
-                <View style={styles.inputContainer}>
+                <Animated.View style={[styles.inputContainer, { paddingBottom: inputPaddingBottom }]}>
                     <TextInput
                         style={styles.input}
                         placeholder="Type a message"
@@ -169,7 +211,7 @@ const MessageScreen = () => {
                     <TouchableOpacity style={styles.sendButton} onPress={handleSend}>
                         <Text style={styles.sendButtonText}>Send</Text>
                     </TouchableOpacity>
-                </View>
+                </Animated.View>
             </KeyboardAvoidingView>
         </View>
     );
@@ -243,6 +285,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         paddingHorizontal: 10,
         paddingVertical: 8,
+        paddingBottom: dimensions.screenHeight * 0.05,
         borderTopWidth: 1,
         borderColor: '#ccc',
         backgroundColor: 'white',

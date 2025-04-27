@@ -81,6 +81,7 @@ export const TypingProvider: React.FC<{ children: React.ReactNode }> = ({ childr
                         conversation_id: conversationId,
                         sender_pet_id: senderPetId,
                         is_typing: isTyping,
+                        updated_at: new Date()
                     },
                     { onConflict: 'conversation_id,sender_pet_id' }
                 );
