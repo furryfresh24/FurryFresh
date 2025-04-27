@@ -15,7 +15,7 @@ import Pets from '../../interfaces/pets';
 import BottomSheet, { BottomSheetBackdrop, BottomSheetView } from '@gorhom/bottom-sheet';
 import { Portal, PortalProvider } from '@gorhom/portal';
 import { usePet } from '../../context/pet_context';
-import { FlatList } from 'react-native-gesture-handler';
+import { FlatList, ScrollView } from 'react-native-gesture-handler';
 import { petsStyles } from '../pets/components/petsStyles';
 import { FontAwesome5, Ionicons } from '@expo/vector-icons';
 import SvgValue from '../../hooks/fetchSvg';
@@ -23,6 +23,8 @@ import supabase from '../../utils/supabase';
 import { useSession } from '../../context/sessions_context';
 import TinderCard from 'react-tinder-card';
 import { GestureHandlerRootView, GestureDetector, Gesture, PanGestureHandler } from 'react-native-gesture-handler';
+import moment from 'moment';
+import Spacer from '../../components/general/spacer';
 
 const screenWidth = dimensions.screenWidth;
 const screenHeight = dimensions.screenHeight;
@@ -45,6 +47,14 @@ const Home = () => {
   const petDetailsRef = useRef<BottomSheet>(null);
   const petDetailsSnapPoints = useMemo(() => ["80%"], []);
 
+  const dataToMap = [
+    { label: 'Friendly' },
+    { label: 'Playful' },
+    { label: 'Energetic' },
+    { label: 'Loyal' },
+  ];
+
+
   const childRefs = useMemo(
     () =>
       Array(fetchedPets.length)
@@ -58,6 +68,9 @@ const Home = () => {
 
   const swiped = async (direction: string, idToDelete: string) => {
     const storeRemovedForAWhile = fetchedPets.find((pet) => pet.id == idToDelete);
+
+    setCurrentPet(null);
+    
     console.log('removing: ' + idToDelete + ' to the ' + direction);
     alreadyRemoved.current.push(idToDelete);
 
@@ -324,7 +337,7 @@ const Home = () => {
                     {pet.breed.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')}
                   </Text>
                 </View>
-                <Image
+                {/* <Image
                   source={
                     pet.gender.toLowerCase() == 'male'
                       ? require('../../assets/images/others/male.png')
@@ -332,7 +345,12 @@ const Home = () => {
                   }
                   style={styles.genderIcon}
                   resizeMode="contain"
-                />
+                /> */}
+                {
+                  pet.gender.toLowerCase() == 'male'
+                    ? <Ionicons name='male' size={dimensions.screenWidth * 0.1} color="#466AA2" />
+                    : <Ionicons name='female' size={dimensions.screenWidth * 0.1} color="#ED7964" />
+                }
               </View>
             </View>
           </TinderCard>
@@ -396,20 +414,12 @@ const Home = () => {
           fetchedPets.length > 0 &&
           <View style={styles.containerRow}>
             <TouchableOpacity disabled={isSwiping} style={styles.skipContainer} onPress={() => swipe('left')}>
-              <Image
-                source={require('../../assets/images/others/skip.png')}
-                style={styles.skipImage}
-                resizeMode="contain"
-              />
+              <Ionicons name='close' color="#fff" size={dimensions.screenWidth * 0.1} />
             </TouchableOpacity>
             <TouchableOpacity disabled={isSwiping} style={styles.checkContainer} onPress={() => {
               swipe('right');
             }}>
-              <Image
-                source={require('../../assets/images/others/check.png')}
-                style={styles.checkImage}
-                resizeMode="contain"
-              />
+              <Ionicons name='checkmark' color="#fff" size={dimensions.screenWidth * 0.1} />
             </TouchableOpacity>
           </View>
         }
@@ -512,34 +522,109 @@ const Home = () => {
           onChange={petDetailsHandleSheetChange}
         >
           <BottomSheetView style={petDetailsBS.mainCont}>
-            <View style={petDetailsBS.header}>
-              <Image
-                source={{ uri: currentPet?.pet_avatar }}
-                style={petDetailsBS.image}
-              />
-              <View style={{
-                position: 'absolute',
-                zIndex: 1,
-                flexDirection: 'row',
-                alignItems: 'center',
-                bottom: dimensions.screenHeight * 0.01,
-                left: dimensions.screenWidth * 0.03
-              }}>
-                <View style={petDetailsBS.ownerImageCont}>
-                  {
-                    currentPet?.profiles?.avatar_url ?
-                      <Image
-                        source={{ uri: currentPet?.profiles?.avatar_url }}
-                        style={petDetailsBS.ownerImage}
-                      /> :
-                      (
-                        <Ionicons name='person' size={dimensions.screenWidth * 0.06} color="#fff"></Ionicons>
-                      )
-                  }
+            <ScrollView bounces={false}>
+              <View style={petDetailsBS.header}>
+                <Image
+                  source={{ uri: currentPet?.pet_avatar }}
+                  style={petDetailsBS.image}
+                />
+                <View style={{
+                  position: 'absolute',
+                  zIndex: 1,
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  bottom: dimensions.screenHeight * 0.01,
+                  left: dimensions.screenWidth * 0.03
+                }}>
+                  <View style={petDetailsBS.ownerImageCont}>
+                    {
+                      currentPet?.profiles?.avatar_url ?
+                        <Image
+                          source={{ uri: currentPet?.profiles?.avatar_url }}
+                          style={petDetailsBS.ownerImage}
+                        /> :
+                        (
+                          <Ionicons name='person' size={dimensions.screenWidth * 0.06} color="#fff"></Ionicons>
+                        )
+                    }
+                  </View>
+                  <Text style={petDetailsBS.ownerName}>{currentPet?.profiles?.first_name}</Text>
                 </View>
-                <Text style={petDetailsBS.ownerName}>{currentPet?.profiles?.first_name}</Text>
               </View>
-            </View>
+              <View style={petDetailsBS.body}>
+                <View>
+                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: dimensions.screenWidth * 0.03, width: dimensions.screenWidth * .85 }}>
+                    <Text numberOfLines={2} style={[petDetailsBS.petName]}>
+                      {currentPet?.name}
+                    </Text>
+                    {
+                      currentPet?.gender?.toLowerCase() == 'male' ?
+                        <Ionicons name='male' size={dimensions.screenWidth * 0.06} color="#466AA2" /> :
+                        <Ionicons name='female' size={dimensions.screenWidth * 0.06} color="#ED7964" />
+                    }
+                  </View>
+                </View>
+                <View>
+                  <View style={{ flexDirection: 'row', flexWrap: 'wrap', marginTop: dimensions.screenHeight * 0.01 }}>
+                    {/* {dataToMap.map((item, index) => (
+                    <View key={index} style={{
+                      padding: 8,
+                      backgroundColor: '#eee',
+                      borderRadius: 8,
+                      marginRight: 8,
+                      marginBottom: 8,
+                    }}>
+                      <Text>{item.label}</Text>
+                    </View>
+                  ))} */}
+                    <View style={{
+                      padding: 8,
+                      backgroundColor: '#b88c33',
+                      borderRadius: 8,
+                      marginRight: 8,
+                      marginBottom: 8,
+                      paddingHorizontal: dimensions.screenWidth * 0.04,
+                      flexDirection: 'row',
+                      alignItems: 'center'
+                    }}>
+                      <Ionicons name='paw' color="#fff" size={dimensions.screenWidth * 0.032} />
+                      <Spacer width={dimensions.screenWidth * 0.01} />
+                      <Text style={{ fontFamily: 'Poppins-Medium', color: 'white', fontSize: dimensions.screenWidth * 0.035 }}>
+                        {currentPet?.breed.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')}
+                      </Text>
+                    </View>
+                    {
+                      currentPet?.birthday && <View style={{
+                        padding: 8,
+                        backgroundColor: '#d47163',
+                        borderRadius: 8,
+                        marginRight: 8,
+                        marginBottom: 8,
+                        paddingHorizontal: dimensions.screenWidth * 0.04,
+                        flexDirection: 'row',
+                        alignItems: 'center'
+                      }}>
+                        <Ionicons name='balloon' color="#fff" size={dimensions.screenWidth * 0.032} />
+                        <Spacer width={dimensions.screenWidth * 0.01} />
+                        <Text style={{ fontFamily: 'Poppins-Medium', color: 'white', fontSize: dimensions.screenWidth * 0.035 }}>
+                          {moment(currentPet?.birthday).format('MMM D, YYYY')}
+                        </Text>
+                      </View>
+                    }
+                  </View>
+                  <View style={{ marginTop: dimensions.screenHeight * 0.01 }}>
+                    <Text style={{ fontFamily: 'Poppins-Medium' }}>What to know about
+                      {' ' + currentPet?.name.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')}?
+                    </Text>
+                    <View style={{ marginTop: dimensions.screenHeight * 0.01, backgroundColor: '#F1F1F1', paddingHorizontal: dimensions.screenWidth * 0.04, paddingVertical: dimensions.screenHeight * 0.012, borderRadius: 10 }}>
+                      <Text style={{ fontFamily: 'Poppins-Regular', color: (currentPet?.bio ?? '').length > 0 ? 'black' : '#808080' }}>
+                        {(currentPet?.bio ?? '').length > 0 ? currentPet?.bio : 'No bio added for this pet'}
+                      </Text>
+                    </View>
+                  </View>
+                </View>
+              </View>
+            </ScrollView>
           </BottomSheetView>
         </BottomSheet>
       </Portal>
@@ -718,7 +803,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#DA8474',
     borderRadius: 50,
     paddingVertical: 15,
-    paddingHorizontal: 25,
     alignItems: 'center',
     justifyContent: 'center',
     width: 78,
@@ -729,7 +813,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#96AFD5',
     borderRadius: 50,
     paddingVertical: 15,
-    paddingHorizontal: 25,
     alignItems: 'center',
     justifyContent: 'center',
     width: 78,
@@ -841,6 +924,9 @@ const petDetailsBS = StyleSheet.create({
   ownerImage: {
     width: dimensions.screenWidth * 0.13,
     height: dimensions.screenWidth * 0.13,
+    borderRadius: 100,
+    borderWidth: 2,
+    borderColor: '#fff',
   },
   ownerImageCont: {
     backgroundColor: '#E0E0E0',
@@ -848,16 +934,25 @@ const petDetailsBS = StyleSheet.create({
     height: dimensions.screenWidth * 0.13,
     width: dimensions.screenWidth * 0.13,
     alignItems: 'center',
-    justifyContent:'center',
+    justifyContent: 'center',
     borderWidth: 2,
     borderColor: '#fff',
     marginRight: dimensions.screenWidth * 0.03
   },
   ownerName: {
     backgroundColor: 'white',
-    paddingHorizontal: dimensions.screenWidth * 0.03,
+    paddingHorizontal: dimensions.screenWidth * 0.035,
     borderRadius: 15,
-    fontFamily: 'Poppins-Regular',
+    fontFamily: 'Poppins-Medium',
     paddingVertical: dimensions.screenHeight * 0.005
+  },
+
+  body: {
+    paddingTop: dimensions.screenHeight * 0.015,
+    paddingHorizontal: dimensions.screenWidth * 0.05
+  },
+  petName: {
+    fontFamily: 'Poppins-SemiBold',
+    fontSize: dimensions.screenWidth * 0.07
   }
 });
