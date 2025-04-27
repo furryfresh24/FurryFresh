@@ -29,6 +29,7 @@ const screenHeight = dimensions.screenHeight;
 
 const Home = () => {
   const alreadyRemoved = useRef<string[]>([]);
+  const [currentPet, setCurrentPet] = useState<Pets | null>(null);
 
   const router = useRouter();
   const { session } = useSession();
@@ -36,9 +37,14 @@ const Home = () => {
   const [isStartUp, setStartUp] = useState<boolean>(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [fetchedPets, setFetchedPets] = useState<Pets[]>([]);
+  const [allSwiped, setAllSwiped] = useState(false);
   const [selectedPet, setSelectedPet] = useState<Pets | null>(null);
-  const sheetRef = useRef<BottomSheet>(null);
-  const snapPoints = useMemo(() => ["50%"], []);
+  const selectPetRef = useRef<BottomSheet>(null);
+  const selectPetSnapPoints = useMemo(() => ["50%"], []);
+
+  const petDetailsRef = useRef<BottomSheet>(null);
+  const petDetailsSnapPoints = useMemo(() => ["80%"], []);
+
   const childRefs = useMemo(
     () =>
       Array(fetchedPets.length)
@@ -47,11 +53,19 @@ const Home = () => {
     [fetchedPets]
   );
 
+  const [isSwiping, setIsSwiping] = useState(false);
+
+
   const swiped = async (direction: string, idToDelete: string) => {
     const storeRemovedForAWhile = fetchedPets.find((pet) => pet.id == idToDelete);
     console.log('removing: ' + idToDelete + ' to the ' + direction);
     alreadyRemoved.current.push(idToDelete);
-  
+
+    if (alreadyRemoved.current.length === fetchedPets.length) {
+      setAllSwiped(true);
+    }
+
+
     if (direction === 'right') {
       const { data: insertedMatch, error } = await supabase
         .from('playdate_matches')
@@ -62,24 +76,24 @@ const Home = () => {
           created_at: new Date()
         })
         .select();
-  
+
       if (error) {
         console.error('Error inserting match:', error);
         return;
       }
-  
+
       const { data: mutualMatch, error: mutualError } = await supabase
         .from('playdate_matches')
         .select()
-        .eq('used_pet_id', idToDelete)   
+        .eq('used_pet_id', idToDelete)
         .eq('to_match_pet_id', selectedPet?.id)
-        .single(); 
-  
-      if (mutualError && mutualError.code !== 'PGRST116') { 
+        .single();
+
+      if (mutualError && mutualError.code !== 'PGRST116') {
         console.error('Error checking for mutual match:', mutualError);
         return;
       }
-  
+
       if (mutualMatch) {
         console.log('Mutual match found! 🎉', mutualMatch);
         router.push({
@@ -94,29 +108,32 @@ const Home = () => {
       } else {
         console.log('No match found!');
 
-      } 
+      }
     }
   };
-  
+
 
   const swipe = async (dir: 'left' | 'right') => {
     const cardsLeft = fetchedPets.filter((pet) => !alreadyRemoved.current.includes(pet.id));
     if (cardsLeft.length) {
+      setIsSwiping(true);
       const toBeRemoved = cardsLeft[cardsLeft.length - 1].id;
       const index = fetchedPets.map(pet => pet.id).indexOf(toBeRemoved);
-      alreadyRemoved.current.push(toBeRemoved);
       await childRefs[index]?.current?.swipe(dir);
+      setTimeout(() => {
+        setIsSwiping(false);
+      }, 100);
     }
   };
 
-  const openSheet = () => sheetRef.current?.expand();
+  const openSheet = () => selectPetRef.current?.expand();
 
   const filterMyPetsData = () => {
     const val = pets.filter((pet) => pet.is_playdate_allowed);
     return val;
   };
 
-  const backDrop = useCallback(
+  const selectPetBackDrop = useCallback(
     (props: any) => (
       <BottomSheetBackdrop
         {...props}
@@ -127,16 +144,35 @@ const Home = () => {
     []
   );
 
-  const handleSheetChange = (index: number) => {
+  const petDetailsBackDrop = useCallback(
+    (props: any) => (
+      <BottomSheetBackdrop
+        {...props}
+        appearsOnIndex={0}
+        disappearsOnIndex={-1}
+        zIndex={2}
+      />
+    ),
+    []
+  );
+
+  const selectPetHandleSheetChange = (index: number) => {
     if (index === 0) {
-      sheetRef.current?.close();
+      selectPetRef.current?.close();
+    }
+  };
+
+  const petDetailsHandleSheetChange = (index: number) => {
+    if (index === 0) {
+      petDetailsRef.current?.close();
     }
   };
 
   const handlePress = () => router.push('../../screens/(tabs)/home');
 
   const fetchPets = useCallback(async () => {
-    // First: Get all pet IDs that the selectedPet has already swiped right on
+    setAllSwiped(false);
+  
     const { data: matchesMade, error: matchesError } = await supabase
       .from('playdate_matches')
       .select('to_match_pet_id')
@@ -149,13 +185,20 @@ const Home = () => {
   
     const alreadyMatchedIds = matchesMade?.map(match => match.to_match_pet_id) || [];
   
-    // Then: Fetch pets excluding pets already matched
     const { data, error } = await supabase
       .from('pets')
-      .select()
+      .select(`
+        *,
+        profiles (
+          id,
+          first_name,
+          last_name,
+          avatar_url
+        )
+      `)
       .eq('is_playdate_allowed', true)
       .neq('user_id', session?.user.id)
-      .not('id', 'in', `(${alreadyMatchedIds.join(',')})`); // Exclude already matched
+      .not('id', 'in', `(${alreadyMatchedIds.join(',')})`);
   
     if (error) {
       console.error('Error fetching pets:', error);
@@ -165,26 +208,26 @@ const Home = () => {
     if (data) {
       setFetchedPets(data as Pets[]);
       alreadyRemoved.current = [];
+      setCurrentPet((data as Pets[])[data.length - 1]);
     }
   }, [selectedPet, session?.user.id]);
   
 
-  // on startup
+
   useEffect(() => {
     if (!isStartUp) {
     }
   }, [fetchPets]);
 
-  // when selectedPet changes
   useEffect(() => {
     if (selectedPet) {
       alreadyRemoved.current = [];
-      setFetchedPets([]); // Clear old pets first
+      setFetchedPets([]);
       fetchPets();
     }
   }, [selectedPet]);
 
-  
+
 
   useEffect(() => {
     if (selectedPet === null) {
@@ -197,6 +240,22 @@ const Home = () => {
   return (
     <PortalProvider>
       <View style={styles.container}>
+        <Ionicons name='paw' color="#bdcde4" size={dimensions.screenWidth * 0.45}
+          style={{
+            position: 'absolute',
+            top: dimensions.screenHeight * 0.05,
+            right: -dimensions.screenWidth * 0.15,
+            transform: 'rotate(-60deg)'
+          }}
+        />
+        <Ionicons name='paw' color="#bdcde4" size={dimensions.screenWidth * 0.45}
+          style={{
+            position: 'absolute',
+            bottom: dimensions.screenHeight * 0.05,
+            left: -dimensions.screenWidth * 0.15,
+            transform: 'rotate(60deg)'
+          }}
+        />
         <View style={styles.topLeftWrapper}>
           <View style={{ flexDirection: 'row', alignItems: 'center' }}>
             <TouchableOpacity style={styles.coloredBox} onPress={handlePress}>
@@ -235,12 +294,19 @@ const Home = () => {
 
         <View style={styles.line} />
 
-        {fetchedPets.map((pet, index) => (
+        {fetchedPets.length > 0 && fetchedPets.map((pet, index) => (
           <TinderCard
             ref={childRefs[index]}
             key={pet.id}
             onSwipe={(dir) => swiped(dir, pet.id)}
-            onCardLeftScreen={() => { }}
+            onCardLeftScreen={() => {
+              const nextIndex = index - 1;
+              if (nextIndex >= 0 && fetchedPets[nextIndex]) {
+                setCurrentPet(fetchedPets[nextIndex]);
+              } else {
+                setCurrentPet(null); // no more pets
+              }
+            }}
             preventSwipe={['up', 'down']}
           >
             <View key={index} style={[styles.whiteContainer]}>
@@ -251,8 +317,12 @@ const Home = () => {
               />
               <View style={styles.infoRow}>
                 <View>
-                  <Text style={styles.containerTitle}>{pet.name}</Text>
-                  <Text style={styles.containerSubtitle}>{pet.breed}</Text>
+                  <Text numberOfLines={2} style={styles.containerTitle}>
+                    {pet.name.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')}
+                  </Text>
+                  <Text numberOfLines={1} style={styles.containerSubtitle}>
+                    {pet.breed.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')}
+                  </Text>
                 </View>
                 <Image
                   source={
@@ -268,61 +338,96 @@ const Home = () => {
           </TinderCard>
         ))}
 
-        <View style={styles.detailsContainer}>
-          <View style={styles.detailsContent}>
-            <Image
-              source={require('../../assets/images/others/i.png')}
-              style={styles.infoIcon}
-              resizeMode="contain"
+        {(allSwiped) && (
+          <View style={[styles.whiteContainer, { position: 'relative', justifyContent: 'center', alignItems: 'center', padding: 20 }]}>
+            <Ionicons
+              name="checkmark-circle"
+              size={dimensions.screenWidth * 0.3}
+              color="#ED7964"
+              style={{ marginBottom: dimensions.screenHeight * 0.0 }}
             />
-            <Text style={styles.detailsText}>PlayDate Details</Text>
+            <Text style={{
+              fontSize: 24,
+              color: '#121F63',
+              fontFamily: 'Poppins-Bold',
+              textAlign: 'center',
+              marginBottom: 10
+            }}>
+              No More Playmates!
+            </Text>
+            <Text style={{
+              fontSize: dimensions.screenWidth * 0.033,
+              color: '#808080',
+              fontFamily: 'Poppins-Light',
+              textAlign: 'center',
+              lineHeight: 22,
+              maxWidth: '90%'
+            }}>
+              All pets have been swiped!
+              Come back later for more furry friends. 🐾
+            </Text>
           </View>
-        </View>
+        )}
 
-        <View style={styles.containerRow}>
-          <TouchableOpacity style={styles.skipContainer} onPress={() => swipe('left')}>
-            <Image
-              source={require('../../assets/images/others/skip.png')}
-              style={styles.skipImage}
-              resizeMode="contain"
-            />
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.checkContainer} onPress={() => {
-            swipe('right');
-          }}>
-            <Image
-              source={require('../../assets/images/others/check.png')}
-              style={styles.checkImage}
-              resizeMode="contain"
-            />
-          </TouchableOpacity>
-        </View>
 
-        <Image
-          source={require('../../assets/images/others/paw1.png')}
-          style={styles.paw1Image}
-          resizeMode="contain"
-        />
-        <Image
-          source={require('../../assets/images/others/paw2.png')}
-          style={styles.paw2Image}
-          resizeMode="contain"
-        />
+        {
+          fetchedPets.length == 0 &&
+          <View style={[styles.whiteContainer, { position: 'relative' }]}>
+            <View style={[styles.petImage, { backgroundColor: '#F5F5F5' }]}></View>
+            <View style={[styles.petImage, { backgroundColor: '#F5F5F5', height: dimensions.screenHeight * 0.03 }]}></View>
+          </View>
+        }
+
+        {
+          fetchedPets.length > 0 &&
+          <TouchableOpacity disabled={isSwiping} style={styles.detailsContainer} onPress={() => petDetailsRef.current?.expand()}>
+            <View style={styles.detailsContent}>
+              <Image
+                source={require('../../assets/images/others/i.png')}
+                style={styles.infoIcon}
+                resizeMode="contain"
+              />
+              <Text style={styles.detailsText}>PlayDate Details</Text>
+            </View>
+          </TouchableOpacity>
+        }
+
+        {
+          fetchedPets.length > 0 &&
+          <View style={styles.containerRow}>
+            <TouchableOpacity disabled={isSwiping} style={styles.skipContainer} onPress={() => swipe('left')}>
+              <Image
+                source={require('../../assets/images/others/skip.png')}
+                style={styles.skipImage}
+                resizeMode="contain"
+              />
+            </TouchableOpacity>
+            <TouchableOpacity disabled={isSwiping} style={styles.checkContainer} onPress={() => {
+              swipe('right');
+            }}>
+              <Image
+                source={require('../../assets/images/others/check.png')}
+                style={styles.checkImage}
+                resizeMode="contain"
+              />
+            </TouchableOpacity>
+          </View>
+        }
       </View>
       <Portal>
         <BottomSheet
-          ref={sheetRef}
-          snapPoints={snapPoints}
+          ref={selectPetRef}
+          snapPoints={selectPetSnapPoints}
           index={-1}
           enablePanDownToClose={true}
           handleComponent={null}
           backgroundStyle={{ backgroundColor: "transparent" }}
-          backdropComponent={backDrop}
-          onChange={handleSheetChange}
+          backdropComponent={selectPetBackDrop}
+          onChange={selectPetHandleSheetChange}
         >
-          <BottomSheetView style={bs.mainCont}>
-            <View style={bs.header}>
-              <Text style={bs.headTitle}>Select a Pet that you want to use</Text>
+          <BottomSheetView style={selectPetBS.mainCont}>
+            <View style={selectPetBS.header}>
+              <Text style={selectPetBS.headTitle}>Select a Pet that you want to use</Text>
             </View>
             <FlatList
               data={filterMyPetsData()}
@@ -331,7 +436,7 @@ const Home = () => {
                   style={styles.petItemCont}
                   onPress={() => {
                     setSelectedPet(item);
-                    sheetRef.current?.close();
+                    selectPetRef.current?.close();
                   }}
                 >
                   <View style={{
@@ -395,6 +500,33 @@ const Home = () => {
             />
           </BottomSheetView>
         </BottomSheet>
+
+        <BottomSheet
+          ref={petDetailsRef}
+          snapPoints={petDetailsSnapPoints}
+          index={-1}
+          enablePanDownToClose={true}
+          handleComponent={null}
+          backgroundStyle={{ backgroundColor: "transparent" }}
+          backdropComponent={petDetailsBackDrop}
+          onChange={petDetailsHandleSheetChange}
+        >
+          <BottomSheetView style={petDetailsBS.mainCont}>
+            <View style={petDetailsBS.header}>
+              <Image 
+                source={{ uri: currentPet?.pet_avatar}}
+                style={petDetailsBS.image}
+              />
+              <View style={{ position: 'absolute', zIndex: 2}}>
+                <Image 
+                  source={{ uri: currentPet?.profiles?.avatar_url }}
+                  style={petDetailsBS.ownerImage}
+                />
+                <Text>test {currentPet?.profiles?.avatar_url}</Text>
+              </View>
+            </View>
+          </BottomSheetView>
+        </BottomSheet>
       </Portal>
     </PortalProvider>
   );
@@ -436,7 +568,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    zIndex: 2,
+    zIndex: 0,
   },
   coloredBox: {
     width: 55,
@@ -495,7 +627,7 @@ const styles = StyleSheet.create({
     borderRadius: 30,
     width: '73%',
     height: dimensions.screenHeight * 0.36,
-    marginTop: 40,
+    marginTop: dimensions.screenHeight * 0.05,
     alignSelf: 'center',
     alignItems: 'center',
     shadowColor: '#000',
@@ -648,7 +780,7 @@ const styles = StyleSheet.create({
   },
 });
 
-const bs = StyleSheet.create({
+const selectPetBS = StyleSheet.create({
   mainCont: {
     flex: 1,
     backgroundColor: "#F8F8FF",
@@ -665,5 +797,34 @@ const bs = StyleSheet.create({
   headTitle: {
     fontFamily: 'Poppins-Medium',
     fontSize: dimensions.screenWidth * 0.04,
+  }
+});
+
+const petDetailsBS = StyleSheet.create({
+  mainCont: {
+    flex: 1,
+    backgroundColor: "#F8F8FF",
+    position: "relative",
+    borderTopLeftRadius: 30,
+    borderTopRightRadius: 30,
+    overflow: "hidden",
+  },
+  header: {
+    alignItems: 'center',
+    position: 'relative'
+  },
+  headTitle: {
+    fontFamily: 'Poppins-Medium',
+    fontSize: dimensions.screenWidth * 0.04,
+  },
+  image: {
+    width: dimensions.screenWidth,
+    height: dimensions.screenHeight * 0.4,
+    borderBottomLeftRadius: 23,
+    borderBottomRightRadius: 23
+  },
+  ownerImage: {
+    width: dimensions.screenWidth * 0.1,
+    height: dimensions.screenWidth * 0.1,
   }
 });

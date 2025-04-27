@@ -30,7 +30,7 @@ const MatchedScreen = (props: Props) => {
         const timer = setTimeout(() => {
             Animated.sequence([
                 Animated.timing(moveAnim, {
-                    toValue: -dimensions.screenHeight * 0.13,
+                    toValue: -dimensions.screenHeight * 0.1,
                     duration: 500,
                     useNativeDriver: true,
                 }),
@@ -62,8 +62,13 @@ const MatchedScreen = (props: Props) => {
             <Ionicons name='paw' size={dimensions.screenWidth * 0.5} color="#f29430" style={[styles.pawStyle, styles.topPaw]} />
             <Ionicons name='paw' size={dimensions.screenWidth * 0.5} color="#f29430" style={[styles.pawStyle, styles.bottomPaw]} />
 
+            <Image 
+              source={require('../../assets/images/others/PetBGMatch.png')}
+              style={styles.petBGMatch}
+            />
+
             <Animated.View style={[styles.headerCont, { transform: [{ translateY: moveAnim }] }]}>
-                <Text style={styles.headerTitle}>Match Found!</Text>
+                <Text style={styles.headerTitle}>It's a Match</Text>
             </Animated.View>
 
             <Animated.View style={[styles.detailsCont, { opacity: detailsOpacity }]}>
@@ -74,7 +79,12 @@ const MatchedScreen = (props: Props) => {
                     />
                     <Image
                         source={{ uri: parsedMatchedPet?.pet_avatar ?? '' }}
-                        style={styles.petImage}
+                        style={[styles.petImage,
+                        {
+                            position: 'absolute',
+                            marginLeft: dimensions.screenWidth * 0.23
+                        }
+                        ]}
                     />
                 </View>
                 <Text style={styles.detailsText}>{parsedUsedPet?.name} has found a playmate!</Text>
@@ -82,7 +92,10 @@ const MatchedScreen = (props: Props) => {
 
             <Animated.View style={[styles.buttonCont, { opacity: buttonOpacity }]}>
                 <TouchableOpacity style={styles.button} onPress={handleContinue}>
-                    <Text style={styles.buttonText}>Continue</Text>
+                    <Text style={styles.buttonText}>Message</Text>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={handleContinue}>
+                    <Text style={styles.notNowButtonText}>Skip for now</Text>
                 </TouchableOpacity>
             </Animated.View>
         </View>
@@ -105,40 +118,56 @@ const styles = StyleSheet.create({
         right: -dimensions.screenWidth * 0.06,
         transform: 'rotate(-30deg)'
     },
+    petBGMatch: {
+        position: 'absolute',
+        top: dimensions.screenHeight * 0.25,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        width: dimensions.screenWidth * 1,
+        height: dimensions.screenHeight * 0.5
+    },
     mainCont: {
         backgroundColor: '#ffa545',
         flex: 1,
         width: dimensions.screenWidth,
         alignItems: 'center',
-        justifyContent: 'center',
+        // justifyContent: 'center',
+        paddingTop: dimensions.screenHeight * 0.3,
         position: 'relative'
     },
     headerCont: {
         alignItems: 'center',
         justifyContent: 'center',
+        // backgroundColor:'green'
     },
     headerTitle: {
-        fontFamily: 'Poppins-SemiBold',
+        fontFamily: 'HipsterScriptPro',
         color: '#fff',
-        fontSize: dimensions.screenWidth * 0.1,
+        fontSize: dimensions.screenWidth * 0.15,
     },
     detailsCont: {
         marginTop: 0,
+        padding: 0,
         alignItems: 'center',
+        // backgroundColor:'red'
     },
     detailsText: {
         fontFamily: 'Poppins-Regular',
-        fontSize: 20,
+        fontSize: dimensions.screenWidth * 0.044,
+        textAlign: 'center',
         color: '#fff',
     },
     petImageCont: {
         flexDirection: 'row',
-        gap: dimensions.screenWidth * 0.05,
-        marginBottom: dimensions.screenHeight * 0.02,
+        marginBottom: dimensions.screenHeight * 0.025,
+        // backgroundColor: 'red',
+        alignItems: 'center',
+        width: dimensions.screenWidth * 0.49
     },
     petImage: {
-        width: dimensions.screenWidth * 0.22,
-        height: dimensions.screenWidth * 0.22,
+        width: dimensions.screenWidth * 0.26,
+        height: dimensions.screenWidth * 0.26,
         borderRadius: 100,
         borderColor: 'white',
         borderWidth: 2,
@@ -160,7 +189,13 @@ const styles = StyleSheet.create({
     },
     buttonText: {
         fontFamily: 'Poppins-SemiBold',
-        fontSize: 18,
+        fontSize: dimensions.screenWidth * 0.05,
         color: '#ffa545',
     },
+    notNowButtonText: {
+        fontFamily: 'Poppins-SemiBold',
+        marginTop: dimensions.screenHeight * 0.03,
+        color: '#fff',
+        fontSize: dimensions.screenWidth * 0.04
+    }
 });

@@ -13,6 +13,14 @@ interface Pets {
     size?: string;
     createdAt: Date;
     updatedAt?: Date;
-} 
+    profiles?: PetOwnerProfile
+}
+
+interface PetOwnerProfile {
+    id: string;
+    first_name: string;
+    last_name: string;
+    avatar_url: string;
+}
 
 export default Pets;
