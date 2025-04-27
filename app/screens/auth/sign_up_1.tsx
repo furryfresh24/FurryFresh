@@ -1,4 +1,4 @@
-import { Alert, StyleSheet, Text, View } from 'react-native'
+import { Alert, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import React, { useState } from 'react'
 import MainContCircle from '../../components/general/background_circle'
 import Title1 from '../../components/texts/title1'
@@ -122,6 +122,12 @@ const SignUp = (props: Props) => {
           marginBottom={dimensions.screenHeight * 0.07}
         />
         <Button1 title="Continue" isPrimary={true} loading={loading} borderRadius={15} onPress={signUpWithEmail} />
+        <View style={styles.container3}>
+                            <Text style={styles.accountLogin}>Already have an account?</Text>
+                            <TouchableOpacity style={styles.clicker} onPress={() => {router.push('./sign_in')}}>
+                                <Text style={styles.signin}>Sign In</Text>
+                            </TouchableOpacity> 
+                        </View>
       </View>
     </MainContCircle>
   )
@@ -133,5 +139,32 @@ const styles = StyleSheet.create({
   header: {
     marginTop: dimensions.screenHeight * 0.1,
     alignItems: 'flex-start'
-  }
+  },
+  container3: {
+          alignItems: 'center',
+          justifyContent: 'center',
+          width: '100%',
+          flexDirection: 'row',
+          margin: 0,
+          padding: 0,
+          marginTop: dimensions.screenHeight * 0.04
+        },
+        accountLogin: {
+          fontFamily: 'Poppins-Regular',
+          alignSelf: 'center',
+          textAlign: 'center',
+          margin: 0,
+          padding: 0,
+          lineHeight: 20,
+          opacity: 0.6
+        },
+        clicker: {
+          marginLeft: 5,
+        },
+        signin: {
+          fontFamily: 'Poppins-SemiBold',
+          textAlign: 'center',
+          lineHeight: 20, 
+          color: '#ED7964',
+        },
 })

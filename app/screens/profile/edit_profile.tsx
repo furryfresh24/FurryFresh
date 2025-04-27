@@ -1,72 +1,100 @@
-import { StyleSheet, Text, View, ScrollView, TouchableOpacity, Alert } from 'react-native'
-import React, { useEffect, useState } from 'react'
-import MainContPaw from '../../components/general/background_paw'
-import AppbarDefault from '../../components/bars/appbar_default'
-import { useSession } from '../../context/sessions_context'
-import dimensions from '../../utils/sizing'
-import PlainTextInput from '../../components/inputs/custom_text_input2'
-import supabase from '../../utils/supabase'
+import { StyleSheet, Text, View, ScrollView, TouchableOpacity, Alert } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import MainContPaw from '../../components/general/background_paw';
+import AppbarDefault from '../../components/bars/appbar_default';
+import { useSession } from '../../context/sessions_context';
+import dimensions from '../../utils/sizing';
+import PlainTextInput from '../../components/inputs/custom_text_input2';
+import supabase from '../../utils/supabase';
+import DateTimePicker from '@react-native-community/datetimepicker';
+import moment from 'moment';
 
 const EditProfile = () => {
-  const { session } = useSession()
-  const [firstName, setFirstName] = useState('')
-  const [lastName, setLastName] = useState('')
-  const [contactNumber, setContactNumber] = useState('')
-  const [bio, setBio] = useState('')
-  const [address, setAddress] = useState('')
-  const [website, setWebsite] = useState('')
-  const [avatarUrl, setAvatarUrl] = useState('')
-  const [petTypes, setPetTypes] = useState('')
-  const [loading, setLoading] = useState(false)
+  const { session } = useSession();
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [contactNumber, setContactNumber] = useState('');
+  const [bio, setBio] = useState('');
+  const [address, setAddress] = useState('');
+  const [birthday, setBirthday] = useState(new Date());
+  const [showPicker, setShowPicker] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (session?.user?.id) {
-      fetchProfile()
+      fetchProfile();
     }
-  }, [session])
+  }, [session]);
 
   const fetchProfile = async () => {
-
     if (session) {
-      setFirstName(session.user?.user_metadata['first_name'] || '')
-      setLastName(session.user?.user_metadata['last_name'] || '')
-      setContactNumber(session.user?.user_metadata['contact_number'] || '')
-      setBio(session.user?.user_metadata['bio'] || '')
-      setAddress(session.user?.user_metadata['address'] || '')
-      setWebsite(session.user?.user_metadata['website'] || '')
-      setAvatarUrl(session.user?.user_metadata['avatar_url'] || '')
-      setPetTypes(session.user?.user_metadata['pet_types'] || '')
+      const metadata = session.user?.user_metadata || {};
+      setFirstName(metadata['first_name'] || '');
+      setLastName(metadata['last_name'] || '');
+      setContactNumber(metadata['contact_number'] || '');
+      setBio(metadata['bio'] || '');
+      setAddress(metadata['address'] || '');
+      const birthdayString = metadata['Birthday'] || '';
+      setBirthday(birthdayString ? new Date(birthdayString) : new Date());
     }
-  }
+  };
 
   const handleSave = async () => {
-    if (!session?.user?.id) return
-
-    setLoading(true)
-
-    const { error } = await supabase
-      .from('profiles')
-      .update({
-        first_name: firstName,
-        last_name: lastName,
-        contact_num: contactNumber,
-        bio,
-        address,
-        website,
-        avatar_url: avatarUrl,
-        pet_types: petTypes,
-        updated_at: new Date().toISOString(),
-      })
-      .eq('id', session.user.id)
-
-    setLoading(false)
-
-    if (error) {
-      Alert.alert('Update Failed', error.message)
-    } else {
-      Alert.alert('Success', 'Profile updated successfully.')
+    if (!session?.user?.id) return;
+  
+    setLoading(true);
+  
+    try {
+      const { error: profileError } = await supabase
+        .from('profiles')
+        .update({
+          first_name: firstName,
+          last_name: lastName,
+          contact_number: contactNumber,
+          bio,
+          address,
+          Birthday: moment(birthday).format('YYYY-MM-DD'),
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', session.user.id);
+  
+      if (profileError) throw profileError;
+  
+      const { error: authError } = await supabase.auth.updateUser({
+        data: {
+          first_name: firstName,
+          last_name: lastName,
+          contact_number: contactNumber,
+          bio,
+          address,
+          Birthday: moment(birthday).format('YYYY-MM-DD'),
+        },
+      });
+  
+      if (authError) throw authError;
+  
+      const { error: refreshError } = await supabase.auth.refreshSession();
+      if (refreshError) throw refreshError;
+  
+      Alert.alert('Success', 'Profile updated successfully.');
+    } catch (error: any) { // Specify the error type here
+      console.error("Error updating user:", error); 
+      Alert.alert('Update Failed', error.message || 'An unknown error occurred.');
+    } finally {
+      setLoading(false);
     }
-  }
+  };
+
+  const showDatePicker = () => {
+    setShowPicker(true);
+  };
+
+  // Updated onDateChange function with types
+  const onDateChange = (event: any, selectedDate?: Date) => {
+    const currentDate = selectedDate || birthday;
+    setShowPicker(false);
+    setBirthday(currentDate);
+  };
 
   return (
     <View style={{ height: '100%', backgroundColor: '#F8F8FF' }}>
@@ -109,21 +137,20 @@ const EditProfile = () => {
             onChangeText={setAddress}
             placeholder="Address"
           />
-          <PlainTextInput
-            value={website}
-            onChangeText={setWebsite}
-            placeholder="Website"
-          />
-          <PlainTextInput
-            value={avatarUrl}
-            onChangeText={setAvatarUrl}
-            placeholder="Avatar URL"
-          />
-          <PlainTextInput
-            value={petTypes}
-            onChangeText={setPetTypes}
-            placeholder="Pet Types (e.g., Dog, Cat)"
-          />
+          <TouchableOpacity style={styles.dateInput} onPress={showDatePicker}>
+            <Text style={styles.dateText}>
+              {moment(birthday).format('MMM D, YYYY')}
+            </Text>
+          </TouchableOpacity>
+
+          {showPicker && (
+            <DateTimePicker
+              value={birthday}
+              mode="date"
+              display="default"
+              onChange={onDateChange}
+            />
+          )}
 
           <TouchableOpacity style={styles.button} onPress={handleSave} disabled={loading}>
             <Text style={styles.buttonText}>{loading ? 'Saving...' : 'Save Changes'}</Text>
@@ -131,10 +158,10 @@ const EditProfile = () => {
         </ScrollView>
       </MainContPaw>
     </View>
-  )
-}
+  );
+};
 
-export default EditProfile
+export default EditProfile;
 
 const styles = StyleSheet.create({
   content: {
@@ -153,4 +180,15 @@ const styles = StyleSheet.create({
     fontFamily: 'Poppins-SemiBold',
     fontSize: dimensions.screenWidth * 0.04,
   },
-})
+  dateInput: {
+    backgroundColor: '#fff',
+    padding: 16,
+    borderRadius: 10,
+    alignItems: 'center',
+    marginTop: 10,
+  },
+  dateText: {
+    color: '#000',
+    fontSize: dimensions.screenWidth * 0.04,
+  },
+});
