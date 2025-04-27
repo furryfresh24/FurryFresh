@@ -6,7 +6,11 @@ import {
     StyleSheet,
     TouchableOpacity,
     TextInput,
-    Image
+    Image,
+    Platform,
+    KeyboardAvoidingView,
+    Keyboard,
+    TouchableWithoutFeedback
 } from "react-native";
 import { petsStyles } from "./components/petsStyles";
 import { Ionicons } from "@expo/vector-icons";
@@ -20,7 +24,7 @@ import CatIcon from "../../components/svgs/signUp/CatIcon";
 import HorizontalButtonList from "../../components/list/horizontal_button_list";
 import MaleIcon from "../../components/svgs/personal/MaleIcon";
 import FemaleIcon from "../../components/svgs/personal/FemaleIcon";
-import { DateTimePickerAndroid } from '@react-native-community/datetimepicker';
+import DateTimePicker, { DateTimePickerAndroid } from '@react-native-community/datetimepicker';
 import CustomInputEvent from "../../components/inputs/custom_input_event";
 import moment from "moment";
 import Spacer from "../../components/general/spacer";
@@ -45,7 +49,8 @@ const EditPet = ({ back, pet }: EditPetProps) => {
     const [petName, setPetName] = useState(pet.name);
     const [petType, setPetType] = useState(pet.pet_type);
     const [petGender, setPetGender] = useState(pet.gender);
-    const [petBirthday, setPetBirthday] = useState(pet.birthday || "");
+    const [showPicker, setShowPicker] = useState(false);
+    const [petBirthday, setPetBirthday] = useState<Date>(pet.birthday || null);
     const [petBio, setPetBio] = useState(pet.bio || "");
     const [petWeight, setPetWeight] = useState(pet.weight || "");
     const [petBreed, setPetBreed] = useState(pet.breed || "");
@@ -68,20 +73,35 @@ const EditPet = ({ back, pet }: EditPetProps) => {
         }
     };
 
-    const showDatepicker = () => {
-        DateTimePickerAndroid.open({
-            value: date,
-            onChange: (_event: any, selectedDate?: Date) => {
-                if (selectedDate) {
-                    setDate(selectedDate);
-                    setPetBirthday(selectedDate);
-                }
-            },
-            mode: 'date',
-            is24Hour: true,
-            maximumDate: new Date(),
-        });
+    const onChange = (event: any, selectedDate?: Date) => {
+        const currentDate = selectedDate || date;
+        setDate(currentDate);
+
+        setPetBirthday(currentDate);
+
+        setShowPicker(false);
     };
+
+    const showMode = async (currentMode: 'date' | 'time') => {
+        if (Platform.OS === 'android') {
+            DateTimePickerAndroid.open({
+                value: date,
+                onChange,
+                mode: currentMode,
+                is24Hour: true,
+                maximumDate: new Date(),
+            });
+            console.log('Opening Android Picker');
+        } else {
+            setShowPicker(true);
+            console.log('Opening iOS Picker');
+        }
+    };
+
+    const showDatepicker = () => {
+        showMode('date');
+    };
+
 
     const handleUpdatePet = async () => {
         try {
@@ -94,7 +114,7 @@ const EditPet = ({ back, pet }: EditPetProps) => {
                 birthday: petBirthday || null,
                 bio: petBio,
                 breed: petBreed,
-                weight: petWeight,
+                weight: parseFloat(petWeight) || null,
             };
 
             const { data: updatedPet, error } = await supabase
@@ -165,194 +185,224 @@ const EditPet = ({ back, pet }: EditPetProps) => {
     ];
 
     return (
-        <View style={petsStyles.addPetContainer}>
-            <View style={{ zIndex: 1 }}>
-                <AppbarDefault
-                    title="Edit Pet"
-                    session={session}
-                    showLeading={false}
-                    leadFunction={back}
-                    leadingChildren={null}
-                    titleSize={dimensions.screenWidth * 0.045}
-                />
-            </View>
-            <MainContPaw>
-                {/* Photo Upload */}
-                <View style={styles.photoUploadContainer}>
-                    <View style={{ position: "relative" }}>
-                        <View style={[styles.circleAdd]}>
-                            <View style={styles.photoPlaceholder}>
-                                <Ionicons name="image-outline" size={40} color="#aaa" />
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+            <KeyboardAvoidingView behavior="padding" style={petsStyles.addPetContainer}>
+                <View style={{ zIndex: 1 }}>
+                    <AppbarDefault
+                        title="Edit Pet"
+                        session={session}
+                        showLeading={false}
+                        leadFunction={back}
+                        leadingChildren={null}
+                        titleSize={dimensions.screenWidth * 0.045}
+                    />
+                </View>
+                <MainContPaw>
+                    {/* Photo Upload */}
+                    <View style={styles.photoUploadContainer}>
+                        <View style={{ position: "relative" }}>
+                            <View style={[styles.circleAdd]}>
+                                <View style={styles.photoPlaceholder}>
+                                    <Ionicons name="image-outline" size={40} color="#aaa" />
+                                </View>
+                                <Text style={styles.photoPlaceholderText}>
+                                    {"Attach a Photo\nof your pet"}
+                                </Text>
+
+                                {image && (
+                                    <Image
+                                        source={{ uri: image }}
+                                        style={{
+                                            width: dimensions.screenWidth * 0.35,
+                                            height: dimensions.screenWidth * 0.35,
+                                            borderColor: "#D1D1D1",
+                                            borderWidth: 1.2,
+                                            position: 'absolute',
+                                            borderRadius: 100
+                                        }}
+                                    />
+                                )}
+
+                                <TouchableOpacity style={styles.cameraIcon} onPress={() => pickImage()}>
+                                    <Ionicons
+                                        name="camera"
+                                        size={dimensions.screenWidth * 0.055}
+                                        color="#777"
+                                    />
+                                </TouchableOpacity>
                             </View>
-                            <Text style={styles.photoPlaceholderText}>
-                                {"Attach a Photo\nof your pet"}
-                            </Text>
-
-                            {image && (
-                                <Image
-                                    source={{ uri: image }}
-                                    style={{
-                                        width: dimensions.screenWidth * 0.35,
-                                        height: dimensions.screenWidth * 0.35,
-                                        borderColor: "#D1D1D1",
-                                        borderWidth: 1.2,
-                                        position: 'absolute',
-                                        borderRadius: 100
-                                    }}
-                                />
-                            )}
-
-                            <TouchableOpacity style={styles.cameraIcon} onPress={() => pickImage()}>
-                                <Ionicons
-                                    name="camera"
-                                    size={dimensions.screenWidth * 0.055}
-                                    color="#777"
-                                />
-                            </TouchableOpacity>
                         </View>
                     </View>
-                </View>
 
-                {/* Pet Name */}
-                <View style={styles.formGroup}>
-                    <Text style={petsStyles.formLabel}>Pet Name</Text>
-                    <PlainTextInput
-                        value={petName}
-                        onChangeText={setPetName}
-                        placeholder="Enter your pet's name"
-                        keyboardType="default"
-                        backgroundColor="white"
-                        height={dimensions.screenHeight * 0.065}
-                        marginBottom={dimensions.screenHeight * 0.0}
-                    />
-                </View>
-
-                {/* Pet Type */}
-                <View>
-                    <View style={[styles.formGroup]}>
-                        <Text style={petsStyles.formLabel}>Pet Type</Text>
+                    {/* Pet Name */}
+                    <View style={styles.formGroup}>
+                        <Text style={petsStyles.formLabel}>Pet Name</Text>
+                        <PlainTextInput
+                            value={petName}
+                            onChangeText={setPetName}
+                            placeholder="Enter your pet's name"
+                            keyboardType="default"
+                            backgroundColor="white"
+                            height={dimensions.screenHeight * 0.065}
+                            marginBottom={dimensions.screenHeight * 0.0}
+                        />
                     </View>
-                    <HorizontalButtonList
-                        services={petTypes}
-                        activeService={activePetType}
-                        setActiveService={(id) => {
-                            setActivePetType(id);
-                        }}
-                        marginLeft={dimensions.screenWidth * 0.05}
-                        marginTop={0}
-                        paddingHorizontal={dimensions.screenWidth * 0.06}
-                    />
-                </View>
 
-                {/* Pet Gender */}
-                <View>
-                    <View style={[styles.formGroup]}>
-                        <Text style={petsStyles.formLabel}>Pet Gender</Text>
+                    {/* Pet Type */}
+                    <View>
+                        <View style={[styles.formGroup]}>
+                            <Text style={petsStyles.formLabel}>Pet Type</Text>
+                        </View>
+                        <HorizontalButtonList
+                            services={petTypes}
+                            activeService={activePetType}
+                            setActiveService={(id) => {
+                                setActivePetType(id);
+                            }}
+                            marginLeft={dimensions.screenWidth * 0.05}
+                            marginTop={0}
+                            paddingHorizontal={dimensions.screenWidth * 0.06}
+                        />
                     </View>
-                    <HorizontalButtonList
-                        services={petGenders}
-                        activeService={activePetGender}
-                        setActiveService={(id) => {
-                            setActivePetGender(id);
-                        }}
-                        activeColor="#466AA2"
-                        marginLeft={dimensions.screenWidth * 0.05}
-                        marginTop={0}
-                        paddingHorizontal={dimensions.screenWidth * 0.06}
+
+                    {/* Pet Gender */}
+                    <View>
+                        <View style={[styles.formGroup]}>
+                            <Text style={petsStyles.formLabel}>Pet Gender</Text>
+                        </View>
+                        <HorizontalButtonList
+                            services={petGenders}
+                            activeService={activePetGender}
+                            setActiveService={(id) => {
+                                setActivePetGender(id);
+                            }}
+                            activeColor="#466AA2"
+                            marginLeft={dimensions.screenWidth * 0.05}
+                            marginTop={0}
+                            paddingHorizontal={dimensions.screenWidth * 0.06}
+                        />
+                    </View>
+
+                    {/* Pet Breed */}
+                    <View style={styles.formGroup}>
+                        <Text style={petsStyles.formLabel}>Pet Breed</Text>
+                        <PlainTextInput
+                            value={petBreed}
+                            onChangeText={setPetBreed}
+                            placeholder="Enter your pet's breed"
+                            keyboardType="default"
+                            backgroundColor="white"
+                            height={dimensions.screenHeight * 0.065}
+                            marginBottom={dimensions.screenHeight * 0.0}
+                        />
+                    </View>
+
+
+                    {/* Pet Weight */}
+                    <View style={styles.formGroup}>
+                        <Text style={petsStyles.formLabel}>Pet Weight (Optional)</Text>
+                        <PlainTextInput
+                            value={petWeight}
+                            onChangeText={setPetWeight}
+                            placeholder="Enter your pet's weight"
+                            keyboardType="default"
+                            backgroundColor="white"
+                            height={dimensions.screenHeight * 0.065}
+                            marginBottom={dimensions.screenHeight * 0.0}
+                        />
+                    </View>
+
+                    {/* Pet Birthday */}
+                    <View style={styles.formGroup}>
+                        <Text style={petsStyles.formLabel}>Pet's Birthday (Optional)</Text>
+                        <CustomInputEvent
+                            title={petBirthday ? moment(petBirthday).format('MMM D, YYYY') : "Select your Pet's Birthday"}
+                            onPress={() => showDatepicker()}
+                            backgroundColor="#ffffff"
+                            fontColor={petBirthday ? '#000' : "#bbb"}
+                            fontSize={dimensions.screenWidth * 0.035}
+                            paddingHorizontal={dimensions.screenWidth * 0.05}
+                            paddingVertical={dimensions.screenHeight * 0.02}
+                            borderRadius={10}
+                            // trailing={<Text style={{ color: 'gray' }}>Optional</Text>}
+                            iconOnEnd={{
+                                name: 'calendar',
+                                size: 20,
+                                color: '#999',
+                            }}
+                        />
+                    </View>
+
+                    {/* Pet Bio */}
+                    <View style={styles.formGroup}>
+                        <Text style={petsStyles.formLabel}>Pet's Bio (Optional)</Text>
+                        <TextInput
+                            style={[
+                                petsStyles.textInput,
+                                {
+                                    minHeight: 100,
+                                    textAlignVertical: "top",
+                                    fontSize: dimensions.screenWidth * 0.035,
+                                    paddingHorizontal: dimensions.screenWidth * 0.05
+                                },
+                            ]}
+                            placeholder="Tell us about your pet..."
+                            placeholderTextColor="#bbb"
+                            value={petBio}
+                            onChangeText={setPetBio}
+                            multiline={true}
+                            numberOfLines={4}
+                        />
+                    </View>
+                    <Spacer height={dimensions.screenHeight * 0.15} />
+                </MainContPaw>
+                {/* Create Button */}
+                <View
+                    style={{
+                        position: 'absolute',
+                        bottom: dimensions.screenHeight * 0.04,
+                        left: dimensions.screenWidth * 0.05,
+                        right: dimensions.screenWidth * 0.05,
+                    }}
+                >
+                    <Button1
+                        title="Save Changes"
+                        isPrimary={true}
+                        loading={isLoading}
+                        onPress={handleUpdatePet}
+                        borderRadius={15}
                     />
                 </View>
+                {Platform.OS === 'ios' && showPicker && (
+                    <View style={{
+                        zIndex: 3,
+                        backgroundColor: 'white',
+                        position: 'absolute',
+                        bottom: 0,
+                        width: dimensions.screenWidth,
+                        paddingTop: dimensions.screenHeight * 0.02,
+                        paddingBottom: dimensions.screenHeight * 0.05,
 
-                {/* Pet Breed */}
-                <View style={styles.formGroup}>
-                    <Text style={petsStyles.formLabel}>Pet Breed</Text>
-                    <PlainTextInput
-                        value={petBreed}
-                        onChangeText={setPetBreed}
-                        placeholder="Enter your pet's breed"
-                        keyboardType="default"
-                        backgroundColor="white"
-                        height={dimensions.screenHeight * 0.065}
-                        marginBottom={dimensions.screenHeight * 0.0}
-                    />
-                </View>
-
-
-                {/* Pet Weight */}
-                <View style={styles.formGroup}>
-                    <Text style={petsStyles.formLabel}>Pet Weight (Optional)</Text>
-                    <PlainTextInput
-                        value={petWeight}
-                        onChangeText={setPetWeight}
-                        placeholder="Enter your pet's weight"
-                        keyboardType="default"
-                        backgroundColor="white"
-                        height={dimensions.screenHeight * 0.065}
-                        marginBottom={dimensions.screenHeight * 0.0}
-                    />
-                </View>
-
-                {/* Pet Birthday */}
-                <View style={styles.formGroup}>
-                    <Text style={petsStyles.formLabel}>Pet's Birthday (Optional)</Text>
-                    <CustomInputEvent
-                        title={petBirthday ? moment(petBirthday).format('MMM D, YYYY') : "Select your Pet's Birthday"}
-                        onPress={() => showDatepicker()}
-                        backgroundColor="#ffffff"
-                        fontColor={petBirthday ? '#000' : "#bbb"}
-                        fontSize={dimensions.screenWidth * 0.035}
-                        paddingHorizontal={dimensions.screenWidth * 0.05}
-                        paddingVertical={dimensions.screenHeight * 0.02}
-                        borderRadius={10}
-                        // trailing={<Text style={{ color: 'gray' }}>Optional</Text>}
-                        iconOnEnd={{
-                            name: 'calendar',
-                            size: 20,
-                            color: '#999',
-                        }}
-                    />
-                </View>
-
-                {/* Pet Bio */}
-                <View style={styles.formGroup}>
-                    <Text style={petsStyles.formLabel}>Pet's Bio (Optional)</Text>
-                    <TextInput
-                        style={[
-                            petsStyles.textInput,
-                            {
-                                minHeight: 100,
-                                textAlignVertical: "top",
-                                fontSize: dimensions.screenWidth * 0.035,
-                                paddingHorizontal: dimensions.screenWidth * 0.05
-                            },
-                        ]}
-                        placeholder="Tell us about your pet..."
-                        placeholderTextColor="#bbb"
-                        value={petBio}
-                        onChangeText={setPetBio}
-                        multiline={true}
-                        numberOfLines={4}
-                    />
-                </View>
-                <Spacer height={dimensions.screenHeight * 0.15} />
-            </MainContPaw>
-            {/* Create Button */}
-            <View
-                style={{
-                    position: 'absolute',
-                    bottom: dimensions.screenHeight * 0.04,
-                    left: dimensions.screenWidth * 0.05,
-                    right: dimensions.screenWidth * 0.05,
-                }}
-            >
-                <Button1
-                    title="Save Changes"
-                    isPrimary={true}
-                    loading={isLoading}
-                    onPress={handleUpdatePet}
-                    borderRadius={15}
-                />
-            </View>
-        </View>
+                        shadowColor: '#000',
+                        shadowOffset: { width: 0, height: -5 },
+                        shadowOpacity: 0.1,
+                        shadowRadius: 10,
+                        elevation: 5,
+                    }}>
+                        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: dimensions.screenWidth * 0.02 }}>
+                            <Text>Birthday</Text>
+                            <DateTimePicker
+                                value={date}
+                                mode="date"
+                                onChange={onChange}
+                                maximumDate={new Date()}
+                                display="default"
+                            />
+                        </View>
+                    </View>
+                )}
+            </KeyboardAvoidingView>
+        </TouchableWithoutFeedback>
     );
 };
 

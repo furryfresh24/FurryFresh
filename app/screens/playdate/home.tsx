@@ -42,7 +42,7 @@ const Home = () => {
   const [allSwiped, setAllSwiped] = useState(false);
   const [selectedPet, setSelectedPet] = useState<Pets | null>(null);
   const selectPetRef = useRef<BottomSheet>(null);
-  const selectPetSnapPoints = useMemo(() => ["50%"], []);
+  const selectPetSnapPoints = useMemo(() => ["60%"], []);
 
   const petDetailsRef = useRef<BottomSheet>(null);
   const petDetailsSnapPoints = useMemo(() => ["80%"], []);
@@ -244,6 +244,8 @@ const Home = () => {
 
   useEffect(() => {
     if (selectedPet === null) {
+    console.log('nullll')
+
       setTimeout(function () {
         openSheet();
       }, 500);
