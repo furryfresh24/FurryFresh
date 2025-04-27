@@ -17,6 +17,7 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { PortalProvider } from "@gorhom/portal";
 import { TouchableOpacity, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import { useMessages } from "./realtime/messages";
 
 const RootLayout = () => {
   const fontsLoaded = useCustomFonts();
@@ -47,6 +48,7 @@ const RootLayout = () => {
 
     return () => subscription?.unsubscribe();
   }, []);
+
 
   // App preparation logic
   useEffect(() => {
@@ -305,7 +307,7 @@ const RootLayout = () => {
               />
               <Stack.Screen
                 name="screens/playdate/matched"
-                options={{ 
+                options={{
                   headerShown: false,
                   animation: 'fade'
                 }}

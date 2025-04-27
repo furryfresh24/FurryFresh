@@ -26,6 +26,8 @@ import { GestureHandlerRootView, GestureDetector, Gesture, PanGestureHandler } f
 import moment from 'moment';
 import Spacer from '../../components/general/spacer';
 import { Heart, HeartHandshake, PawPrint, MessageCircle, MessageCircleMore } from "lucide-react-native";
+import { useMessages } from '../../realtime/messages';
+import { useConversations } from '../../realtime/conversations';
 
 const screenWidth = dimensions.screenWidth;
 const screenHeight = dimensions.screenHeight;
@@ -47,6 +49,21 @@ const Home = () => {
 
   const petDetailsRef = useRef<BottomSheet>(null);
   const petDetailsSnapPoints = useMemo(() => ["80%"], []);
+
+
+
+  const { newMessages } = useMessages();
+
+  useEffect(() => {
+    console.log('New incoming messages:', newMessages);
+  }, [newMessages]);
+
+  const { newConversations } = useConversations();
+
+  useEffect(() => {
+    console.log('New incoming conversation:', newConversations);
+  }, [newConversations]);
+
 
   const dataToMap = [
     { label: 'Friendly' },
@@ -71,7 +88,7 @@ const Home = () => {
     const storeRemovedForAWhile = fetchedPets.find((pet) => pet.id == idToDelete);
 
     setCurrentPet(null);
-    
+
     console.log('removing: ' + idToDelete + ' to the ' + direction);
     alreadyRemoved.current.push(idToDelete);
 
@@ -110,16 +127,36 @@ const Home = () => {
 
       if (mutualMatch) {
         console.log('Mutual match found! 🎉', mutualMatch);
+
+        const { data: insertedConversation, error: conversationError } = await supabase
+          .from('playdate_conversations')
+          .insert({
+            pet_1_id: selectedPet?.id,
+            pet_2_id: idToDelete,
+            created_at: new Date()
+          })
+          .select()
+          .single();
+
+        if (conversationError) {
+          console.error('Error creating conversation:', conversationError);
+          // You can choose to continue anyway or show error
+        } else {
+          console.log('Conversation created:', insertedConversation);
+        }
+
         router.push({
           pathname: './matched',
           params: {
             mutualMath: JSON.stringify(mutualMatch),
             insertedMatch: JSON.stringify(insertedMatch),
+            insertedConversation: JSON.stringify(insertedConversation), // maybe you want to pass it
             usedPet: JSON.stringify(selectedPet),
             matchedPet: JSON.stringify(storeRemovedForAWhile)
           }
         });
-      } else {
+      }
+      else {
         console.log('No match found!');
 
       }
@@ -244,7 +281,7 @@ const Home = () => {
 
   useEffect(() => {
     if (selectedPet === null) {
-    console.log('nullll')
+      console.log('nullll')
 
       setTimeout(function () {
         openSheet();
@@ -331,7 +368,7 @@ const Home = () => {
                 resizeMode="contain"
               />
               <View style={styles.infoRow}>
-                <View style={{flex: 1 }}>
+                <View style={{ flex: 1 }}>
                   <Text numberOfLines={2} style={styles.containerTitle}>
                     {pet.name.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')}
                   </Text>
@@ -427,7 +464,7 @@ const Home = () => {
         }
 
         <View style={styles.matchesButton}>
-          <MessageCircleMore size={dimensions.screenWidth * 0.07} color="white"/>
+          <MessageCircleMore size={dimensions.screenWidth * 0.07} color="white" />
         </View>
       </View>
       <Portal>
@@ -436,7 +473,7 @@ const Home = () => {
           snapPoints={selectPetSnapPoints}
           index={-1}
           enablePanDownToClose={true}
-          handleComponent={null} 
+          handleComponent={null}
           backgroundStyle={{ backgroundColor: "transparent" }}
           backdropComponent={selectPetBackDrop}
           onChange={selectPetHandleSheetChange}
@@ -447,7 +484,7 @@ const Home = () => {
             </View>
             <FlatList
               data={filterMyPetsData()}
-              style={{ flex: 1 ,  }}
+              style={{ flex: 1, }}
               renderItem={({ item, index }) => (
                 <TouchableOpacity
                   style={styles.petItemCont}

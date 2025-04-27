@@ -7,6 +7,8 @@ import { SubcategoryProvider } from './subcategory_context';
 import { GroomingProvider } from './grooming_context';
 import { BookingProvider } from './booking_context';
 import { OrderProvider } from './order_context';
+import { ConversationsProvider } from '../realtime/conversations';
+import { MessagesProvider } from '../realtime/messages';
 
 interface ProvidersProps {
   children: React.ReactNode;
@@ -22,7 +24,11 @@ const Providers: React.FC<ProvidersProps> = ({ children }) => {
               <OrderProvider>
                 <CartProvider>
                   <PetProvider>
-                    {children}
+                    <ConversationsProvider>
+                      <MessagesProvider>
+                        {children}
+                      </MessagesProvider>
+                    </ConversationsProvider>
                   </PetProvider>
                 </CartProvider>
               </OrderProvider>
