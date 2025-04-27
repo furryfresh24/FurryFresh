@@ -115,12 +115,13 @@ const MessageScreen = () => {
 
                 <View style={{ flex: 1, alignItems: isMine ? 'flex-end' : 'flex-start' }}>
                     <View style={[
+                        { maxWidth: dimensions.screenWidth * 0.65 },
                         isMine ? styles.myMessageBubble : styles.senderMessageBubble, ,
                         isMine ? styles.myBubble : styles.theirBubble,
-                        isStartOfBlock && !isMine && { borderTopLeftRadius: 18, borderTopRightRadius: 30 }, // optional example
-                        isLastOfBlock && !isMine && { borderBottomLeftRadius: 18, borderBottomRightRadius: 30 }, // optional example
-                        isStartOfBlock && isMine && { borderTopRightRadius: 18, borderTopLeftRadius: 30 }, // optional example
-                        isLastOfBlock && isMine && { borderBottomRightRadius: 18, borderBottomLeftRadius: 30 }, // optional example
+                        isStartOfBlock && !isMine && { borderTopLeftRadius: 18, borderTopRightRadius: 20 },
+                        isLastOfBlock && !isMine && { borderBottomLeftRadius: 18, borderBottomRightRadius: 20 }, 
+                        isStartOfBlock && isMine && { borderTopRightRadius: 18, borderTopLeftRadius: 20 },
+                        isLastOfBlock && isMine && { borderBottomRightRadius: 18, borderBottomLeftRadius: 20 }, 
                     ]}>
                         <Text style={[styles.messageText, isMine ? styles.myBubbleText : styles.theirBubbleText]}>
                             {item.content}
@@ -148,7 +149,9 @@ const MessageScreen = () => {
                     style={styles.list}
                     contentContainerStyle={styles.contentContainer}
                     renderItem={renderItem}
-                    showsVerticalScrollIndicator={false}
+                    onContentSizeChange={() => {
+                        flatListRef.current?.scrollToOffset({ offset: 999999, animated: true });
+                      }}
                 />
 
                 <View style={styles.inputContainer}>
@@ -201,16 +204,15 @@ const styles = StyleSheet.create({
         padding: 10,
         paddingHorizontal: dimensions.screenWidth * 0.03,
         borderRadius: 8,
-        borderTopRightRadius: 30,
-        borderBottomRightRadius: 30
+        borderTopRightRadius: 20,
+        borderBottomRightRadius: 20
     },
     myMessageBubble: {
-        maxWidth: '70%',
         padding: 10,
         paddingHorizontal: dimensions.screenWidth * 0.03,
         borderRadius: 8,
-        borderTopLeftRadius: 30,
-        borderBottomLeftRadius: 30
+        borderTopLeftRadius: 20,
+        borderBottomLeftRadius: 20
     },
     myBubble: {
         alignSelf: 'flex-end',
