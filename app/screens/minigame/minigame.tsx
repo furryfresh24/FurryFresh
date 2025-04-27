@@ -1,56 +1,106 @@
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, Image } from 'react-native';
+import { View, StyleSheet, Image, Text } from 'react-native';
 import { PanGestureHandler, PanGestureHandlerGestureEvent } from 'react-native-gesture-handler';
-import Animated, { useSharedValue, useAnimatedStyle, withSpring, withTiming, Easing } from 'react-native-reanimated';
+import Animated, { 
+  useSharedValue, 
+  useAnimatedStyle, 
+  withSpring, 
+  withTiming, 
+  Easing, 
+  useAnimatedReaction,
+  runOnJS
+} from 'react-native-reanimated';
 import dimensions from '../../utils/sizing';
 
 const Minigame = () => {
-  const [catImage] = useState(require('../../assets/images/others/miniGameCatOpen.png'));
-  const [fishImage] = useState(require('../../assets/images/others/miniGameFish.png')); // Fish image
+  const [catImageOpen] = useState(require('../../assets/images/others/miniGameCatOpen.png'));
+  const [catImageClose] = useState(require('../../assets/images/others/miniGameCatClose.png'));
+  const [catImage, setCatImage] = useState(catImageOpen);
 
-  const translateX = useSharedValue(0); // Shared value to track the horizontal movement
-  const translateY = useSharedValue(-dimensions.screenHeight * 0.1); // Initial position above the screen for the fish
-  const catContainerWidth = dimensions.screenWidth * 0.2; // Width of the cat container
-  const platformWidth = dimensions.screenWidth * 0.8; // Width of the platform container
-  const platformHeight = dimensions.screenHeight * 0.02; // Height of the platform container
-  const platformStartX = (dimensions.screenWidth - platformWidth) / 2; // Start X position of the platform container
-  const platformY = dimensions.screenHeight * 0.05; // Y position of the platform container
+  const [fishImage] = useState(require('../../assets/images/others/miniGameFish.png'));
+  const [logoImage] = useState(require('../../assets/images/general/furry-fresh-logo.png')); // Furry Fresh logo
 
-  // Fish falling animation
+  const translateX = useSharedValue(0);
+  const translateY = useSharedValue(-dimensions.screenHeight * 0.1);
+  const fishPosX = useSharedValue(0);
+
+  const [score, setScore] = useState(0);
+  const [gamePaused, setGamePaused] = useState(false); // Game paused state
+
+  const catContainerWidth = dimensions.screenWidth * 0.2;
+  const platformWidth = dimensions.screenWidth * 0.8;
+  const platformHeight = dimensions.screenHeight * 0.02;
+  const platformStartX = (dimensions.screenWidth - platformWidth) / 2;
+  const platformY = dimensions.screenHeight * 0.05;
+
+  const fishWidth = dimensions.screenWidth * 0.15;
+  const fishHeight = dimensions.screenHeight * 0.05;
+
   const startFishFall = () => {
-    translateY.value = withTiming(dimensions.screenHeight - platformHeight - dimensions.screenHeight * 0.07, {
-      duration: 2000,
-      easing: Easing.linear,
-    });
+    if (gamePaused) return; // Prevent fish fall if the game is paused
+    translateY.value = withTiming(
+      dimensions.screenHeight - platformHeight - dimensions.screenHeight * 0.07,
+      {
+        duration: 2000,
+        easing: Easing.linear,
+      }
+    );
+  };
+
+  const resetFish = () => {
+    if (gamePaused) return; // Prevent fish reset if the game is paused
+    const maxLeft = platformWidth - fishWidth;
+    const randomLeftWithinPlatform = Math.random() * maxLeft;
+    fishPosX.value = platformStartX + randomLeftWithinPlatform;
+    translateY.value = -dimensions.screenHeight * 0.1;
+    startFishFall();
+  };
+
+  const onCatEatFish = () => {
+    setCatImage(catImageClose);
+    setTimeout(() => {
+      setCatImage(catImageOpen);
+    }, 300);
+  };
+
+  const handleFishEaten = () => {
+    if (gamePaused) return; // Prevent score change if the game is paused
+    runOnJS(setScore)(prev => prev + 1);
+    resetFish();
+    onCatEatFish();
+  };
+
+  const handleFishMissed = () => {
+    if (gamePaused) return; // Prevent score change if the game is paused
+    runOnJS(setScore)(0);
+    resetFish();
+    runOnJS(setGamePaused)(true); // Pause the game
   };
 
   useEffect(() => {
-    startFishFall();
+    resetFish();
   }, []);
 
-  // Cast the event to the correct type
   const onGestureEvent = (event: PanGestureHandlerGestureEvent) => {
+    if (gamePaused) return; // Prevent gestures if the game is paused
     const { translationX } = event.nativeEvent;
-
-    // Limit the translationX to ensure it doesn't surpass the platformContainer boundaries
-    const maxTranslationX = platformWidth - catContainerWidth; // Maximum allowable translation
-    const minTranslationX = 0; // Minimum allowable translation (start point)
-
-    // Apply the limit for the translation
+    const maxTranslationX = platformWidth - catContainerWidth;
+    const minTranslationX = 0;
     let newTranslationX = translationX;
 
     if (newTranslationX < minTranslationX) {
-      newTranslationX = minTranslationX; // Prevent moving left beyond the platform container
+      newTranslationX = minTranslationX;
     } else if (newTranslationX > maxTranslationX) {
-      newTranslationX = maxTranslationX; // Prevent moving right beyond the platform container
+      newTranslationX = maxTranslationX;
     }
 
-    translateX.value = newTranslationX; // Update the position of the catContainer
+    translateX.value = newTranslationX;
   };
 
   const onHandlerStateChange = (event: any) => {
-    if (event.nativeEvent.state === 5) { // End of the gesture (GESTURE_STATE_END)
-      translateX.value = withSpring(translateX.value); // Smooth transition when drag is finished
+    if (gamePaused) return; // Prevent gesture state changes if the game is paused
+    if (event.nativeEvent.state === 5) {
+      translateX.value = withSpring(translateX.value);
     }
   };
 
@@ -64,16 +114,46 @@ const Minigame = () => {
     return {
       transform: [{ translateY: translateY.value }],
       position: 'absolute',
-      left: (dimensions.screenWidth - dimensions.screenWidth * 0.15) / 2, // Center horizontally
+      left: fishPosX.value,
     };
   });
 
+  useAnimatedReaction(
+    () => {
+      return {
+        fishY: translateY.value,
+        catX: translateX.value,
+      };
+    },
+    (values) => {
+      const fishCenterX = fishPosX.value + fishWidth / 2;
+      const catLeftX = platformStartX + values.catX;
+      const catRightX = catLeftX + catContainerWidth;
+      const catTopY = dimensions.screenHeight - dimensions.screenHeight * 0.07 - dimensions.screenHeight * 0.12;
+
+      const fishBottomY = values.fishY + fishHeight;
+      const platformTopY = dimensions.screenHeight - dimensions.screenHeight * 0.05 - platformHeight;
+
+      const isTouchingX = fishCenterX >= catLeftX && fishCenterX <= catRightX;
+      const isTouchingY = fishBottomY >= catTopY;
+
+      const isMissed = fishBottomY >= platformTopY;
+
+      if (isTouchingX && isTouchingY) {
+        runOnJS(handleFishEaten)();
+      } else if (isMissed) {
+        runOnJS(handleFishMissed)();
+      }
+    }
+  );
+
   return (
     <View style={styles.container}>
-      {/* Fish image falling from top to bottom */}
+      <Text style={styles.scoreText}>{score}</Text>
+
       <Animated.Image
         source={fishImage}
-        style={[styles.fish, fishStyle]} // Apply the falling animation style
+        style={[styles.fish, fishStyle]}
         resizeMode="contain"
       />
 
@@ -91,6 +171,21 @@ const Minigame = () => {
           />
         </Animated.View>
       </PanGestureHandler>
+
+      {/* Dark Overlay and Centered Message when Game is Paused */}
+      {gamePaused && (
+        <View style={styles.overlay}>
+          <View style={styles.centeredBox}>
+            <Image
+              source={logoImage}
+              style={styles.logo}
+              resizeMode="contain"
+            />
+            <Text style={styles.congratsText}>Congrats! Your Score is: </Text>
+            <Text style={styles.scoreTextCongrats}>{score}</Text>
+          </View>
+        </View>
+      )}
     </View>
   );
 };
@@ -99,6 +194,14 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#D0DFF4',
+  },
+  scoreText: {
+    fontSize: 36,
+    fontWeight: 'bold',
+    color: '#333',
+    position: 'absolute',
+    top: 40,
+    alignSelf: 'center',
   },
   platformContainer: {
     width: dimensions.screenWidth * 0.8,
@@ -111,14 +214,14 @@ const styles = StyleSheet.create({
   },
   catContainer: {
     position: 'absolute',
-    bottom: dimensions.screenHeight * 0.07, // Positioning it above the platformContainer
-    left: dimensions.screenWidth * 0.1, // Adjust to center the container
-    width: dimensions.screenWidth * 0.2, // Adjust width for the cat container
-    height: dimensions.screenHeight * 0.12, // Adjust height for the cat container
-    backgroundColor: '#F1C1C1', // Cat container background color
+    bottom: dimensions.screenHeight * 0.07,
+    left: dimensions.screenWidth * 0.1,
+    width: dimensions.screenWidth * 0.2,
+    height: dimensions.screenHeight * 0.12,
+    backgroundColor: '#F1C1C1',
     justifyContent: 'center',
     alignItems: 'center',
-    borderRadius: dimensions.screenWidth * 0.02, // Optional border radius for rounded corners
+    borderRadius: dimensions.screenWidth * 0.02,
   },
   cat: {
     width: '100%',
@@ -127,6 +230,34 @@ const styles = StyleSheet.create({
   fish: {
     width: dimensions.screenWidth * 0.15,
     height: dimensions.screenHeight * 0.05,
+  },
+  overlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(0, 0, 0, 0.7)', // Darkened overlay
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  centeredBox: {
+    backgroundColor: 'white',
+    padding: 20,
+    borderRadius: 10,
+    width: '60%', // Adjust as needed
+    alignItems: 'center',
+  },
+  logo: {
+    width: 80,
+    height: 80,
+  },
+  congratsText: {
+    fontSize: dimensions.screenWidth * 0.04,
+    marginTop: dimensions.screenWidth * 0.03,
+  },
+  scoreTextCongrats: {
+    fontSize: dimensions.screenWidth * 0.04,
+    fontWeight: 'bold',
+    color: '#333',
+    marginTop: dimensions.screenWidth * 0.02,
+    textAlign: 'center',
   },
 });
 
