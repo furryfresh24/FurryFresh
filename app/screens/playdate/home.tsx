@@ -172,19 +172,19 @@ const Home = () => {
 
   const fetchPets = useCallback(async () => {
     setAllSwiped(false);
-  
+
     const { data: matchesMade, error: matchesError } = await supabase
       .from('playdate_matches')
       .select('to_match_pet_id')
       .eq('used_pet_id', selectedPet?.id);
-  
+
     if (matchesError) {
       console.error('Error fetching matches:', matchesError);
       return;
     }
-  
+
     const alreadyMatchedIds = matchesMade?.map(match => match.to_match_pet_id) || [];
-  
+
     const { data, error } = await supabase
       .from('pets')
       .select(`
@@ -199,19 +199,19 @@ const Home = () => {
       .eq('is_playdate_allowed', true)
       .neq('user_id', session?.user.id)
       .not('id', 'in', `(${alreadyMatchedIds.join(',')})`);
-  
+
     if (error) {
       console.error('Error fetching pets:', error);
       return;
     }
-  
+
     if (data) {
       setFetchedPets(data as Pets[]);
       alreadyRemoved.current = [];
       setCurrentPet((data as Pets[])[data.length - 1]);
     }
   }, [selectedPet, session?.user.id]);
-  
+
 
 
   useEffect(() => {
@@ -513,16 +513,31 @@ const Home = () => {
         >
           <BottomSheetView style={petDetailsBS.mainCont}>
             <View style={petDetailsBS.header}>
-              <Image 
-                source={{ uri: currentPet?.pet_avatar}}
+              <Image
+                source={{ uri: currentPet?.pet_avatar }}
                 style={petDetailsBS.image}
               />
-              <View style={{ position: 'absolute', zIndex: 2}}>
-                <Image 
-                  source={{ uri: currentPet?.profiles?.avatar_url }}
-                  style={petDetailsBS.ownerImage}
-                />
-                <Text>test {currentPet?.profiles?.avatar_url}</Text>
+              <View style={{
+                position: 'absolute',
+                zIndex: 1,
+                flexDirection: 'row',
+                alignItems: 'center',
+                bottom: dimensions.screenHeight * 0.01,
+                left: dimensions.screenWidth * 0.03
+              }}>
+                <View style={petDetailsBS.ownerImageCont}>
+                  {
+                    currentPet?.profiles?.avatar_url ?
+                      <Image
+                        source={{ uri: currentPet?.profiles?.avatar_url }}
+                        style={petDetailsBS.ownerImage}
+                      /> :
+                      (
+                        <Ionicons name='person' size={dimensions.screenWidth * 0.06} color="#fff"></Ionicons>
+                      )
+                  }
+                </View>
+                <Text style={petDetailsBS.ownerName}>{currentPet?.profiles?.first_name}</Text>
               </View>
             </View>
           </BottomSheetView>
@@ -824,7 +839,25 @@ const petDetailsBS = StyleSheet.create({
     borderBottomRightRadius: 23
   },
   ownerImage: {
-    width: dimensions.screenWidth * 0.1,
-    height: dimensions.screenWidth * 0.1,
+    width: dimensions.screenWidth * 0.13,
+    height: dimensions.screenWidth * 0.13,
+  },
+  ownerImageCont: {
+    backgroundColor: '#E0E0E0',
+    borderRadius: 100,
+    height: dimensions.screenWidth * 0.13,
+    width: dimensions.screenWidth * 0.13,
+    alignItems: 'center',
+    justifyContent:'center',
+    borderWidth: 2,
+    borderColor: '#fff',
+    marginRight: dimensions.screenWidth * 0.03
+  },
+  ownerName: {
+    backgroundColor: 'white',
+    paddingHorizontal: dimensions.screenWidth * 0.03,
+    borderRadius: 15,
+    fontFamily: 'Poppins-Regular',
+    paddingVertical: dimensions.screenHeight * 0.005
   }
 });
