@@ -4,13 +4,19 @@ import { router, useNavigation } from 'expo-router';
 import dimensions from "../../utils/sizing";
 import MainContPlain from '../../components/general/background_plain';
 import Spacer from '../../components/general/spacer';
-// import { ChevronRight } from "lucide-react-native";
-import { Ionicons, Feather, MaterialIcons, FontAwesome5 } from "@expo/vector-icons";
+import { AntDesign, Feather } from "@expo/vector-icons";
 import supabase from '../../utils/supabase';
 import BottomSheet, { BottomSheetBackdrop, BottomSheetView } from "@gorhom/bottom-sheet";
 import { Portal } from "@gorhom/portal";
 
 interface SettingOption {
+  id: string;
+  title: string;
+  icon: JSX.Element;
+  onPress?: () => void;
+}
+
+interface SettingSupAbt {
   id: string;
   title: string;
   icon: JSX.Element;
@@ -26,7 +32,6 @@ interface SettingLogin {
 
 const Settings: React.FC = () => {
   const navigation = useNavigation();
-
   const sheetRef = useRef<BottomSheet>(null);
   const snapPoints = useMemo(() => ["20%"], []);
   const openSheet = () => sheetRef.current?.expand();
@@ -51,29 +56,32 @@ const Settings: React.FC = () => {
         router.push('../settings/account_info');
       },
     },
+  ];
+
+  const SETTINGS_SUPPORT_ABOUT: SettingSupAbt[] = [
+    {
+      id: '1',
+      title: 'Terms and Policies',
+      icon: <Feather name="alert-circle" size={20} color="#a2a2a2" />,
+      onPress: () => {
+        router.push('../settings/terms-policies');
+      },
+    },
     {
       id: '2',
-      title: 'Privacy',
-      icon: <Feather name="lock" size={20} color="#a2a2a2" />,
-      onPress: () => { },
+      title: 'Contact Us',
+      icon: <Feather name="phone" size={20} color="#a2a2a2" />,
+      onPress: () => {
+        router.push('../settings/contact-us');
+      },
     },
     {
       id: '3',
-      title: 'Security & permissions',
-      icon: <MaterialIcons name="security" size={20} color="#a2a2a2" />,
-      onPress: () => { },
-    },
-    {
-      id: '4',
-      title: 'Your orders',
-      icon: <FontAwesome5 name="box" size={20} color="#a2a2a2" />,
-      onPress: () => { },
-    },
-    {
-      id: '5',
-      title: 'Share profile',
-      icon: <Feather name="share-2" size={20} color="#a2a2a2" />,
-      onPress: () => { },
+      title: 'About Us',
+      icon: <AntDesign name="questioncircleo" size={20} color="#a2a2a2" />,
+      onPress: () => {
+        router.push('../settings/about-us');
+      },
     },
   ];
 
@@ -102,7 +110,6 @@ const Settings: React.FC = () => {
         )}
         <Text style={styles.itemText}>{item.title}</Text>
       </View>
-      {/* <ChevronRight size={dimensions.screenWidth * 0.05} color="#000" style={styles.chevronIcon} /> */}
     </TouchableOpacity>
   );
 
@@ -119,6 +126,20 @@ const Settings: React.FC = () => {
         <View style={styles.listCont}>
           <FlatList
             data={SETTINGS_OPTIONS}
+            renderItem={renderItem}
+            keyExtractor={(item) => item.id}
+            scrollEnabled={false}
+          />
+        </View>
+      </View>
+
+      <Spacer height={dimensions.screenHeight * 0.01} />
+
+      <View style={styles.containerSupAbt}>
+        {renderSectionHeader('Support & About')}
+        <View style={styles.listCont}>
+          <FlatList
+            data={SETTINGS_SUPPORT_ABOUT}
             renderItem={renderItem}
             keyExtractor={(item) => item.id}
             scrollEnabled={false}
@@ -187,6 +208,10 @@ const styles = StyleSheet.create({
     padding: dimensions.screenWidth * 0.04,
     paddingTop: 0,
   },
+  containerSupAbt: {
+    padding: dimensions.screenWidth * 0.04,
+    paddingTop: 0,
+  },
   listCont: {
     backgroundColor: 'white',
     borderRadius: 6,
@@ -203,9 +228,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-  },
-  chevronIcon: {
-    marginLeft: 10,
   },
   itemText: {
     fontSize: dimensions.screenWidth * 0.04,
@@ -243,4 +265,3 @@ const styles = StyleSheet.create({
     color: 'black',
   },
 });
-

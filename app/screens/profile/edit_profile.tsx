@@ -16,7 +16,6 @@ const EditProfile = () => {
     const [firstName, setFirstName] = useState('');
     const [lastName, setLastName] = useState('');
     const [contactNumber, setContactNumber] = useState('');
-    const [bio, setBio] = useState('');
     const [address, setAddress] = useState('');
     const [birthday, setBirthday] = useState<Date | null>(null);
     const [sex, setSex] = useState<string | null>(null); // Allow null for no selection
@@ -36,7 +35,6 @@ const EditProfile = () => {
             setFirstName(metadata['first_name'] || '');
             setLastName(metadata['last_name'] || '');
             setContactNumber(metadata['contact_number'] || '');
-            setBio(metadata['bio'] || '');
             setAddress(metadata['address'] || '');
             setSex(metadata['sex'] ? metadata['sex'].toLowerCase() : null); // Set to null if not present
             const birthdayString = metadata['birthday'] || '';
@@ -70,7 +68,6 @@ const EditProfile = () => {
                 first_name: firstName,
                 last_name: lastName,
                 contact_number: contactNumber,
-                bio,
                 address,
                 sex: sex ? sex : null, // Save as null if not selected
                 birthday: birthday ? moment(birthday).format('YYYY-MM-DD') : null,
@@ -171,11 +168,6 @@ const EditProfile = () => {
                         </View>
                     </View>
 
-                    <PlainTextInput
-                        value={bio}
-                        onChangeText={setBio}
-                        placeholder="Bio"
-                    />
                     <PlainTextInput
                         value={address}
                         onChangeText={setAddress}
