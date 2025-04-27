@@ -45,7 +45,7 @@ const Settings: React.FC = () => {
   const SETTINGS_OPTIONS: SettingOption[] = [
     {
       id: '1',
-      title: 'Account',
+      title: 'Personal Account Information',
       icon: <Feather name="user" size={20} color="#a2a2a2" />,
       onPress: () => {
         router.push('../settings/account_info');

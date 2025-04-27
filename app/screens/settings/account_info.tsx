@@ -9,9 +9,9 @@ import {
 import { useNavigation } from "expo-router";
 import MainContPlain from "../../components/general/background_plain";
 import dimensions from "../../utils/sizing";
-import { ChevronRight } from "lucide-react-native";
 import { Ionicons } from "@expo/vector-icons";
 import supabase from "../../utils/supabase";
+import moment from "moment";
 
 type UserInfoItem = {
   id: string;
@@ -25,6 +25,7 @@ const AccountInformationScreen = () => {
   const navigation = useNavigation();
   const [userEmail, setUserEmail] = useState<string>("");
   const [userNumber, setUserNumber] = useState<string>("");
+  const [userBirthday, setUserBirthday] = useState<string>("Not set");
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -44,10 +45,16 @@ const AccountInformationScreen = () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (user) {
         setUserEmail(user.email || "Not set");
-
-        // Fetch phone number from user_metadata
+        
         const phoneNumber = user.user_metadata?.contact_number || "Not set";
         setUserNumber(phoneNumber);
+
+        const birthday = user.user_metadata?.birthday || "Not set";
+        if (birthday !== "Not set") {
+          setUserBirthday(moment(birthday).format("MMMM D, YYYY"));
+        } else {
+          setUserBirthday(birthday);
+        }
       }
     };
 
@@ -57,7 +64,7 @@ const AccountInformationScreen = () => {
   const userInfo: UserInfoItem[] = [
     { id: "1", title: "Phone number", value: userNumber },
     { id: "2", title: "Email", value: userEmail },
-    { id: "3", title: "Date of birth", value: "Not set" },
+    { id: "3", title: "Date of birth", value: userBirthday },
   ];
 
   const renderItem = ({ item }: { item: UserInfoItem }) => (
@@ -71,11 +78,6 @@ const AccountInformationScreen = () => {
         <Text style={styles.itemValue}>{item.value}</Text>
         {item.note && <Text style={styles.itemNote}>{item.note}</Text>}
       </View>
-      {/* <ChevronRight
-        size={dimensions.screenWidth * 0.05}
-        color="#000"
-        style={styles.chevronIcon}
-      /> */}
     </TouchableOpacity>
   );
 
@@ -119,9 +121,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-  },
-  chevronIcon: {
-    marginLeft: 10,
   },
   itemTitle: {
     fontSize: 14,

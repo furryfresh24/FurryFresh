@@ -3,21 +3,21 @@ import React from 'react';
 import dimensions from '../../utils/sizing';
 
 type Service = {
-  id: number | string;
+  id: string; // Changed to string only
   icon?: React.ElementType | null;
   title: string;
 };
 
 type Props = {
   services: Service[];
-  activeService: number | string;
-  setActiveService: (id: number | string) => void;
-  onServiceClick?: (item: Service) => void; // 👈 add this
+  activeService: string; // Changed to string only
+  setActiveService: (id: string) => void; // Changed to string only
+  onServiceClick?: (item: Service) => void;
   activeColor?: string | null;
   inactiveColor?: string | null;
   paddingHorizontal?: number | null;
-  marginLeft?: number | null,
-  marginTop?: number | null
+  marginLeft?: number | null;
+  marginTop?: number | null;
 };
 
 const HorizontalButtonList = ({
@@ -29,7 +29,7 @@ const HorizontalButtonList = ({
   paddingHorizontal,
   marginLeft = dimensions.screenWidth * 0.03,
   marginTop = 20,
-  onServiceClick
+  onServiceClick,
 }: Props) => {
   const defaultActiveColor = activeColor ?? '#ED7964';
   const defaultInactiveColor = inactiveColor ?? '#808080';
@@ -46,17 +46,14 @@ const HorizontalButtonList = ({
           styles.button,
           { paddingHorizontal: defaultPaddingHorizontal },
           isActive && { backgroundColor: defaultActiveColor },
-          { marginLeft: index === 0 ? marginLeft : 0,
-            marginTop: marginTop
-           },
+          { marginLeft: index === 0 ? marginLeft : 0, marginTop: marginTop },
         ]}
         onPress={() => {
           setActiveService(item.id);
           if (onServiceClick) {
-            onServiceClick(item); // 🔥 let parent know which was clicked
+            onServiceClick(item);
           }
         }}
-        
       >
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
           {IconComponent && (
@@ -83,7 +80,7 @@ const HorizontalButtonList = ({
     <FlatList
       data={services}
       renderItem={renderItem}
-      keyExtractor={(item) => item.id.toString()}
+      keyExtractor={(item) => item.id}
       horizontal
       showsHorizontalScrollIndicator={false}
     />
