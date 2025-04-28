@@ -8,6 +8,8 @@ interface MessagesContextType {
   setNewMessages: React.Dispatch<React.SetStateAction<Message[]>>;
   sendMessage: (conversationId: string, senderPetId: string, user_id: string, content: string) => Promise<void>;
   markMessagesAsRead: (conversationId: string) => Promise<void>;
+  lastReceivedMessage: Message | null;
+  clearLastReceivedMessage: () => void;
 }
 
 const MessagesContext = createContext<MessagesContextType | undefined>(undefined);
@@ -15,6 +17,7 @@ const MessagesContext = createContext<MessagesContextType | undefined>(undefined
 export const MessagesProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { pets } = usePet();
   const [newMessages, setNewMessages] = useState<Message[]>([]);
+  const [lastReceivedMessage, setLastReceivedMessage] = useState<Message | null>(null);
 
   useEffect(() => {
     if (pets.length === 0) return;
@@ -48,7 +51,7 @@ export const MessagesProvider: React.FC<{ children: React.ReactNode }> = ({ chil
           .single();
 
         if (error) throw error;
-        return data as Message;
+        return data as Message; 
       } catch (err) {
         console.error('Failed to fetch single message:', err);
         return null;
@@ -68,6 +71,7 @@ export const MessagesProvider: React.FC<{ children: React.ReactNode }> = ({ chil
           const fullMessage = await fetchSingleMessage(incomingMessage.id);
           if (fullMessage) {
             setNewMessages((prev) => [...prev, fullMessage]);
+            setLastReceivedMessage(fullMessage);
           }
         }
       )
@@ -125,7 +129,6 @@ export const MessagesProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
       if (error) throw error;
 
-      // Update local messages too
       setNewMessages((prev) =>
         prev.map((msg) =>
           unreadMessageIds.includes(msg.id)
@@ -138,8 +141,19 @@ export const MessagesProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     }
   };
 
+  const clearLastReceivedMessage = () => {
+    setLastReceivedMessage(null);
+  };
+
   return (
-    <MessagesContext.Provider value={{ newMessages, setNewMessages, sendMessage, markMessagesAsRead }}>
+    <MessagesContext.Provider value={{ 
+      newMessages, 
+      setNewMessages, 
+      sendMessage, 
+      markMessagesAsRead, 
+      lastReceivedMessage, 
+      clearLastReceivedMessage 
+    }}>
       {children}
     </MessagesContext.Provider>
   );

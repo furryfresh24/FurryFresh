@@ -18,6 +18,7 @@ import { PortalProvider } from "@gorhom/portal";
 import { TouchableOpacity, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useMessages } from "./realtime/messages";
+import GlobalMessageListener from "./providers/GlobalProvider";
 
 const RootLayout = () => {
   const fontsLoaded = useCustomFonts();
@@ -117,6 +118,7 @@ const RootLayout = () => {
       <ThemeProvider>
         <GestureHandlerRootView style={{ flex: 1 }}>
           <PortalProvider>
+            <GlobalMessageListener />
             <Stack>
               <Stack.Screen name="index" options={{ headerShown: false }} />
               <Stack.Screen

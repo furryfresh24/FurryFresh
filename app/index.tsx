@@ -2,7 +2,7 @@ import { View, StyleSheet, ActivityIndicator, Image } from 'react-native';
 import { useLocalSearchParams } from 'expo-router'; 
 import GetStarted from '../app/screens/onboarding/get_started';
 
-const MainPage = () => {
+const MainsPage = () => {
   const { isFirstTime } = useLocalSearchParams(); 
 
   if (isFirstTime === null) {
@@ -41,4 +41,4 @@ const styles = StyleSheet.create({
   },
 }); 
 
-export default MainPage;
+export default MainsPage;

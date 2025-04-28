@@ -13,7 +13,7 @@ import * as Animatable from 'react-native-animatable';
 const MessageScreen = () => {
   const { pets } = usePet();
   const { session } = useSession();
-  const { newMessages, sendMessage, markMessagesAsRead } = useMessages();
+  const { newMessages, sendMessage, markMessagesAsRead, clearLastReceivedMessage } = useMessages();
   const { typingStatuses, setTypingStatus } = useTyping();
   const { conversationId, otherPetAvatar } = useLocalSearchParams<{ conversationId: string, otherPetAvatar: string }>();
   const [keyboardVisible, setKeyboardVisible] = useState(false);
@@ -100,6 +100,7 @@ const MessageScreen = () => {
   }, [conversationMessages.length]);
 
   useEffect(() => {
+    clearLastReceivedMessage(); 
     if (!pendingMessages.length) return;
     setPendingMessages((pending) =>
       pending.filter((pendingMsg) =>

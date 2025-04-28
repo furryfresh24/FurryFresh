@@ -90,8 +90,6 @@ export const ConversationsProvider: React.FC<{ children: React.ReactNode }> = ({
           const updatedConversation = payload.new as Conversation;
           const involved = myPetIds.includes(updatedConversation.pet_1_id) || myPetIds.includes(updatedConversation.pet_2_id);
 
-          console.log('New Data');
-
           if (!involved) return;
 
           const fullConversation = await fetchSingleConversation(updatedConversation.id);
