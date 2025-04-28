@@ -10,6 +10,7 @@ import { useTyping } from '../../../realtime/typing-status';
 import { Ionicons } from '@expo/vector-icons';
 import * as Animatable from 'react-native-animatable';
 
+
 const MessageScreen = () => {
   const { pets } = usePet();
   const { session } = useSession();
@@ -50,9 +51,9 @@ const MessageScreen = () => {
     if (!conversationId) return;
     const hasUnread = conversationMessages.some((msg) => !myPetIds.includes(msg.sender_pet_id) && !msg.is_read);
     if (hasUnread) {
-      markMessagesAsRead(conversationId);
+      markMessagesAsRead(conversationId, session?.user.id ?? '');
     }
-  }, [conversationMessages, conversationId]);
+  }, [newMessages]);
 
   const handleSend = async () => {
     if (messageInput.trim().length === 0) return;
@@ -69,7 +70,6 @@ const MessageScreen = () => {
     await sendMessage(conversationId, senderPetId, session?.user.id ?? '', messageInput.trim());
     await setTypingStatus(conversationId, senderPetId, false);
     setMessageInput('');
-    Keyboard.dismiss();
   };
 
   useEffect(() => {
@@ -80,6 +80,10 @@ const MessageScreen = () => {
         duration: 100,
         useNativeDriver: false,
       }).start();
+
+      setTimeout(() => {
+        flatListRef.current?.scrollToEnd({ animated: true });
+      }, 100); 
     });
     const keyboardHideListener = Keyboard.addListener('keyboardDidHide', () => {
       setKeyboardVisible(false);
@@ -185,13 +189,13 @@ const MessageScreen = () => {
           </View>
   
           {isMine && (
-            <>
+            <View style={{ marginRight: dimensions.screenWidth * 0.01 }}>
               {isPending ? (
                 <Text style={styles.sendingText}>Sending...</Text>
               ) : shouldShowSent ? (
                 <Text style={styles.sendingText}>Sent</Text>
               ) : null}
-            </>
+            </View>
           )}
         </View>
       </View>

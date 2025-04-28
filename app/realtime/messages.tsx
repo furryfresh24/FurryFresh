@@ -7,7 +7,7 @@ interface MessagesContextType {
   newMessages: Message[];
   setNewMessages: React.Dispatch<React.SetStateAction<Message[]>>;
   sendMessage: (conversationId: string, senderPetId: string, user_id: string, content: string) => Promise<void>;
-  markMessagesAsRead: (conversationId: string) => Promise<void>;
+  markMessagesAsRead: (conversationId: string, yourOwnUserId: string) => Promise<void>;
   lastReceivedMessage: Message | null;
   clearLastReceivedMessage: () => void;
 }
@@ -112,23 +112,26 @@ export const MessagesProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     }
   };
 
-  const markMessagesAsRead = async (conversationId: string) => {
+  const markMessagesAsRead = async (conversationId: string, yourOwnUserId: string) => {
     try {
       const unreadMessages = newMessages.filter(
-        (msg) => msg.conversation_id === conversationId && msg.read_at === null
+        (msg) => 
+          msg.conversation_id === conversationId &&
+          msg.read_at === null &&
+          msg.user_id !== yourOwnUserId // 🛠 only mark messages not sent by me
       );
-
+  
       if (unreadMessages.length === 0) return;
-
+  
       const unreadMessageIds = unreadMessages.map((msg) => msg.id);
-
+  
       const { error } = await supabase
         .from('playdate_messages')
         .update({ read_at: new Date().toISOString() })
         .in('id', unreadMessageIds);
-
+  
       if (error) throw error;
-
+  
       setNewMessages((prev) =>
         prev.map((msg) =>
           unreadMessageIds.includes(msg.id)
@@ -140,6 +143,7 @@ export const MessagesProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       console.error('Failed to mark messages as read:', err);
     }
   };
+  
 
   const clearLastReceivedMessage = () => {
     setLastReceivedMessage(null);

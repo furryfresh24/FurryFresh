@@ -66,7 +66,7 @@ const ConversationScreen = () => {
                             const otherPetProfile = isPet1Mine ? item.pet_2_profile : item.pet_1_profile;
                             const conversationMessages = newMessages.filter((msg) => msg.conversation_id === item.id);
                             const latestMessage = conversationMessages.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())[0];
-                            const isUnread = latestMessage && latestMessage.read_at === null;
+                            const isUnread = latestMessage && latestMessage.read_at === null && !myPetIds.includes(latestMessage.sender_pet_id);
 
                             return (
                                 <TouchableOpacity onPress={() => router.push(`./message_screen?conversationId=${item.id}&otherPetAvatar=${otherPetProfile.pet_avatar}`)}>
