@@ -67,35 +67,35 @@ const Profile = () => {
     try {
       setLoading(true);
       if (!session?.user?.id) throw new Error("No user ID");
-
+  
       const response = await FileSystem.readAsStringAsync(uri, {
         encoding: FileSystem.EncodingType.Base64,
       });
-      const fileBuffer = Buffer.from(response, 'base64');
       const fileExt = uri.split('.').pop();
       const fileName = `user_${session.user.id}.${fileExt}`;
       const filePath = `${session.user.id}/avatar/${fileName}`;
-
+  
       const { error: uploadError } = await supabase.storage
         .from('usersavatar')
-        .upload(filePath, fileBuffer, {
+        .upload(filePath, response, {
           contentType: `image/${fileExt}`,
           upsert: true,
+          cacheControl: '3600',
         });
-
+  
       if (uploadError) throw uploadError;
-
+  
       const { data } = supabase.storage.from('usersavatar').getPublicUrl(filePath);
       const photoUrl = data.publicUrl;
-
+  
       const { error: updateError } = await supabase.auth.updateUser({
         data: {
-          'avatar_url': photoUrl
-        }
+          avatar_url: photoUrl,
+        },
       });
-
+  
       if (updateError) throw updateError;
-
+  
       alert("Profile picture updated successfully!");
     } catch (error) {
       console.error("Error uploading image:", error);
@@ -104,6 +104,7 @@ const Profile = () => {
       setLoading(false);
     }
   };
+  
 
   const backDrop = useCallback(
     (props: any) => (

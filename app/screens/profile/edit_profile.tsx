@@ -76,10 +76,11 @@ const EditProfile = () => {
 
             console.log("Profile Data:", profileData);
 
-            const { error: profileError } = await supabase
-                .from('profiles')
-                .update(profileData)
-                .eq('id', session.user.id);
+            const { data: data, error: profileError } = await supabase
+                .auth
+                .updateUser({
+                  data: profileData
+                });
 
             if (profileError) throw profileError;
 
