@@ -816,18 +816,22 @@ export const homeOptions = {
   header: (session: Session | null) => (
     <View style={styles.header}>
       <View style={styles.headerLeft}>
-        <View style={[styles.profileImage]}>
-          {
-            session?.user.user_metadata['avatar_url'] ? (
-              <Image
-                source={{ uri: session?.user.user_metadata['avatar_url'] }}
-                style={[styles.profileImage, { marginRight: 0 }]}
-              />
-            ) : (
-              <Ionicons name="person" style={{ alignSelf: 'center', alignContent: 'center', color: 'white' }} size={dimensions.screenWidth * 0.05} />
-            )
-          }
-        </View>
+        <TouchableOpacity
+          onPress={() => router.push("../(tabs)/profile")}
+        >
+          <View style={[styles.profileImage]}>
+            {
+              session?.user.user_metadata['avatar_url'] ? (
+                <Image
+                  source={{ uri: session?.user.user_metadata['avatar_url'] }}
+                  style={[styles.profileImage, { marginRight: 0 }]}
+                />
+              ) : (
+                <Ionicons name="person" style={{ alignSelf: 'center', alignContent: 'center', color: 'white' }} size={dimensions.screenWidth * 0.05} />
+              )
+            }
+          </View>
+        </TouchableOpacity>
         <View>
           <Text style={styles.title}>Hello!</Text>
           <Text style={styles.subtitle}>

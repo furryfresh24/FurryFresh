@@ -6,8 +6,10 @@ import {
   TextInput,
   TouchableOpacity,
   ScrollView,
+  Platform,
+  KeyboardAvoidingView
 } from "react-native";
-import React, { useCallback, useMemo, useRef, useState } from "react";
+import React, { useCallback, useMemo, useRef, useState, useEffect } from "react";
 import MainContPaw from "../../components/general/background_paw";
 import dimensions from "../../utils/sizing";
 import Icon from "react-native-vector-icons/FontAwesome";
@@ -16,10 +18,9 @@ import { useSession } from "../../context/sessions_context";
 import moment from "moment";
 import { Ionicons } from "@expo/vector-icons";
 import Spacer from "../../components/general/spacer";
-import { router } from "expo-router";
+import { router, useFocusEffect } from "expo-router";
 import * as ImagePicker from 'expo-image-picker';
 import * as FileSystem from 'expo-file-system';
-import { Buffer } from 'buffer';
 import supabase from "../../utils/supabase";
 import BottomSheet, {
   BottomSheetBackdrop,
@@ -27,22 +28,25 @@ import BottomSheet, {
 } from "@gorhom/bottom-sheet";
 import { Portal } from "@gorhom/portal";
 
-// Define a type for Comment
-type Comment = {
-  text: string;
-  date: string;
-};
-
 const Profile = () => {
   const { session } = useSession();
   const { pets } = usePet();
   const [image, setImage] = useState<string | null>(null);
   const [isLoading, setLoading] = useState(false);
-  const [comments, setComments] = useState<Comment[]>([]);
-  const [currentComment, setCurrentComment] = useState("");
+  const [bio, setBio] = useState(session?.user.user_metadata?.bio || "");
+  const bioInputRef = useRef<TextInput>(null);
+
+  
+  // Add this effect to refresh bio when screen focuses
+  useFocusEffect(
+    useCallback(() => {
+      setBio(session?.user.user_metadata?.bio || "");
+    }, [session?.user.user_metadata?.bio])
+  );
 
   const sheetRef = useRef<BottomSheet>(null);
   const snapPoints = useMemo(() => ["33%"], []);
+
   const openSheet = () => sheetRef.current?.expand();
 
   const pickImage = async () => {
@@ -85,8 +89,8 @@ const Profile = () => {
       const photoUrl = data.publicUrl;
 
       const { error: updateError } = await supabase.auth.updateUser({
-        data: { 
-          'avatar_url': photoUrl 
+        data: {
+          'avatar_url': photoUrl
         }
       });
 
@@ -118,17 +122,6 @@ const Profile = () => {
     }
   };
 
-  const addComment = () => {
-    if (currentComment.trim()) {
-      const newComment: Comment = {
-        text: currentComment,
-        date: moment().format('MMM DD, YYYY HH:mm'),
-      };
-      setComments([...comments, newComment]);
-      setCurrentComment("");
-    }
-  };
-
   type SheetItemProps = {
     title: string;
     icon: keyof typeof Ionicons.glyphMap;
@@ -138,7 +131,7 @@ const Profile = () => {
 
   const SheetItem = ({ title, icon, onPress, toRoute }: SheetItemProps) => {
     return (
-      <TouchableOpacity onPress={onPress != null ? onPress : () => {sheetRef.current?.close(); router.push(toRoute ?? '');}}>
+      <TouchableOpacity onPress={onPress != null ? onPress : () => { sheetRef.current?.close(); router.push(toRoute ?? ''); }}>
         <View style={bs.itemCont}>
           <Ionicons name={icon} size={dimensions.screenWidth * 0.055} />
           <Spacer width={dimensions.screenWidth * 0.025} />
@@ -150,118 +143,120 @@ const Profile = () => {
 
   return (
     <MainContPaw>
-      <View style={styles.topContainer}>
-        <View style={styles.titlePage}>
-          <View style={{ flex: 1 }}></View>
-          <Text style={styles.titleText}>Profile</Text>
-          <View style={styles.iconContainer}>
-            <TouchableOpacity>
-              <Ionicons
-                name="chatbubble-ellipses-outline"
-                size={dimensions.screenWidth * 0.06}
-                color="black"
-              />
-            </TouchableOpacity>
-            <Spacer width={dimensions.screenWidth * 0.02} />
-            <TouchableOpacity onPress={openSheet}>
-              <Ionicons
-                name="menu"
-                size={dimensions.screenWidth * 0.07}
-                color="black"
-              />
-            </TouchableOpacity>
-          </View>
-        </View>
-        <View style={styles.profileContainer}>
-          <View style={styles.profilePicContainer}>
-            <View style={styles.profilePic}>
-              {image ? (
-                <Image 
-                  source={{ uri: image }} 
-                  style={styles.profilePic} 
-                />
-              ) : session?.user.user_metadata['avatar_url'] ? (
-                <Image 
-                  source={{ uri: session.user.user_metadata.avatar_url }} 
-                  style={styles.profilePic} 
-                />
-              ) : (
-                <Ionicons style={styles.profileIcon}
-                  name="person" 
-                  size={dimensions.screenWidth * 0.12} 
-                />
-              )}
-            </View>
-            <TouchableOpacity 
-              style={styles.cameraButton} 
-              onPress={pickImage}
-              disabled={isLoading}
-            >
-              <Icon name="camera" size={20} color="black" />
-            </TouchableOpacity>
-          </View>
-          <Text style={styles.userName}>{session?.user.user_metadata['first_name'] + ' ' + session?.user.user_metadata['last_name']}</Text>
-          <View style={styles.buttonContainer}>
-            <TouchableOpacity style={styles.editButton} onPress={() => router.push('../profile/edit_profile')}>
-              <Text style={styles.editButtonText}>Edit Profile</Text>
-              <Icon name="edit" size={20} color="black" />
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.viewPetsButton} onPress={() => router.push('../pets/pets')}>
-              <Text style={styles.buttonText}>View Pets</Text>
-              <Icon name="paw" size={20} color="white" />
-            </TouchableOpacity>
-          </View>
-          <View style={[styles.statsContainer, { paddingTop: dimensions.screenWidth * 0.025 }]}>
-            <View style={[styles.statItem, { flex: 1, alignItems: 'flex-start' }]}>
-              <View style={{ alignItems: "center" }}>
-                <Text style={styles.statNumber}>{pets.length}</Text>
-                <Text style={styles.statLabel}>Pets</Text>
+      <View style={{ flex: 1 }}>
+        <View style={{ flex: 1 }}>
+          <View style={styles.topContainer}>
+            <View style={styles.titlePage}>
+              <View style={{ flex: 1 }}></View>
+              <Text style={styles.titleText}>Profile</Text>
+              <View style={styles.iconContainer}>
+                <TouchableOpacity>
+                  <Ionicons
+                    name="chatbubble-ellipses-outline"
+                    size={dimensions.screenWidth * 0.06}
+                    color="black"
+                  />
+                </TouchableOpacity>
+                <Spacer width={dimensions.screenWidth * 0.02} />
+                <TouchableOpacity onPress={openSheet}>
+                  <Ionicons
+                    name="menu"
+                    size={dimensions.screenWidth * 0.07}
+                    color="black"
+                  />
+                </TouchableOpacity>
               </View>
             </View>
-            <View style={[styles.statItem, { flex: 2 }]}>
-              <Text style={styles.statNumber}>{moment(session?.user.created_at).format('MMM DD, YYYY')}</Text>
-              <Text style={styles.statLabel}>Joined On</Text>
-            </View>
-            <View style={[styles.statItem, { flex: 1, alignItems: 'flex-end' }]}>
-              <View style={{ alignItems: 'center' }}>
-                <Text style={styles.statNumber}>10</Text>
-                <Text style={styles.statLabel}>Playdates</Text>
+            <View style={styles.profileContainer}>
+              <View style={styles.profilePicContainer}>
+                <View style={styles.profilePic}>
+                  {image ? (
+                    <Image
+                      source={{ uri: image }}
+                      style={styles.profilePic}
+                    />
+                  ) : session?.user.user_metadata['avatar_url'] ? (
+                    <Image
+                      source={{ uri: session.user.user_metadata.avatar_url }}
+                      style={styles.profilePic}
+                    />
+                  ) : (
+                    <Ionicons style={styles.profileIcon}
+                      name="person"
+                      size={dimensions.screenWidth * 0.12}
+                    />
+                  )}
+                </View>
+                <TouchableOpacity
+                  style={styles.cameraButton}
+                  onPress={pickImage}
+                  disabled={isLoading}
+                >
+                  <Icon name="camera" size={20} color="black" />
+                </TouchableOpacity>
               </View>
+              <Text style={styles.userName}>{session?.user.user_metadata['first_name'] + ' ' + session?.user.user_metadata['last_name']}</Text>
+              <View style={styles.buttonContainer}>
+                <TouchableOpacity style={styles.editButton} onPress={() => router.push('../profile/edit_profile')}>
+                  <Text style={styles.editButtonText}>Edit Profile</Text>
+                  <Icon name="edit" size={20} color="black" />
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.viewPetsButton} onPress={() => router.push('../pets/pets')}>
+                  <Text style={styles.buttonText}>View Pets</Text>
+                  <Icon name="paw" size={20} color="white" />
+                </TouchableOpacity>
+              </View>
+              <View style={[styles.statsContainer, { paddingTop: dimensions.screenWidth * 0.025 }]}>
+                <View style={[styles.statItem, { flex: 1, alignItems: 'flex-start' }]}>
+                  <View style={{ alignItems: "center" }}>
+                    <Text style={styles.statNumber}>{pets.length}</Text>
+                    <Text style={styles.statLabel}>Pets</Text>
+                  </View>
+                </View>
+                <View style={[styles.statItem, { flex: 2 }]}>
+                  <Text style={styles.statNumber}>{moment(session?.user.created_at).format('MMM DD, YYYY')}</Text>
+                  <Text style={styles.statLabel}>Joined On</Text>
+                </View>
+                <View style={[styles.statItem, { flex: 1, alignItems: 'flex-end' }]}>
+                  <View style={{ alignItems: 'center' }}>
+                    <Text style={styles.statNumber}>10</Text>
+                    <Text style={styles.statLabel}>Playdates</Text>
+                  </View>
+                </View>
+              </View>
+            </View>
+          </View>
+          <View style={styles.aboutContainer}>
+            <View style={styles.aboutHeader}>
+              <Text style={[styles.aboutTitle, { fontFamily: 'Poppins-SemiBold' }]}>Bio</Text>
+              <Icon
+                name="user"
+                size={dimensions.screenWidth * 0.04}
+                color="white"
+              />
+            </View>
+            <View style={styles.inputContainer}>
+              <TextInput
+                ref={bioInputRef}
+                style={styles.aboutInput}
+                placeholder="Tell us about you and your pets..."
+                placeholderTextColor="#888"
+                multiline
+                value={bio}
+                editable={false}
+                returnKeyType="done"
+              />
+              <TouchableOpacity
+                style={styles.editBioButton}
+                onPress={() => router.push('../profile/edit_bio')}
+              >
+                <Text style={styles.editBioButtonText}>Edit Bio</Text>
+              </TouchableOpacity>
             </View>
           </View>
         </View>
       </View>
-      <View style={styles.aboutContainer}>
-        <View style={styles.aboutHeader}>
-          <Text style={[styles.aboutTitle, { fontFamily: 'Poppins-SemiBold' }]}>About Me</Text>
-          <Icon
-            name="user"
-            size={dimensions.screenWidth * 0.04}
-            color="white"
-          />
-        </View>
-        <View style={styles.inputContainer}>
-          <TextInput
-            style={styles.aboutInput}
-            placeholder="Say something about you as a pet owner..."
-            value={currentComment}
-            onChangeText={setCurrentComment}
-            onSubmitEditing={addComment}
-            returnKeyType="done"
-          />
-          <TouchableOpacity style={styles.editIconButton} onPress={addComment}>
-            <Icon name="edit" size={20} color="white" />
-          </TouchableOpacity>
-        </View>
-        <ScrollView style={styles.commentsContainer}>
-          {comments.map((comment, index) => (
-            <View key={index} style={styles.comment}>
-              <Text style={styles.commentText}>{comment.text}</Text>
-              <Text style={styles.commentDate}>{comment.date}</Text>
-            </View>
-          ))}
-        </ScrollView>
-      </View>
+
       <Portal>
         <BottomSheet
           ref={sheetRef}
@@ -274,9 +269,9 @@ const Profile = () => {
           onChange={handleSheetChange}
         >
           <BottomSheetView style={bs.mainCont}>
-            <SheetItem 
-              icon="settings-outline" 
-              title="Settings and Privacy" 
+            <SheetItem
+              icon="settings-outline"
+              title="Settings and Privacy"
               toRoute="../profile/settings"
             />
           </BottomSheetView>
@@ -287,6 +282,10 @@ const Profile = () => {
 };
 
 const styles = StyleSheet.create({
+  scrollContainer: {
+    flexGrow: 1,
+    paddingBottom: 20,
+  },
   topContainer: {
     backgroundColor: "white",
     borderBottomLeftRadius: 25,
@@ -433,7 +432,8 @@ const styles = StyleSheet.create({
     borderRadius: 30,
     paddingVertical: dimensions.screenHeight * 0.0035,
     paddingHorizontal: dimensions.screenHeight * 0.013,
-    width: dimensions.screenHeight * 0.14,
+    width: dimensions.screenHeight * 0.1,
+    marginBottom: dimensions.screenHeight * 0.01,
   },
   aboutTitle: {
     fontSize: dimensions.screenWidth * 0.035,
@@ -441,8 +441,27 @@ const styles = StyleSheet.create({
     color: "white",
     marginRight: dimensions.screenHeight * 0.01,
   },
+  bioContainer: {
+    paddingHorizontal: dimensions.screenWidth * 0.05,
+    paddingBottom: dimensions.screenHeight * 0.02,
+  },
+  editBioButton: {
+    backgroundColor: "#FF6F61",
+    paddingVertical: dimensions.screenHeight * 0.01,
+    borderRadius: 10,
+    alignItems: "center",
+    justifyContent: "center",
+    marginTop: dimensions.screenHeight * 0.02,
+    width: "60%",
+  },
+  editBioButtonText: {
+    color: "white",
+    fontSize: dimensions.screenWidth * 0.04,
+    fontFamily: "Poppins-SemiBold",
+  },
   inputContainer: {
-    position: "relative",
+    alignItems: "center",
+    marginTop: dimensions.screenHeight * 0.001,
   },
   aboutInput: {
     borderColor: "transparent",
@@ -452,38 +471,11 @@ const styles = StyleSheet.create({
     minHeight: dimensions.screenHeight * 0.17,
     borderRadius: 15,
     padding: dimensions.screenWidth * 0.035,
-    maxHeight: dimensions.screenHeight * 0.1,
     paddingRight: dimensions.screenHeight * 0.05,
-    marginTop: dimensions.screenHeight * 0.01,
-  },
-  commentsContainer: {
-    marginTop: dimensions.screenHeight * 0.01,
-    maxHeight: dimensions.screenHeight * 0.3,
-  },
-  comment: {
-    padding: 10,
-    borderBottomColor: "#ccc",
-    borderBottomWidth: 1,
-  },
-  commentText: {
-    fontSize: dimensions.screenWidth * 0.035,
-    color: "#333",
-  },
-  commentDate: {
-    fontSize: dimensions.screenWidth * 0.03,
-    color: "#888",
-  },
-  editIconButton: {
-    backgroundColor: "#FF6F61",
-    borderRadius: 100,
-    padding: dimensions.screenHeight * 0.005,
-    alignItems: "center",
-    justifyContent: "center",
-    width: dimensions.screenHeight * 0.05,
-    height: dimensions.screenHeight * 0.05,
-    position: "absolute",
-    right: dimensions.screenWidth * 0.04,
-    bottom: dimensions.screenHeight * 0.02,
+    textAlignVertical: 'top',
+    fontSize: dimensions.screenWidth * 0.04,
+    fontFamily: 'Poppins-Regular',
+    width: "100%",
   },
 });
 
