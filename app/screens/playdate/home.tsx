@@ -25,7 +25,7 @@ import TinderCard from 'react-tinder-card';
 import { GestureHandlerRootView, GestureDetector, Gesture, PanGestureHandler } from 'react-native-gesture-handler';
 import moment from 'moment';
 import Spacer from '../../components/general/spacer';
-import { Heart, HeartHandshake, PawPrint, MessageCircle, MessageCircleMore } from "lucide-react-native";
+import { Heart, HeartHandshake, PawPrint, MessageCircle, MessageCircleMore, HomeIcon } from "lucide-react-native";
 import { useMessages } from '../../realtime/messages';
 import { useConversations } from '../../realtime/conversations';
 
@@ -311,11 +311,7 @@ const Home = () => {
         <View style={styles.topLeftWrapper}>
           <View style={{ flexDirection: 'row', alignItems: 'center' }}>
             <TouchableOpacity style={styles.coloredBox} onPress={handlePress}>
-              <Image
-                source={require('../../assets/images/others/home.png')}
-                style={styles.homeIcon}
-                resizeMode="contain"
-              />
+              <HomeIcon size={dimensions.screenWidth * 0.07} color="#fff" />
             </TouchableOpacity>
             <View style={styles.textContainer}>
               <Text style={styles.backText}>Back to Home</Text>
@@ -365,7 +361,6 @@ const Home = () => {
               <Image
                 source={{ uri: pet.pet_avatar }}
                 style={styles.petImage}
-                resizeMode="contain"
               />
               <View style={styles.infoRow}>
                 <View style={{ flex: 1 }}>
@@ -376,15 +371,6 @@ const Home = () => {
                     {pet.breed.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')}
                   </Text>
                 </View>
-                {/* <Image
-                  source={
-                    pet.gender.toLowerCase() == 'male'
-                      ? require('../../assets/images/others/male.png')
-                      : require('../../assets/images/others/female.png')
-                  }
-                  style={styles.genderIcon}
-                  resizeMode="contain"
-                /> */}
                 {
                   pet.gender.toLowerCase() == 'male'
                     ? <Ionicons name='male' size={dimensions.screenWidth * 0.1} color="#466AA2" />
@@ -439,11 +425,8 @@ const Home = () => {
           fetchedPets.length > 0 &&
           <TouchableOpacity disabled={isSwiping} style={styles.detailsContainer} onPress={() => petDetailsRef.current?.expand()}>
             <View style={styles.detailsContent}>
-              <Image
-                source={require('../../assets/images/others/i.png')}
-                style={styles.infoIcon}
-                resizeMode="contain"
-              />
+              <Ionicons name='information-circle' color="#fff" size={dimensions.screenWidth * 0.05} />
+              <Spacer width={dimensions.screenWidth * 0.02} />
               <Text style={styles.detailsText}>PlayDate Details</Text>
             </View>
           </TouchableOpacity>
@@ -691,10 +674,10 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#D0DFF4',
-    paddingTop: 60,
+    paddingTop: dimensions.screenHeight * 0.05,
     paddingHorizontal: 20,
     position: 'relative',
-  },
+  }, 
   petItemCont: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -723,11 +706,10 @@ const styles = StyleSheet.create({
     zIndex: 0,
   },
   coloredBox: {
-    width: 55,
-    height: 55,
+    width: dimensions.screenWidth * 0.14,
+    height: dimensions.screenWidth * 0.14,
     backgroundColor: '#466AA2',
     borderRadius: 30,
-    marginLeft: 10,
     marginRight: 5,
     alignItems: 'center',
     justifyContent: 'center',
@@ -742,14 +724,14 @@ const styles = StyleSheet.create({
   },
   backText: {
     color: '#121F63',
-    fontSize: 14,
+    fontSize: dimensions.screenWidth * 0.03,
     fontFamily: 'Poppins-Regular',
     marginTop: 4,
   },
   pageText: {
     color: '#121F63',
-    fontSize: 14,
-    fontFamily: 'Poppins-Regular',
+    fontSize: dimensions.screenWidth * 0.04,
+    fontFamily: 'Poppins-Medium',
     marginTop: -3,
   },
   titleWrapper: {
@@ -772,13 +754,14 @@ const styles = StyleSheet.create({
     height: 8,
     backgroundColor: '#121F63',
     alignSelf: 'center',
+    borderRadius: 30
   },
   whiteContainer: {
     backgroundColor: '#FFFFFF',
     padding: 20,
     borderRadius: 30,
-    width: '73%',
-    height: dimensions.screenHeight * 0.36,
+    width: dimensions.screenWidth * 0.66,
+    height: dimensions.screenHeight * 0.35,
     marginTop: dimensions.screenHeight * 0.05,
     alignSelf: 'center',
     alignItems: 'center',
@@ -792,11 +775,11 @@ const styles = StyleSheet.create({
     resizeMode: 'cover',
   },
   petImage: {
-    width: dimensions.screenHeight * 0.23,
-    height: dimensions.screenHeight * 0.23,
+    width: dimensions.screenWidth * 0.5,
+    height:  dimensions.screenHeight * 0.2,
+    backgroundColor: '#F5F5F5',
     borderRadius: 15,
     marginBottom: 10,
-    alignSelf: 'center',
   },
   infoRow: {
     flexDirection: 'row',
@@ -805,16 +788,17 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   containerTitle: {
-    fontSize: 20,
+    fontSize: dimensions.screenSize * 0.016,
     color: '#121F63',
     fontFamily: 'Poppins-Medium',
     marginBottom: 2,
+    lineHeight: dimensions.screenSize * 0.02,
   },
   containerSubtitle: {
-    fontSize: 13,
+    fontSize: dimensions.screenSize * 0.011,
     color: '#828282',
     fontFamily: 'Poppins-Regular',
-    marginTop: -5,
+    marginTop: 0,
   },
   genderIcon: {
     width: 40,
