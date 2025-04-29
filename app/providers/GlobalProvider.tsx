@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Animated, StyleSheet, Text } from 'react-native';
+import { Animated, StyleSheet, Text, TouchableOpacity } from 'react-native';
 import { useMessages } from '../realtime/messages';
-import { usePathname } from 'expo-router';
+import { useRouter, usePathname } from 'expo-router'; // Import useRouter
 import dimensions from '../utils/sizing';
 
 const GlobalMessageListener = () => {
@@ -11,11 +11,12 @@ const GlobalMessageListener = () => {
   const [popupMessage, setPopupMessage] = useState<string>('');
   const popupOpacity = useRef(new Animated.Value(0)).current;
   const [lastShownMessageId, setLastShownMessageId] = useState<string | null>(null);
+  const router = useRouter();
 
   useEffect(() => {
     if (lastReceivedMessage && lastReceivedMessage.id !== lastShownMessageId) {
       if (pathname.includes('message_screen')) {
-        return; 
+        return;
       }
 
       const message = `${lastReceivedMessage.sender_pet_profile.name}: ${lastReceivedMessage.content}`;
@@ -24,7 +25,7 @@ const GlobalMessageListener = () => {
       setLastShownMessageId(lastReceivedMessage.id);
 
       Animated.sequence([
-        Animated.timing(popupOpacity, { 
+        Animated.timing(popupOpacity, {
           toValue: 1,
           duration: 300,
           useNativeDriver: true,
@@ -42,12 +43,22 @@ const GlobalMessageListener = () => {
     }
   }, [lastReceivedMessage, pathname]);
 
+  const handlePopupPress = () => {
+    setShowPopup(false);
+    setPopupMessage('');
+    if (lastReceivedMessage?.conversation_id && lastReceivedMessage?.sender_pet_profile?.pet_avatar) {
+      router.push(`/screens/playdate/chats/message_screen?conversationId=${lastReceivedMessage.conversation_id}&otherPetAvatar=${lastReceivedMessage.sender_pet_profile.pet_avatar}`);
+    }
+  };
+
   if (!showPopup) return null;
 
   return (
-    <Animated.View style={[styles.popupContainer, { opacity: popupOpacity }]}>
-      <Text style={styles.popupText}>{popupMessage}</Text>
-    </Animated.View>
+    <TouchableOpacity onPress={handlePopupPress}>
+      <Animated.View style={[styles.popupContainer, { opacity: popupOpacity }]}>
+        <Text style={styles.popupText}>{popupMessage}</Text>
+      </Animated.View>
+    </TouchableOpacity>
   );
 };
 
