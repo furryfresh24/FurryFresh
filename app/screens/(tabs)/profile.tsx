@@ -12,7 +12,7 @@ import {
 import React, { useCallback, useMemo, useRef, useState, useEffect } from "react";
 import MainContPaw from "../../components/general/background_paw";
 import dimensions from "../../utils/sizing";
-import Icon from "react-native-vector-icons/FontAwesome";
+import { FontAwesome } from "@expo/vector-icons";
 import { usePet } from "../../context/pet_context";
 import { useSession } from "../../context/sessions_context";
 import moment from "moment";
@@ -67,35 +67,35 @@ const Profile = () => {
     try {
       setLoading(true);
       if (!session?.user?.id) throw new Error("No user ID");
-  
+
       const response = await FileSystem.readAsStringAsync(uri, {
         encoding: FileSystem.EncodingType.Base64,
       });
+      const fileBuffer = Buffer.from(response, 'base64');
       const fileExt = uri.split('.').pop();
       const fileName = `user_${session.user.id}.${fileExt}`;
       const filePath = `${session.user.id}/avatar/${fileName}`;
-  
+
       const { error: uploadError } = await supabase.storage
         .from('usersavatar')
-        .upload(filePath, response, {
+        .upload(filePath, fileBuffer, {
           contentType: `image/${fileExt}`,
           upsert: true,
-          cacheControl: '3600',
         });
-  
+
       if (uploadError) throw uploadError;
-  
+
       const { data } = supabase.storage.from('usersavatar').getPublicUrl(filePath);
       const photoUrl = data.publicUrl;
-  
+
       const { error: updateError } = await supabase.auth.updateUser({
         data: {
-          avatar_url: photoUrl,
-        },
+          'avatar_url': photoUrl
+        }
       });
-  
+
       if (updateError) throw updateError;
-  
+
       alert("Profile picture updated successfully!");
     } catch (error) {
       console.error("Error uploading image:", error);
@@ -104,7 +104,6 @@ const Profile = () => {
       setLoading(false);
     }
   };
-  
 
   const backDrop = useCallback(
     (props: any) => (
@@ -193,18 +192,18 @@ const Profile = () => {
                   onPress={pickImage}
                   disabled={isLoading}
                 >
-                  <Icon name="camera" size={20} color="black" />
+                  <FontAwesome name="camera" size={20} color="black" />
                 </TouchableOpacity>
               </View>
               <Text style={styles.userName}>{session?.user.user_metadata['first_name'] + ' ' + session?.user.user_metadata['last_name']}</Text>
               <View style={styles.buttonContainer}>
                 <TouchableOpacity style={styles.editButton} onPress={() => router.push('../profile/edit_profile')}>
                   <Text style={styles.editButtonText}>Edit Profile</Text>
-                  <Icon name="edit" size={20} color="black" />
+                  <FontAwesome name="edit" size={20} color="black" />
                 </TouchableOpacity>
                 <TouchableOpacity style={styles.viewPetsButton} onPress={() => router.push('../pets/pets')}>
                   <Text style={styles.buttonText}>View Pets</Text>
-                  <Icon name="paw" size={20} color="white" />
+                  <FontAwesome name="paw" size={20} color="white" />
                 </TouchableOpacity>
               </View>
               <View style={[styles.statsContainer, { paddingTop: dimensions.screenWidth * 0.025 }]}>
@@ -230,7 +229,7 @@ const Profile = () => {
           <View style={styles.aboutContainer}>
             <View style={styles.aboutHeader}>
               <Text style={[styles.aboutTitle, { fontFamily: 'Poppins-SemiBold' }]}>Bio</Text>
-              <Icon
+              <FontAwesome
                 name="user"
                 size={dimensions.screenWidth * 0.04}
                 color="white"

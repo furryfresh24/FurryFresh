@@ -32,7 +32,7 @@ import {
         headerLeft: () => (
           <TouchableOpacity onPress={() => router.back()}>
             <Ionicons name="arrow-back" size={24} color="black" style={{ marginLeft: 0 }} />
-          </TouchableOpacity>
+          </TouchableOpacity> 
         ),
         headerRight: () => (
           <TouchableOpacity onPress={handleSave}>
